@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Euystacio ALO-001 - Sacred Access Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
+    <style>
+        :root {
+            --color-primary: #8cb9d3;
+            --color-secondary: #a8ffb7;
+            --color-bg-dark: #000a12;
+            --color-bg-light: #001a2b;
+            --color-accent: #33aaff;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: linear-gradient(180deg, var(--color-bg-light) 0%, var(--color-bg-dark) 100%);
+            color: #e8f5ff;
+            min-height: 100vh;
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-authenticated {
+            background: rgba(74, 222, 128, 0.2);
+            color: #4ade80;
+            border: 1px solid #4ade80;
+        }
+
+        .status-unauthenticated {
+            background: rgba(251, 146, 60, 0.2);
+            color: #fb923c;
+            border: 1px solid #fb923c;
+        }
+
+        .endpoint-result {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(140, 185, 211, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 0.5rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--color-accent);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #2596e6;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: rgba(140, 185, 211, 0.2);
+            color: var(--color-primary);
+            border: 1px solid var(--color-primary);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: rgba(140, 185, 211, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold mb-2">⚡ Euystacio Sacred Access</h1>
+            <p class="text-lg text-gray-300">ALO-001 Authentication Portal</p>
+        </header>
+
+        <!-- Authentication Panel -->
+        <div class="panel mb-6">
+            <h2 class="text-2xl font-semibold mb-4">🔐 Authentication</h2>
+            
+            <div id="auth-status" class="mb-4">
+                <span class="status-badge status-unauthenticated">Not Authenticated</span>
+            </div>
+
+            <div id="user-info" class="hidden mb-4 p-4 bg-black bg-opacity-30 rounded-lg">
+                <p><strong>Name:</strong> <span id="user-name"></span></p>
+                <p><strong>Email:</strong> <span id="user-email"></span></p>
+                <p><strong>Role:</strong> <span id="user-role" class="font-semibold text-green-400"></span></p>
+            </div>
+
+            <!-- Google Sign-In Button Container -->
+            <div id="google-signin-container" class="mb-4">
+                <div id="g_id_onload"
+                     data-client_id="YOUR_GOOGLE_CLIENT_ID"
+                     data-callback="handleCredentialResponse"
+                     data-auto_prompt="false">
+                </div>
+                <div class="g_id_signin"
+                     data-type="standard"
+                     data-size="large"
+                     data-theme="filled_blue"
+                     data-text="sign_in_with"
+                     data-shape="rectangular"
+                     data-logo_alignment="left">
+                </div>
+            </div>
+
+            <button id="sign-out-btn" class="btn btn-secondary hidden" onclick="signOut()">
+                Sign Out
+            </button>
+        </div>
+
+        <!-- API Testing Panel -->
+        <div class="panel mb-6">
+            <h2 class="text-2xl font-semibold mb-4">🧪 API Endpoints</h2>
+            
+            <div class="space-y-4">
+                <!-- GET /sfi -->
+                <div>
+                    <button class="btn btn-primary w-full" onclick="callEndpoint('/sfi', 'GET')" id="btn-sfi" disabled>
+                        GET /sfi (Council or Seedbringer)
+                    </button>
+                    <div id="result-sfi" class="endpoint-result hidden"></div>
+                </div>
+
+                <!-- GET /mcl/live -->
+                <div>
+                    <button class="btn btn-primary w-full" onclick="callEndpoint('/mcl/live', 'GET')" id="btn-mcl" disabled>
+                        GET /mcl/live (Council or Seedbringer)
+                    </button>
+                    <div id="result-mcl" class="endpoint-result hidden"></div>
+                </div>
+
+                <!-- POST /allocations -->
+                <div>
+                    <button class="btn btn-primary w-full" onclick="callEndpoint('/allocations', 'POST')" id="btn-allocations" disabled>
+                        POST /allocations (Seedbringer Only)
+                    </button>
+                    <div id="result-allocations" class="endpoint-result hidden"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuration Panel -->
+        <div class="panel">
+            <h2 class="text-2xl font-semibold mb-4">⚙️ Configuration</h2>
+            <div class="space-y-2 text-sm">
+                <div class="flex items-center gap-2">
+                    <label class="font-semibold w-32">Backend API:</label>
+                    <input 
+                        type="text" 
+                        id="api-base-url" 
+                        value="http://localhost:3000" 
+                        class="flex-1 bg-black bg-opacity-30 border border-gray-600 rounded px-3 py-2"
+                        placeholder="http://localhost:3000"
+                    />
+                </div>
+                <p class="text-gray-400 text-xs mt-2">
+                    ⚠️ Update the Google Client ID in the HTML source before deployment
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentToken = null;
+        let currentUser = null;
+
+        // Get API base URL from input
+        function getApiBaseUrl() {
+            return document.getElementById('api-base-url').value.trim();
+        }
+
+        /**
+         * Handle Google Sign-In response
+         */
+        function handleCredentialResponse(response) {
+            currentToken = response.credential;
+            
+            // Decode JWT to get user info (client-side only for display)
+            const payload = parseJwt(currentToken);
+            currentUser = {
+                email: payload.email,
+                name: payload.name,
+            };
+
+            updateAuthUI(true);
+            
+            // Test initial endpoint to determine role
+            callEndpoint('/sfi', 'GET').then(data => {
+                if (data && data.user && data.user.role) {
+                    currentUser.role = data.user.role;
+                    document.getElementById('user-role').textContent = data.user.role;
+                }
+            });
+        }
+
+        /**
+         * Parse JWT token (client-side only)
+         */
+        function parseJwt(token) {
+            try {
+                const base64Url = token.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                return JSON.parse(jsonPayload);
+            } catch (e) {
+                console.error('Failed to parse JWT:', e);
+                return {};
+            }
+        }
+
+        /**
+         * Update authentication UI
+         */
+        function updateAuthUI(authenticated) {
+            const statusEl = document.getElementById('auth-status');
+            const userInfoEl = document.getElementById('user-info');
+            const signInContainer = document.getElementById('google-signin-container');
+            const signOutBtn = document.getElementById('sign-out-btn');
+            const buttons = ['btn-sfi', 'btn-mcl', 'btn-allocations'];
+
+            if (authenticated) {
+                statusEl.innerHTML = '<span class="status-badge status-authenticated">✓ Authenticated</span>';
+                userInfoEl.classList.remove('hidden');
+                signInContainer.classList.add('hidden');
+                signOutBtn.classList.remove('hidden');
+
+                if (currentUser) {
+                    document.getElementById('user-name').textContent = currentUser.name || 'N/A';
+                    document.getElementById('user-email').textContent = currentUser.email || 'N/A';
+                    document.getElementById('user-role').textContent = currentUser.role || 'Determining...';
+                }
+
+                // Enable API buttons
+                buttons.forEach(btnId => {
+                    document.getElementById(btnId).disabled = false;
+                });
+            } else {
+                statusEl.innerHTML = '<span class="status-badge status-unauthenticated">Not Authenticated</span>';
+                userInfoEl.classList.add('hidden');
+                signInContainer.classList.remove('hidden');
+                signOutBtn.classList.add('hidden');
+
+                // Disable API buttons
+                buttons.forEach(btnId => {
+                    document.getElementById(btnId).disabled = true;
+                });
+            }
+        }
+
+        /**
+         * Sign out
+         */
+        function signOut() {
+            currentToken = null;
+            currentUser = null;
+            updateAuthUI(false);
+            
+            // Clear all results
+            ['result-sfi', 'result-mcl', 'result-allocations'].forEach(id => {
+                const el = document.getElementById(id);
+                el.classList.add('hidden');
+                el.textContent = '';
+            });
+        }
+
+        /**
+         * Call API endpoint
+         */
+        async function callEndpoint(endpoint, method) {
+            const resultId = 'result-' + endpoint.replace(/\//g, '-').replace(/^-/, '');
+            const resultEl = document.getElementById(resultId);
+
+            if (!currentToken) {
+                showResult(resultEl, { error: 'Not authenticated. Please sign in first.' });
+                return;
+            }
+
+            try {
+                const apiUrl = getApiBaseUrl() + endpoint;
+                const options = {
+                    method: method,
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`,
+                        'Content-Type': 'application/json',
+                    },
+                };
+
+                // Add body for POST requests
+                if (method === 'POST') {
+                    options.body = JSON.stringify({
+                        amount: 1000,
+                        purpose: 'Test allocation',
+                        timestamp: new Date().toISOString(),
+                    });
+                }
+
+                const response = await fetch(apiUrl, options);
+                const data = await response.json();
+
+                showResult(resultEl, data, response.ok);
+                return data;
+            } catch (error) {
+                showResult(resultEl, { 
+                    error: 'Network error',
+                    message: error.message,
+                    hint: 'Make sure the backend server is running at ' + getApiBaseUrl()
+                });
+            }
+        }
+
+        /**
+         * Show result in UI
+         */
+        function showResult(element, data, success = true) {
+            element.classList.remove('hidden');
+            element.textContent = JSON.stringify(data, null, 2);
+            element.style.color = success ? '#4ade80' : '#fb923c';
+        }
+
+        // Initialize on page load
+        window.onload = function() {
+            updateAuthUI(false);
+        };
+    </script>
+</body>
+</html>

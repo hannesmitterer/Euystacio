@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import config from './config';
 import { requireAuth, Role, AuthenticatedRequest } from './middleware/googleAuth';
+import * as hopeKpi from './kpi/hope';
 
 const app = express();
 
@@ -78,6 +79,37 @@ app.post('/allocations', requireAuth([Role.SEEDBRINGER]), (req: AuthenticatedReq
       createdAt: new Date().toISOString(),
       createdBy: req.user?.email,
     },
+  });
+});
+
+// GET /kpi/hope-ratio - Hope/Sorrow ratio KPI (Council or Seedbringer)
+app.get('/kpi/hope-ratio', requireAuth([Role.COUNCIL, Role.SEEDBRINGER]), (req: AuthenticatedRequest, res: Response) => {
+  const kpi = hopeKpi.getRollingKpi();
+  res.json({
+    kpi,
+    principal: req.user?.email,
+  });
+});
+
+// POST /ingest/sentimento - Ingest sorrow/hope samples (public, unauthenticated in this PR)
+app.post('/ingest/sentimento', (req: Request, res: Response) => {
+  const { sorrow, hope } = req.body;
+  
+  // Validate input
+  if (typeof sorrow !== 'number' || typeof hope !== 'number') {
+    res.status(400).json({ error: 'sorrow and hope must be numbers' });
+    return;
+  }
+  
+  if (sorrow < 0 || sorrow > 1 || hope < 0 || hope > 1) {
+    res.status(400).json({ error: 'sorrow and hope must be in [0,1] range' });
+    return;
+  }
+  
+  hopeKpi.pushSample(sorrow, hope);
+  res.json({ 
+    status: 'accepted',
+    timestamp: new Date().toISOString(),
   });
 });
 

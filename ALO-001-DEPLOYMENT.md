@@ -273,6 +273,8 @@ All require `Authorization: Bearer <google-id-token>` header.
 3. **Restrict CORS** - Update `src/server.ts` to limit origins
 4. **Keep dependencies updated** - Run `npm audit` regularly
 5. **Monitor access logs** - The server logs all authentication attempts
+6. **Rate Limiting (Recommended)** - For production deployments, consider adding rate limiting middleware (e.g., `express-rate-limit`) to prevent DoS attacks on authentication endpoints
+7. **Token Expiration** - Google ID tokens expire after 1 hour; implement token refresh logic for long-running sessions
 
 ## Support
 

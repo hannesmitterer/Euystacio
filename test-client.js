@@ -18,9 +18,13 @@ async function testHealthEndpoint() {
       let data = '';
       res.on('data', (chunk) => { data += chunk; });
       res.on('end', () => {
-        const response = JSON.parse(data);
-        console.log('✅ Health check passed:', response.status);
-        resolve(response);
+        try {
+          const response = JSON.parse(data);
+          console.log('✅ Health check passed:', response.status);
+          resolve(response);
+        } catch (error) {
+          reject(new Error(`Failed to parse response: ${error.message}`));
+        }
       });
     }).on('error', reject);
   });
@@ -40,9 +44,13 @@ async function testALO001Endpoints() {
         let data = '';
         res.on('data', (chunk) => { data += chunk; });
         res.on('end', () => {
-          const response = JSON.parse(data);
-          console.log(`✅ ${endpoint.method} ${endpoint.path}:`, response.status);
-          resolve(response);
+          try {
+            const response = JSON.parse(data);
+            console.log(`✅ ${endpoint.method} ${endpoint.path}:`, response.status);
+            resolve(response);
+          } catch (error) {
+            reject(new Error(`Failed to parse response: ${error.message}`));
+          }
         });
       }).on('error', reject);
     });
@@ -71,9 +79,13 @@ async function testALO001Endpoints() {
       let data = '';
       res.on('data', (chunk) => { data += chunk; });
       res.on('end', () => {
-        const response = JSON.parse(data);
-        console.log('✅ POST /allocations:', response.status);
-        resolve(response);
+        try {
+          const response = JSON.parse(data);
+          console.log('✅ POST /allocations:', response.status);
+          resolve(response);
+        } catch (error) {
+          reject(new Error(`Failed to parse response: ${error.message}`));
+        }
       });
     });
 
@@ -95,18 +107,22 @@ async function testWebSocket() {
     });
 
     ws.on('message', (data) => {
-      const event = JSON.parse(data.toString());
-      messageCount++;
-      console.log(`📨 Received message ${messageCount}:`, {
-        timestamp: event.timestamp,
-        composites: event.composites,
-        source: event.source,
-        sequence: event.sequence
-      });
+      try {
+        const event = JSON.parse(data.toString());
+        messageCount++;
+        console.log(`📨 Received message ${messageCount}:`, {
+          timestamp: event.timestamp,
+          composites: event.composites,
+          source: event.source,
+          sequence: event.sequence
+        });
 
-      // Close after receiving 3 messages
-      if (messageCount >= 3) {
-        ws.close();
+        // Close after receiving 3 messages
+        if (messageCount >= 3) {
+          ws.close();
+        }
+      } catch (error) {
+        console.error('❌ Failed to parse WebSocket message:', error.message);
       }
     });
 
@@ -149,12 +165,16 @@ async function testIngestEndpoint() {
       let data = '';
       res.on('data', (chunk) => { data += chunk; });
       res.on('end', () => {
-        const response = JSON.parse(data);
-        console.log('✅ Ingest successful:', {
-          status: response.status,
-          broadcasted: response.broadcasted
-        });
-        resolve(response);
+        try {
+          const response = JSON.parse(data);
+          console.log('✅ Ingest successful:', {
+            status: response.status,
+            broadcasted: response.broadcasted
+          });
+          resolve(response);
+        } catch (error) {
+          reject(new Error(`Failed to parse response: ${error.message}`));
+        }
       });
     });
 
@@ -171,14 +191,16 @@ async function testWebSocketWithBroadcast() {
     const ws = new WebSocket(WS_URL);
     let receivedMessages = [];
 
-    ws.on('open', async () => {
+    ws.on('open', () => {
       console.log('✅ WebSocket connected');
       
       // Wait a bit for welcome message
-      setTimeout(async () => {
+      setTimeout(() => {
         // Trigger a broadcast
         console.log('📤 Sending ingest request...');
-        await testIngestEndpoint();
+        testIngestEndpoint().catch(error => {
+          console.error('❌ Ingest failed:', error.message);
+        });
         
         // Wait for broadcast to arrive
         setTimeout(() => {
@@ -188,14 +210,18 @@ async function testWebSocketWithBroadcast() {
     });
 
     ws.on('message', (data) => {
-      const event = JSON.parse(data.toString());
-      receivedMessages.push(event);
-      console.log(`📨 Received:`, {
-        source: event.source,
-        hope: event.composites.hope,
-        sorrow: event.composites.sorrow,
-        sequence: event.sequence
-      });
+      try {
+        const event = JSON.parse(data.toString());
+        receivedMessages.push(event);
+        console.log(`📨 Received:`, {
+          source: event.source,
+          hope: event.composites.hope,
+          sorrow: event.composites.sorrow,
+          sequence: event.sequence
+        });
+      } catch (error) {
+        console.error('❌ Failed to parse WebSocket message:', error.message);
+      }
     });
 
     ws.on('close', () => {

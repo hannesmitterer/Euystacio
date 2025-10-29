@@ -1,0 +1,26 @@
+{
+  "name": "euystacio-bridge",
+  "version": "1.0.0",
+  "description": "Euystacio Bridge - WebSocket API with Seed-003 metrics and ALO-001 protections",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/server.ts",
+    "start": "node dist/server.js",
+    "watch": "tsc --watch"
+  },
+  "keywords": ["websocket", "metrics", "bridge"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "ws": "^8.14.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.20",
+    "@types/node": "^20.8.10",
+    "@types/ws": "^8.5.8",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
+  }
+}

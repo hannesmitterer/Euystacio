@@ -18,13 +18,11 @@ app.use((req: Request, _res: Response, next: NextFunction) => {
 const server = createServer(app);
 
 // Configuration from environment
-const SENTIMENTO_BROADCAST_HZ = parseInt(process.env.SENTIMENTO_BROADCAST_HZ || '10', 10);
 const SENTIMENTO_BUFFER_MAX_KB = parseInt(process.env.SENTIMENTO_BUFFER_MAX_KB || '512', 10);
 const PORT = parseInt(process.env.PORT || '3000', 10);
 
 // Initialize SentimentoWSHub
 const wsHub = new SentimentoWSHub(server, {
-  broadcastHz: SENTIMENTO_BROADCAST_HZ,
   bufferMaxKb: SENTIMENTO_BUFFER_MAX_KB
 });
 
@@ -249,7 +247,7 @@ server.listen(PORT, () => {
   console.log(`[Server] Euystacio Sentimento API listening on port ${PORT}`);
   console.log(`[Server] WebSocket endpoint: ws://localhost:${PORT}/api/v2/sentimento/live`);
   console.log(`[Server] ALO-001 protected routes active`);
-  console.log(`[Server] Broadcast: ${SENTIMENTO_BROADCAST_HZ}Hz, Buffer limit: ${SENTIMENTO_BUFFER_MAX_KB}KB`);
+  console.log(`[Server] Buffer limit: ${SENTIMENTO_BUFFER_MAX_KB}KB`);
 });
 
 // Graceful shutdown

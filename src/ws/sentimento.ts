@@ -48,7 +48,7 @@ export class SentimentoWSHub {
   private seed003 = new Seed003Metrics();
   private bufferMaxKb: number;
 
-  constructor(server: HTTPServer, options?: { broadcastHz?: number; bufferMaxKb?: number }) {
+  constructor(server: HTTPServer, options?: { bufferMaxKb?: number }) {
     // Store bufferMaxKb for backpressure handling
     this.bufferMaxKb = options?.bufferMaxKb ?? 512;
 
@@ -86,16 +86,8 @@ export class SentimentoWSHub {
         this.clients.delete(ws);
       });
 
-      // Send initial connection acknowledgment
-      this.sendToClient(ws, {
-        timestamp: new Date().toISOString(),
-        composites: { hope: 0, sorrow: 0 },
-        sequence: this.sequence,
-        seed003: {
-          sampleCount: this.seed003.getSampleCount(),
-          hopeRatio: this.seed003.getHopeRatio()
-        }
-      });
+      // Connection acknowledgment sent via console log
+      console.log('[SentimentoWSHub] Client connection established');
     });
   }
 
@@ -138,20 +130,6 @@ export class SentimentoWSHub {
           // Drop message for this client due to backpressure
           console.warn(`[SentimentoWSHub] Dropping message for client (buffer: ${bufferedKb.toFixed(1)}KB)`);
         }
-      }
-    }
-  }
-
-  /**
-   * Send event to a specific client
-   */
-  private sendToClient(client: WebSocket, event: SentimentoLiveEvent): void {
-    if (client.readyState === WebSocket.OPEN) {
-      try {
-        client.send(JSON.stringify(event));
-      } catch (err) {
-        console.error('[SentimentoWSHub] Send error:', err);
-        this.clients.delete(client);
       }
     }
   }

@@ -1,46 +1,59 @@
 from flask import Flask, render_template, jsonify, request
 from sentimento_pulse_interface import SentimentoPulseInterface
-from core.red_code import RED_CODE
-from core.reflector import reflect_and_suggest
-from tutor_nomination import TutorNomination
+from red_code import RED_CODE, ensure_red_code  # changed: top-level module
+from reflector import reflect_and_suggest      # changed: top-level module
+from tutor_nomination import TutorNomination   # changed: top-level module
 import json
 import os
 
 app = Flask(__name__)
 
+# Ensure minimal state exists
+ensure_red_code()  # creates red_code.json from RED_CODE if missing
+os.makedirs("logs", exist_ok=True)
+
 spi = SentimentoPulseInterface()
 tutors = TutorNomination()
 
 def get_pulses():
-    # Collect all pulses from logs and recent_pulses in red_code.json
+    # Collect all pulses from red_code.json and logs
     pulses = []
-    # From red_code.json
     try:
         with open('red_code.json', 'r') as f:
             red_code = json.load(f)
             pulses += red_code.get("recent_pulses", [])
-    except:
+    except Exception:
+        # If red_code.json missing or malformed, return empty list (already ensured above)
         pass
+
     # From logs
-    for fname in sorted(os.listdir("logs")):
-        if fname.startswith("log_") and fname.endswith(".json"):
-            with open(os.path.join("logs", fname)) as f:
-                log = json.load(f)
-                for k, v in log.items():
-                    if isinstance(v, dict) and "emotion" in v:
-                        pulses.append(v)
+    try:
+        for fname in sorted(os.listdir("logs")):
+            if fname.startswith("log_") and fname.endswith(".json"):
+                with open(os.path.join("logs", fname)) as f:
+                    log = json.load(f)
+                    for k, v in log.items():
+                        if isinstance(v, dict) and ("emotion" in v or "feeling" in v):
+                            pulses.append(v)
+    except FileNotFoundError:
+        # logs directory may be empty
+        pass
     return pulses
 
 def get_reflections():
     reflections = []
-    for fname in sorted(os.listdir("logs")):
-        if "reflection" in fname:
-            with open(os.path.join("logs", fname)) as f:
-                reflections.append(json.load(f))
+    try:
+        for fname in sorted(os.listdir("logs")):
+            if "reflection" in fname:
+                with open(os.path.join("logs", fname)) as f:
+                    reflections.append(json.load(f))
+    except FileNotFoundError:
+        pass
     return reflections
 
 @app.route("/")
 def index():
+    # serve the static index in templates/ or the public/ index.html
     return render_template("index.html")
 
 @app.route("/api/red_code")
@@ -67,14 +80,18 @@ def api_tutors():
 
 @app.route("/api/pulse", methods=["POST"])
 def api_pulse():
-    data = request.get_json()
-    emotion = data.get("emotion", "undefined")
-    intensity = float(data.get("intensity", 0.5))
+    data = request.get_json() or {}
+    emotion = data.get("emotion", data.get("feeling", "undefined"))
+    try:
+        intensity = float(data.get("intensity", 0.5))
+    except (TypeError, ValueError):
+        intensity = 0.5
     clarity = data.get("clarity", "medium")
     note = data.get("note", "")
     event = spi.receive_pulse(emotion, intensity, clarity, note)
     return jsonify(event)
 
 if __name__ == "__main__":
+    # local dev: ensure directories and run
     os.makedirs("logs", exist_ok=True)
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("FLASK_PORT", 5000)))

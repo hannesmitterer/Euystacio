@@ -1,0 +1,14 @@
+[
+  {
+    "id": "tutor-1",
+    "name": "Seed Tutor",
+    "role": "guide",
+    "resonance": 0.9
+  },
+  {
+    "id": "tutor-2",
+    "name": "Community Tutor",
+    "role": "witness",
+    "resonance": 0.7
+  }
+]

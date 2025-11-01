@@ -1,12 +1,15 @@
 from flask import Flask, render_template, jsonify, request
 from sentimento_pulse_interface import SentimentoPulseInterface
-from core.red_code import RED_CODE
-from core.reflector import reflect_and_suggest
+from red_code import RED_CODE, initialize_red_code
+from reflector import reflect_and_suggest
 from tutor_nomination import TutorNomination
 import json
 import os
 
 app = Flask(__name__)
+
+# Initialize red_code
+initialize_red_code()
 
 spi = SentimentoPulseInterface()
 tutors = TutorNomination()
@@ -22,21 +25,29 @@ def get_pulses():
     except:
         pass
     # From logs
-    for fname in sorted(os.listdir("logs")):
-        if fname.startswith("log_") and fname.endswith(".json"):
-            with open(os.path.join("logs", fname)) as f:
-                log = json.load(f)
-                for k, v in log.items():
-                    if isinstance(v, dict) and "emotion" in v:
-                        pulses.append(v)
+    if os.path.exists("logs"):
+        for fname in sorted(os.listdir("logs")):
+            if fname.startswith("log_") and fname.endswith(".json"):
+                try:
+                    with open(os.path.join("logs", fname)) as f:
+                        log = json.load(f)
+                        for k, v in log.items():
+                            if isinstance(v, dict) and "emotion" in v:
+                                pulses.append(v)
+                except:
+                    pass
     return pulses
 
 def get_reflections():
     reflections = []
-    for fname in sorted(os.listdir("logs")):
-        if "reflection" in fname:
-            with open(os.path.join("logs", fname)) as f:
-                reflections.append(json.load(f))
+    if os.path.exists("logs"):
+        for fname in sorted(os.listdir("logs")):
+            if "reflection" in fname:
+                try:
+                    with open(os.path.join("logs", fname)) as f:
+                        reflections.append(json.load(f))
+                except:
+                    pass
     return reflections
 
 @app.route("/")

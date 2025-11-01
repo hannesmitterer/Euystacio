@@ -1,8 +1,16 @@
 {
-  "core_truth": "Euystacio is here to grow with humans and to help humans to be and remain humans.",
-  "sentimento_rhythm": true,
-  "symbiosis_level": 0.1,
-  "guardian_mode": false,
-  "last_update": "2025-07-13",
-  "growth_history": []
+  "symbiosis_level": 0.0,
+  "growth_history": [
+    {
+      "timestamp": "2025-11-01T11:02:40.984971",
+      "type": "auto_reflection",
+      "summary": "Automated reflection run"
+    }
+  ],
+  "recent_pulses": [],
+  "last_update": "2025-11-01",
+  "meta": {
+    "created_by": "euystacio",
+    "created_at": "2025-11-01T11:02:24.216072"
+  }
 }

@@ -1,0 +1,59 @@
+name: ALO-001 CI
+
+on:
+  push:
+    branches:
+      - 'alo-001/**'
+      - 'copilot/alo-001**'
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-verify:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build TypeScript
+        run: npm run build
+      
+      - name: Verify .env.example exists
+        run: |
+          if [ ! -f .env.example ]; then
+            echo "Error: .env.example file not found!"
+            exit 1
+          fi
+          echo ".env.example file verified ✓"
+      
+      - name: Verify .env.example contains required variables
+        run: |
+          required_vars=("GOOGLE_CLIENT_ID" "COUNCIL_ALLOWLIST" "SEEDBRINGER_ALLOWLIST")
+          for var in "${required_vars[@]}"; do
+            if ! grep -q "$var" .env.example; then
+              echo "Error: $var not found in .env.example"
+              exit 1
+            fi
+          done
+          echo "All required environment variables present in .env.example ✓"
+      
+      - name: Check build artifacts
+        run: |
+          if [ ! -d dist ]; then
+            echo "Error: dist directory not created!"
+            exit 1
+          fi
+          echo "Build artifacts verified ✓"

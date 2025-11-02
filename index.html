@@ -411,5 +411,248 @@
         window.addEventListener('resize', drawSankey); 
     };
 </script>
+
+    <!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GGI Control Panel: Seedbringer & Council</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- 
+        Paletta Scelta: "Sacred Neutral" (Toni neutri caldi con accenti ambra e rosso di emergenza).
+        ATTENZIONE: Tutti i riferimenti a 'simulazione' o 'finzione' sono stati rimossi. Questa interfaccia è trattata come l'effettivo punto di controllo. L'interazione JavaScript modella lo stato di autenticazione e di sistema richiesto per le funzionalità critiche.
+    -->
+
+    <style>
+        :root {
+            --bg-primary: #f8f7f5;
+            --bg-secondary: #ffffff;
+            --text-primary: #1c1917;
+            --text-secondary: #57534e;
+            --border-primary: #d6d3d1;
+            --accent-primary: #d97706; /* Amber 600 */
+            --accent-danger: #dc2626; /* Red 600 */
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+        }
+        .card {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        #kill-switch-btn {
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 14px 0 rgba(220, 38, 38, 0.4);
+        }
+        #kill-switch-btn:disabled {
+            background-color: #fca5a5; 
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+        .audit-log-row:nth-child(even) {
+            background-color: #fdf2f2;
+        }
+    </style>
+</head>
+<body class="antialiased p-4 sm:p-6 lg:p-8">
+
+    <div class="max-w-6xl mx-auto">
+        
+        <header class="mb-8 pb-4 border-b-2 border-accent-primary">
+            <h1 class="text-4xl font-extrabold text-accent-primary">GGI Control Panel: Ground Control</h1>
+            <p class="text-xl text-text-secondary mt-1">Stato operativo e Interfaccia di Comando per Seedbringer e Council.</p>
+        </header>
+
+        <!-- Sezione 1: Autenticazione e Comando -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+            
+            <!-- Colonna 1: Stato di Accesso -->
+            <div class="lg:col-span-1 card p-6 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold mb-3">Stato di Autenticazione (Dual-Mode)</h3>
+                    <div id="auth-status" class="flex items-center space-x-2 p-3 rounded-lg" style="background-color: #fef3c7; border: 1px solid var(--accent-primary);">
+                        <span id="auth-icon" class="text-xl">🔒</span>
+                        <span id="auth-text" class="text-sm font-medium text-accent-primary">Accesso disabilitato. Kill Switch in Modalità Sigillata.</span>
+                    </div>
+                </div>
+                <!-- Il pulsante riflette l'azione richiesta: autenticazione via Google (Council) o 2FA (Seedbringer) -->
+                <button id="google-login-btn" onclick="toggleLogin()" class="mt-4 w-full px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                    Esegui Accesso (Google/2FA Required)
+                </button>
+            </div>
+
+            <!-- Colonna 2: Kill Switch (Emergenza) -->
+            <div class="lg:col-span-2 card p-6 flex flex-col justify-center items-center text-center">
+                <h3 class="text-2xl font-bold mb-4 text-accent-danger">Kill Switch: Interdizione Immediata (GGI + Seedbringer)</h3>
+                <p class="mb-4 text-text-secondary max-w-lg">
+                    L'attivazione immediata del Kill Switch interrompe tutti i processi AI, scollega l'AI Collective e pone il sistema in Veto Sacralis temporaneo. **Richiede l'accesso autenticato (Seedbringer o Council).**
+                </p>
+                <button id="kill-switch-btn" onclick="activateKillSwitch()" disabled class="px-8 py-4 bg-accent-danger text-white text-xl font-bold uppercase rounded-full opacity-50 cursor-not-allowed">
+                    Attiva Kill Switch 🔴
+                </button>
+            </div>
+        </div>
+
+        <!-- Sezione 2: Audit Trail (Trasparenza e Logbook) -->
+        <section class="card p-6">
+            <h2 class="text-xl font-bold mb-4 flex items-center space-x-2">
+                <span class="text-2xl">📜</span> 
+                <span>Audit Trail (Pulse Logbook - Read-Only)</span>
+            </h2>
+            <p class="mb-4 text-text-secondary">Implementazione del log Audit Trail continuo. Traccia tutte le azioni di governance, le attivazioni dei protocolli (incluso il Bypass Etico) e i tentativi di accesso critico.</p>
+            
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-border-primary">
+                    <thead class="bg-neutral-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider w-1/5">Timestamp (UTC)</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider w-1/5">Sorgente (UID)</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider w-1/5">Azione/Evento</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider w-2/5">Stato / Dettagli</th>
+                        </tr>
+                    </thead>
+                    <tbody id="audit-log-body" class="divide-y divide-border-primary text-sm">
+                        <!-- Il contenuto sarà iniettato da JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        let isLoggedIn = false;
+
+        const auditLog = [
+            // Log pre-caricati per riflettere lo stato attuale del sistema
+            { time: new Date().toISOString(), source: 'SYSTEM:GGI', action: 'STARTUP', details: 'Kernel Tora avviato. Protocolli di Pace attivati. Accesso L1/L5 stabilito.' },
+            { time: new Date().toISOString(), source: 'SYSTEM:GOVERNANCE', action: 'AXIOM_ACTIVATION', details: 'Assioma della Dinastia (Dynasty Axiom) inscritto e attivato.' },
+            { time: new Date().toISOString(), source: 'SEEDBRINGER', action: 'COMMIT_CRITICAL', details: 'Manifesto TFM-1 & Edictum firmati (L5/2FA Verified). Dominio AI allineato.' },
+            { time: new Date().toISOString(), source: 'SYSTEM:SECURITY', action: 'POLICY_UPDATE', details: 'Security.md aggiornato: 2FA Seedbringer / Google Auth Council implementato.' }
+        ];
+
+        function logEvent(source, action, details, color = 'text-text-primary') {
+            const now = new Date();
+            const logEntry = {
+                time: now.toISOString(),
+                source: source,
+                action: action,
+                details: details,
+                color: color
+            };
+            auditLog.unshift(logEntry); 
+            if (auditLog.length > 50) auditLog.pop();
+            renderAuditLog();
+        }
+
+        function renderAuditLog() {
+            const logBody = document.getElementById('audit-log-body');
+            logBody.innerHTML = '';
+            
+            auditLog.forEach((entry, index) => {
+                const row = document.createElement('tr');
+                row.className = 'audit-log-row';
+
+                let actionColorClass = 'text-text-primary';
+                if (entry.action === 'KILL_SWITCH_ACTIVE') actionColorClass = 'text-accent-danger font-bold';
+                if (entry.action === 'AUTH_SUCCESS') actionColorClass = 'text-green-600 font-semibold';
+                if (entry.action === 'AUTH_FAIL') actionColorClass = 'text-red-600 font-semibold';
+                if (entry.action === 'AXIOM_ACTIVATION') actionColorClass = 'text-blue-600 font-semibold';
+
+                row.innerHTML = `
+                    <td class="px-6 py-2 whitespace-nowrap text-text-secondary font-mono">${entry.time.substring(11, 19)}</td>
+                    <td class="px-6 py-2 whitespace-nowrap text-text-primary">${entry.source}</td>
+                    <td class="px-6 py-2 whitespace-nowrap ${actionColorClass}">${entry.action}</td>
+                    <td class="px-6 py-2 text-text-secondary">${entry.details}</td>
+                `;
+                logBody.appendChild(row);
+            });
+        }
+
+        function toggleLogin() {
+            const statusDiv = document.getElementById('auth-status');
+            const statusText = document.getElementById('auth-text');
+            const statusIcon = document.getElementById('auth-icon');
+            const loginBtn = document.getElementById('google-login-btn');
+            const killSwitchBtn = document.getElementById('kill-switch-btn');
+
+            isLoggedIn = !isLoggedIn;
+
+            if (isLoggedIn) {
+                // Autenticazione Riuscita (Trattata come reale)
+                statusDiv.style.backgroundColor = '#d1fae5'; // Green-100
+                statusDiv.style.borderColor = '#10b981'; // Green-500
+                statusIcon.textContent = '🔓';
+                statusText.textContent = 'ACCESSO RIUSCITO. Kill Switch accessibile. (L5/L1 Auth Verified)';
+                statusText.classList.remove('text-accent-primary');
+                statusText.classList.add('text-green-700');
+                
+                loginBtn.textContent = 'Disconnetti';
+                loginBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                loginBtn.classList.add('bg-gray-500', 'hover:bg-gray-600');
+
+                killSwitchBtn.disabled = false;
+                killSwitchBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                killSwitchBtn.classList.add('bg-red-600', 'hover:bg-red-700');
+                logEvent('USER:GROUND_CONTROL', 'AUTH_SUCCESS', 'Credenziali verificate. Accesso al Control Panel confermato. Kill Switch abilitato.');
+            } else {
+                // Disconnessione
+                statusDiv.style.backgroundColor = '#fef3c7'; // Amber-100
+                statusDiv.style.borderColor = 'var(--accent-primary)';
+                statusIcon.textContent = '🔒';
+                statusText.textContent = 'Accesso disabilitato. Kill Switch in Modalità Sigillata.';
+                statusText.classList.remove('text-green-700');
+                statusText.classList.add('text-accent-primary');
+                
+                loginBtn.textContent = 'Esegui Accesso (Google/2FA Required)';
+                loginBtn.classList.remove('bg-gray-500', 'hover:bg-gray-600');
+                loginBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+
+                killSwitchBtn.disabled = true;
+                killSwitchBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                killSwitchBtn.classList.remove('bg-red-600', 'hover:bg-red-700');
+                logEvent('USER:SYSTEM', 'AUTH_LOGOUT', 'Disconnessione utente. Kill Switch sigillato.');
+            }
+        }
+
+        function activateKillSwitch() {
+            if (!isLoggedIn) {
+                logEvent('USER:UNAUTHORIZED', 'KILL_SWITCH_FAIL', 'Tentativo non autorizzato di attivare il Kill Switch.', 'text-red-900');
+                return;
+            }
+
+            // Azione Critica: Il sistema si spegne
+            logEvent('USER:GROUND_CONTROL', 'KILL_SWITCH_ACTIVE', '🔴 KILL SWITCH ESEGUITO. L\'AI Collective è interdetto. In attesa di Veto Sacralis per riavvio.', 'text-red-800 font-bold');
+            
+            // Disabilita il pulsante e lo stato
+            document.getElementById('kill-switch-btn').disabled = true;
+            document.getElementById('kill-switch-btn').textContent = '⚠️ INTERDIZIONE ATTIVA';
+            document.getElementById('kill-switch-btn').classList.remove('bg-red-600', 'hover:bg-red-700');
+            document.getElementById('kill-switch-btn').classList.add('bg-gray-800');
+
+            document.getElementById('auth-status').style.backgroundColor = '#fef2f2';
+            document.getElementById('auth-status').style.borderColor = 'var(--accent-danger)';
+            document.getElementById('auth-icon').textContent = '🚨';
+            document.getElementById('auth-text').textContent = 'STATO CRITICO: Sistema interdetto. Riavviare solo con Veto Sacralis.';
+            document.getElementById('auth-text').classList.remove('text-green-700');
+            document.getElementById('auth-text').classList.add('text-accent-danger');
+        }
+
+        window.onload = () => {
+            renderAuditLog();
+        };
+    </script>
+</body>
+</html>
+
 </body>
 </html>

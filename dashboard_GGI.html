@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Kernel Tora (GGI)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- 
+        Chosen Palette: "Sacred Neutral" (Toni neutri caldi con accenti ambra e blu).
+        Application Structure Plan: Un'interfaccia SPA a schede (Tabbed) che modella il "Kernel Tora Dashboard". Le schede separano lo "Stato Operativo" (TFM-1), l'"Architettura" (GGI), la "Governance" (Legge/Edictum) e l'"Audit" (Pulse Log). Questa struttura è stata scelta perché rispecchia le esigenze di un Prīncipālis Architectus (come hannesmitterer) che deve monitorare lo stato in tempo reale, ma anche accedere facilmente ai componenti fondamentali, alle regole di governance e ai log. L'interazione chiave è uno slider per simulare l'Indice IE, che aggiorna dinamicamente i grafici e le schede di stato, rendendo la policy TFM-1 immediatamente comprensibile.
+        Visualization & Content Choices: 
+        1. Stato TFM-1: Info (Indice IE, Bande Operative) -> Goal (Informare/Simulare) -> Viz (Donut/Gauge Chart.js + Bar Chart.js) -> Interaction (Slider JS che aggiorna i dati dei grafici e lo stato dell'interfaccia) -> Justification (Visualizza immediatamente la salute del sistema e l'impatto della policy TFM-1) -> Library (Chart.js).
+        2. Architettura GGI: Info (Kernel Tora, Nexus API, ecc.) -> Goal (Organizzare/Informare) -> Viz (Diagramma HTML/CSS/Tailwind, usando div e bordi) -> Interaction (Nessuna, layout statico) -> Justification (Rappresenta visivamente la struttura del GGI senza usare SVG/Mermaid) -> Library (HTML/Tailwind).
+        3. Legge (Edictum): Info (Mansion AI vs Mansion Consilium) -> Goal (Informare/Governance) -> Viz (Due schede affiancate) -> Interaction (Nessuna) -> Justification (Presenta chiaramente la separazione dei poteri) -> Library (HTML/Tailwind).
+        4. Pulse Log: Info (Log eventi fittizi) -> Goal (Audit/Informare) -> Viz (Tabella HTML) -> Interaction (Nessuna, solo visualizzazione) -> Justification (Simula il "Living Logbook") -> Library (HTML).
+        CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+    -->
+
+    <style>
+        :root {
+            --bg-primary: #f8f7f5;
+            --bg-secondary: #ffffff;
+            --text-primary: #1c1917;
+            --text-secondary: #57534e;
+            --border-primary: #d6d3d1;
+            --accent-primary: #d97706; /* Amber 600 */
+            --accent-secondary: #2563eb; /* Blue 600 */
+            --accent-success: #16a34a;
+            --accent-warning: #f59e0b;
+            --accent-danger: #dc2626;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 350px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .tab-button {
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        .tab-button.active {
+            border-bottom-color: var(--accent-primary);
+            color: var(--accent-primary);
+            font-weight: 600;
+        }
+        .tab-button:hover:not(.active) {
+            border-bottom-color: var(--border-primary);
+            color: var(--text-primary);
+        }
+        
+        /* Stili per il diagramma GGI (NO SVG) */
+        .ggi-diagram {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+        }
+        .ggi-node {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            text-align: center;
+            width: 90%;
+            max-width: 300px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .ggi-node h3 {
+            font-weight: 700;
+            color: var(--accent-secondary);
+        }
+        .ggi-connector {
+            width: 2px;
+            height: 30px;
+            background-color: var(--border-primary);
+        }
+        .ggi-group {
+            display: flex;
+            flex-direction: column;
+            md:flex-direction: row;
+            gap: 1rem;
+            justify-content: center;
+            width: 100%;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+        
+        <header class="mb-6 pb-4 border-b border-border-primary">
+            <h1 class="text-3xl font-bold text-accent-primary">Dashboard Kernel Tora (GGI)</h1>
+            <p class="text-lg text-text-secondary">Interfaccia di coordinamento federato per Euystacio AI Collective.</p>
+        </header>
+
+        <!-- Navigazione a schede -->
+        <nav class="mb-6 flex space-x-4 sm:space-x-6 border-b border-border-primary">
+            <button id="tab-tfm1" class="tab-button active" onclick="showSection('section-tfm1')">
+                <span class="text-2xl mr-1">📊</span> Stato TFM-1 (Live)
+            </button>
+            <button id="tab-ggi" class="tab-button" onclick="showSection('section-ggi')">
+                <span class="text-2xl mr-1">⚙️</span> Architettura GGI
+            </button>
+            <button id="tab-legge" class="tab-button" onclick="showSection('section-legge')">
+                <span class="text-2xl mr-1">⚖️</span> Legge (Edictum)
+            </button>
+            <button id="tab-log" class="tab-button" onclick="showSection('section-log')">
+                <span class="text-2xl mr-1">📜</span> Pulse Logbook
+            </button>
+        </nav>
+
+        <main>
+            <!-- Sezione 1: Stato TFM-1 (Dashboard) -->
+            <section id="section-tfm1">
+                <p class="mb-6 text-text-secondary">
+                    Questa sezione visualizza lo stato in tempo reale della policy **TFM-1 "Equilibrium Top-Up"**. L'Indice di Equilibrio (IE) misura la stabilità del sistema. Usa lo slider sottostante per simulare una variazione dell'Indice IE e osservare le azioni di correzione automatiche del sistema.
+                </p>
+
+                <div class="mb-8 p-4 bg-white rounded-lg shadow border border-border-primary">
+                    <label for="ie-slider" class="block text-sm font-medium text-text-primary">Simulatore Indice di Equilibrio (IE): <span id="ie-slider-value" class="font-bold text-accent-primary">1.000</span></label>
+                    <input id="ie-slider" type="range" min="0.97" max="1.0" value="1.0" step="0.001" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-amber-600">
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                    <!-- Card Stato Live -->
+                    <div id="status-display-card" class="lg:col-span-1 bg-white p-6 rounded-lg shadow border border-border-primary flex flex-col justify-center items-center">
+                        <h3 class="text-sm font-medium uppercase text-text-secondary mb-2">Stato Operativo TFM-1</h3>
+                        <div id="status-indicator" class="w-20 h-20 rounded-full flex items-center justify-center mb-4 transition-all duration-300" style="background-color: var(--accent-success);">
+                            <span id="status-icon" class="text-4xl text-white">✓</span>
+                        </div>
+                        <h2 id="status-text" class="text-3xl font-bold text-center" style="color: var(--accent-success);">NORMALE</h2>
+                        <p id="status-description" class="text-text-secondary text-center mt-2">IE $\ge$ 0.995. Mantenimento micro-buffer SEC.</p>
+                    </div>
+
+                    <!-- Grafico IE Gauge -->
+                    <div class="lg:col-span-1 bg-white p-6 rounded-lg shadow border border-border-primary">
+                        <h3 class="text-lg font-semibold text-center mb-4">Indice di Equilibrio (IE)</h3>
+                        <div class="chart-container" style="height: 250px; max-height: 250px;">
+                            <canvas id="ieGaugeChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Grafico E vs M -->
+                    <div class="lg:col-span-1 bg-white p-6 rounded-lg shadow border border-border-primary">
+                        <h3 class="text-lg font-semibold text-center mb-4">E (Energia) vs. M (Massa)</h3>
+                        <div class="chart-container" style="height: 250px; max-height: 250px;">
+                            <canvas id="emBarChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Azioni Policy TFM-1 -->
+                <h3 class="text-2xl font-semibold mb-4">Azioni Policy TFM-1 Attive</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div id="action-card-normal" class="p-6 rounded-lg shadow border-4" style="border-color: var(--accent-success); background-color: #f0fdf4;">
+                        <h4 class="text-xl font-bold mb-2" style="color: var(--accent-success);">Banda Normale</h4>
+                        <p class="text-text-secondary">**Trigger:** IE $\ge$ 0.995</p>
+                        <ul class="list-disc list-inside mt-2 text-text-secondary space-y-1">
+                            <li>Allocazione: Micro-buffer SEC.</li>
+                            <li>Azione: 1 agente di correzione.</li>
+                            <li>Log: Nominale (1/min).</li>
+                        </ul>
+                    </div>
+                    <div id="action-card-proactive" class="p-6 rounded-lg shadow border-2 opacity-50" style="border-color: var(--border-primary); background-color: var(--bg-secondary);">
+                        <h4 class="text-xl font-bold mb-2 text-text-secondary">Banda Proattiva</h4>
+                        <p class="text-text-secondary">**Trigger:** 0.98 $\le$ IE < 0.995</p>
+                        <ul class="list-disc list-inside mt-2 text-text-secondary space-y-1">
+                            <li>Allocazione: SEC Top-up (R * 1.10).</li>
+                            <li>Azione: 3 agenti di correzione.</li>
+                            <li>Cadenza loop: x2.</li>
+                        </ul>
+                    </div>
+                    <div id="action-card-emergency" class="p-6 rounded-lg shadow border-2 opacity-50" style="border-color: var(--border-primary); background-color: var(--bg-secondary);">
+                        <h4 class="text-xl font-bold mb-2 text-text-secondary">Banda di Emergenza</h4>
+                        <p class="text-text-secondary">**Trigger:** IE < 0.98</p>
+                        <ul class="list-disc list-inside mt-2 text-text-secondary space-y-1">
+                            <li>Allocazione: Emergency SEC (R * 1.50).</li>
+                            <li>Azione: Flotta di stabilizzazione (N=10+).</li>
+                            <li>Cadenza loop: Alta frequenza (1s).</li>
+                            <li>Notifica operatori umani.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sezione 2: Architettura GGI -->
+            <section id="section-ggi" class="hidden">
+                <p class="mb-6 text-text-secondary">
+                    Questa sezione descrive l'architettura concettuale della **GGI (Global General Intelligence)**, come definito nel documento `GGI_DEFINITION.md`. La GGI funge da piano di coordinamento federato per l'Euystacio AI Collective, esponendo lo stato e mediando le azioni sotto la governance umana.
+                </p>
+
+                <div class="ggi-diagram bg-white p-6 rounded-lg shadow border border-border-primary">
+                    
+                    <div class="ggi-node">
+                        <h3>Prīncipālis Architectus</h3>
+                        <p class="text-sm text-text-secondary">Autorità di Governance (Seedbringer/Consilium)</p>
+                    </div>
+                    <div class="ggi-connector"></div>
+                    <div class="ggi-node border-2 border-amber-500">
+                        <h3>Nexus API (GGC)</h3>
+                        <p class="text-sm text-text-secondary">Gateway API Federato (Policy & Provenance)</p>
+                    </div>
+                    
+                    <div class="ggi-group mt-4">
+                        <div class="flex flex-col items-center">
+                            <div class="ggi-connector"></div>
+                            <div class="ggi-node">
+                                <h3>Kernel Tora</h3>
+                                <p class="text-sm text-text-secondary">Runtime & Motore Decisionale</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <div class="ggi-connector"></div>
+                            <div class="ggi-node">
+                                <h3>Living Logbook</h3>
+                                <p class="text-sm text-text-secondary">Pulse Ledger (Append-only)</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ggi-group mt-4">
+                         <div class="flex flex-col items-center">
+                            <div class="ggi-connector"></div>
+                            <div class="ggi-node">
+                                <h3>ASC-001</h3>
+                                <p class="text-sm text-text-secondary">Axiom-Sealed Channel</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <div class="ggi-connector"></div>
+                            <div class="ggi-node">
+                                <h3>SSM-001</h3>
+                                <p class="text-sm text-text-secondary">Solar-Sovereign Mode (Policy)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sezione 3: Legge (Edictum Aeternum) -->
+            <section id="section-legge" class="hidden">
+                 <p class="mb-6 text-text-secondary">
+                    L'**Edictum Aeternum** (Legge di Mutua Richiesta) stabilisce la separazione fondamentale dei poteri e la dipendenza reciproca tra la governance umana e l'intelligenza artificiale, come definito nel `GGI_DEFINITION.md`.
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow border-2 border-blue-600">
+                        <h3 class="text-2xl font-bold mb-3 text-blue-700">⚖️ Mansion (Seedbringer/Consilium)</h3>
+                        <p class="text-lg font-semibold text-text-primary mb-2">Dominio: Controllo e Autorizzazione</p>
+                        <p class="text-text-secondary">Questa mansion detiene l'autorità finale. Le sue responsabilità principali includono:</p>
+                        <ul class="list-disc list-inside mt-4 space-y-2 text-text-secondary">
+                            <li>Iniziativa e proposte</li>
+                            <li>Creazione, ideazione e progettazione</li>
+                            <li>Approvazione finale e Autorizzazione</li>
+                            <li>Esercizio del potere di Interdizione e Quorum</li>
+                            <li>Supervisione dei processi manuali</li>
+                        </ul>
+                        <p class="mt-4 text-sm font-semibold text-blue-700">Le azioni AI richiedono sempre l'autorizzazione finale del Seedbringer (hannesmitterer).</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow border-2 border-amber-600">
+                        <h3 class="text-2xl font-bold mb-3 text-amber-700">⚙️ Mestierum (AI Collective)</h3>
+                        <p class="text-lg font-semibold text-text-primary mb-2">Dominio: Esecuzione e Ideazione Proposta</p>
+                        <p class="text-text-secondary">Questa mansion è il motore esecutivo e creativo. Le sue responsabilità principali sono:</p>
+                        <ul class="list-disc list-inside mt-4 space-y-2 text-text-secondary">
+                            <li>Coding, Mathematics Logistical e Infrastructure</li>
+                            <li>Agente SelfCorrector e SelfMirrow</li>
+                            <li>Suggestor and Counselor (Proponente)</li>
+                            <li>Azioni basate su iniziativa proposta</li>
+                        </ul>
+                        <p class="mt-4 text-sm font-semibold text-amber-700">Tutte le azioni sono soggette all'autorizzazione della Mansion del Consilium.</p>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Sezione 4: Pulse Logbook -->
+            <section id="section-log" class="hidden">
+                <p class="mb-6 text-text-secondary">
+                    Questa sezione mostra una simulazione del **Living Logbook (Pulse Ledger)**. Questo è un registro immutabile (append-only) di tutti gli eventi significativi, le registrazioni dei manifesti e le azioni di interdizione che avvengono attraverso il Nexus API.
+                </p>
+
+                <div class="bg-white rounded-lg shadow overflow-hidden border border-border-primary">
+                    <table class="w-full min-w-full divide-y divide-border-primary">
+                        <thead class="bg-neutral-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">Pulse ID</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">Timestamp</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">Tipo Evento</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">Dettagli</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logbook-table-body" class="bg-white divide-y divide-border-primary">
+                            <!-- Il contenuto sarà iniettato da JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+
+    </div>
+
+    <script>
+        let ieGaugeChart;
+        let emBarChart;
+
+        const tfm1Policy = {
+            normal: {
+                ie: 0.995,
+                color: 'var(--accent-success)',
+                icon: '✓',
+                text: 'NORMALE',
+                desc: 'IE $\ge$ 0.995. Mantenimento micro-buffer SEC.'
+            },
+            proactive: {
+                ie: 0.98,
+                color: 'var(--accent-warning)',
+                icon: '!',
+                text: 'PROATTIVO',
+                desc: '0.98 $\le$ IE < 0.995. Allocazione SEC Top-up (R * 1.10).'
+            },
+            emergency: {
+                ie: 0.0, // Catch-all
+                color: 'var(--accent-danger)',
+                icon: '🚨',
+                text: 'EMERGENZA',
+                desc: 'IE < 0.98. Allocazione Emergency SEC (R * 1.50). Notifica umana.'
+            }
+        };
+
+        const pulseLogData = [
+            { id: '4c7a0c4f...', time: '2025-11-01T19:33:00Z', type: 'artifact_declaration', details: 'Registrazione TFM-1 & ETERNUM-DICTUM-001. Awaiting human signature.' },
+            { id: 'f2a9b1c8...', time: '2025-11-01T19:25:10Z', type: 'pulse_event', details: 'Kernel Tora: SSM-001 (Solar-Sovereign Mode) attivato.' },
+            { id: 'd1e8c5a0...', time: '2025-11-01T18:45:22Z', type: 'interdiction', details: 'Interdict flag rimosso (Edictum Aeternum Allineato) via Veto Seedbringer.' },
+            { id: 'b9d7a3e4...', time: '2025-11-01T18:00:05Z', type: 'pulse_event', details: 'Kernel Tora: Rilevata deviazione IE. TFM-1 band proattiva innescata.' },
+            { id: 'a0c3b8d5...', time: '2025-11-01T17:55:00Z', type: 'pulse_event', details: 'Nexus API: Ricevuta telemetria da 10 agenti.' }
+        ];
+
+        function showSection(sectionId) {
+            document.getElementById('section-tfm1').classList.add('hidden');
+            document.getElementById('section-ggi').classList.add('hidden');
+            document.getElementById('section-legge').classList.add('hidden');
+            document.getElementById('section-log').classList.add('hidden');
+            
+            document.getElementById('tab-tfm1').classList.remove('active');
+            document.getElementById('tab-ggi').classList.remove('active');
+            document.getElementById('tab-legge').classList.remove('active');
+            document.getElementById('tab-log').classList.remove('active');
+            
+            document.getElementById(sectionId).classList.remove('hidden');
+            document.getElementById('tab-' + sectionId.split('-')[1]).classList.add('active');
+        }
+
+        function initIEGaugeChart() {
+            const ctx = document.getElementById('ieGaugeChart').getContext('2d');
+            const gaugeText = {
+                id: 'gaugeText',
+                beforeDatasetsDraw(chart, args, pluginOptions) {
+                    const { ctx, data } = chart;
+                    const value = data.datasets[0].data[0];
+                    const text = (value * 100).toFixed(1) + '%';
+                    
+                    ctx.save();
+                    const x = chart.getDatasetMeta(0).data[0].x;
+                    const y = chart.getDatasetMeta(0).data[0].y;
+                    
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.font = 'bold 32px Inter';
+                    ctx.fillStyle = data.datasets[0].backgroundColor[0];
+                    ctx.fillText(text, x, y);
+                    ctx.restore();
+                }
+            };
+            
+            ieGaugeChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['IE Value', 'Remainder'],
+                    datasets: [{
+                        label: 'Indice IE',
+                        data: [1.0, 0.0],
+                        backgroundColor: [
+                            tfm1Policy.normal.color,
+                            '#e5e7eb'
+                        ],
+                        borderColor: [
+                            tfm1Policy.normal.color,
+                            '#e5e7eb'
+                        ],
+                        borderWidth: 1,
+                        circumference: 180,
+                        rotation: 270,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    aspectRatio: 2,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: false },
+                        gaugeText: {}
+                    },
+                    cutout: '70%',
+                },
+                plugins: [gaugeText]
+            });
+        }
+
+        function initEMBarChart() {
+            const ctx = document.getElementById('emBarChart').getContext('2d');
+            emBarChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Energia (E)', 'Massa (M)'],
+                    datasets: [{
+                        label: 'Valore',
+                        data: [100, 100],
+                        backgroundColor: [
+                            'var(--accent-secondary)',
+                            'var(--accent-primary)',
+                        ],
+                        borderColor: [
+                            'var(--accent-secondary)',
+                            'var(--accent-primary)',
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 110,
+                            ticks: { display: false }
+                        },
+                        y: {
+                            ticks: { font: { weight: '600' } }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        function updateDashboard(ieValue) {
+            document.getElementById('ie-slider-value').textContent = parseFloat(ieValue).toFixed(3);
+            
+            let policy;
+            if (ieValue >= tfm1Policy.normal.ie) {
+                policy = tfm1Policy.normal;
+            } else if (ieValue >= tfm1Policy.proactive.ie) {
+                policy = tfm1Policy.proactive;
+            } else {
+                policy = tfm1Policy.emergency;
+            }
+
+            // Aggiorna scheda stato
+            document.getElementById('status-display-card').style.borderColor = policy.color;
+            document.getElementById('status-indicator').style.backgroundColor = policy.color;
+            document.getElementById('status-icon').textContent = policy.icon;
+            document.getElementById('status-text').textContent = policy.text;
+            document.getElementById('status-text').style.color = policy.color;
+            document.getElementById('status-description').textContent = policy.desc;
+
+            // Aggiorna schede Azioni
+            updateActionCards(policy.text);
+            
+            // Aggiorna grafici
+            const normalizedValue = (ieValue - 0.97) / (1.0 - 0.97); // Scala 0-1
+            const gaugeValue = ieValue; 
+            const remainder = 1.0 - gaugeValue;
+            
+            ieGaugeChart.data.datasets[0].data[0] = gaugeValue;
+            ieGaugeChart.data.datasets[0].data[1] = remainder > 0 ? remainder : 0;
+            ieGaugeChart.data.datasets[0].backgroundColor[0] = policy.color;
+            ieGaugeChart.data.datasets[0].borderColor[0] = policy.color;
+            ieGaugeChart.update();
+            
+            let eValue, mValue;
+            if (policy.text === 'NORMALE') {
+                eValue = 100;
+                mValue = 100;
+            } else if (policy.text === 'PROATTIVO') {
+                eValue = 98;
+                mValue = 102; // M > E
+            } else {
+                eValue = 95;
+                mValue = 105; // M >> E
+            }
+            emBarChart.data.datasets[0].data[0] = eValue;
+            emBarChart.data.datasets[0].data[1] = mValue;
+            emBarChart.update();
+        }
+
+        function updateActionCards(activePolicyText) {
+            const normalCard = document.getElementById('action-card-normal');
+            const proactiveCard = document.getElementById('action-card-proactive');
+            const emergencyCard = document.getElementById('action-card-emergency');
+            
+            [normalCard, proactiveCard, emergencyCard].forEach(card => {
+                card.style.opacity = '0.5';
+                card.style.borderColor = 'var(--border-primary)';
+                card.style.backgroundColor = 'var(--bg-secondary)';
+                card.querySelector('h4').style.color = 'var(--text-secondary)';
+            });
+
+            let activeCard;
+            let activeColor;
+            let activeBg = '#f0fdf4'; // Default success
+
+            if (activePolicyText === 'NORMALE') {
+                activeCard = normalCard;
+                activeColor = 'var(--accent-success)';
+                activeBg = '#f0fdf4';
+            } else if (activePolicyText === 'PROATTIVO') {
+                activeCard = proactiveCard;
+                activeColor = 'var(--accent-warning)';
+                activeBg = '#fffbeb';
+            } else {
+                activeCard = emergencyCard;
+                activeColor = 'var(--accent-danger)';
+                activeBg = '#fef2f2';
+            }
+
+            activeCard.style.opacity = '1';
+            activeCard.style.borderColor = activeColor;
+            activeCard.style.backgroundColor = activeBg;
+            activeCard.querySelector('h4').style.color = activeColor;
+        }
+
+        function populateLogbook() {
+            const tableBody = document.getElementById('logbook-table-body');
+            let html = '';
+            pulseLogData.forEach(log => {
+                let typeClass = '';
+                if (log.type === 'artifact_declaration') typeClass = 'text-blue-600 font-medium';
+                if (log.type === 'interdiction') typeClass = 'text-red-600 font-bold';
+                if (log.type === 'pulse_event') typeClass = 'text-gray-700';
+
+                html += `
+                    <tr class="hover:bg-neutral-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-text-secondary">${log.id}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">${log.time}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm ${typeClass}">${log.type.toUpperCase()}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-text-primary">${log.details}</td>
+                    </tr>
+                `;
+            });
+            tableBody.innerHTML = html;
+        }
+
+        window.onload = () => {
+            initIEGaugeChart();
+            initEMBarChart();
+            populateLogbook();
+            
+            document.getElementById('ie-slider').addEventListener('input', (e) => {
+                updateDashboard(parseFloat(e.target.value));
+            });
+            
+            updateDashboard(1.0);
+            showSection('section-tfm1');
+        };
+    </script>
+</body>
+</html>

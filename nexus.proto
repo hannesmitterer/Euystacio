@@ -1,0 +1,528 @@
+// Nexus Protocol Buffer Definitions
+// Version: 1.0.0
+// 
+// This file defines the protocol buffer schemas for the Nexus API
+// for efficient binary serialization of telemetry and command frames.
+
+syntax = "proto3";
+
+package nexus.v1;
+
+option go_package = "github.com/hannesmitterer/Euystacio/proto/nexus/v1";
+option java_package = "io.euystacio.nexus.v1";
+option java_multiple_files = true;
+
+// ============================================================================
+// Telemetry Messages
+// ============================================================================
+
+// TelemetryFrame represents a single telemetry data point
+message TelemetryFrame {
+  // Unique event identifier
+  string event_id = 1;
+  
+  // Source identifier (e.g., "agent-001")
+  string source = 2;
+  
+  // Event type classification
+  EventType event_type = 3;
+  
+  // Timestamp in milliseconds since Unix epoch
+  int64 timestamp_ms = 4;
+  
+  // Telemetry data payload
+  TelemetryData data = 5;
+  
+  // Optional metadata tags
+  map<string, string> tags = 6;
+}
+
+// EventType enumeration
+enum EventType {
+  EVENT_TYPE_UNSPECIFIED = 0;
+  EVENT_TYPE_METRIC = 1;
+  EVENT_TYPE_LOG = 2;
+  EVENT_TYPE_TRACE = 3;
+  EVENT_TYPE_ALERT = 4;
+}
+
+// TelemetryData contains the actual telemetry payload
+message TelemetryData {
+  oneof data {
+    MetricData metric = 1;
+    LogData log = 2;
+    TraceData trace = 3;
+    AlertData alert = 4;
+  }
+}
+
+// MetricData for numeric measurements
+message MetricData {
+  string name = 1;
+  double value = 2;
+  string unit = 3;
+  MetricType type = 4;
+  
+  enum MetricType {
+    METRIC_TYPE_UNSPECIFIED = 0;
+    METRIC_TYPE_GAUGE = 1;
+    METRIC_TYPE_COUNTER = 2;
+    METRIC_TYPE_HISTOGRAM = 3;
+  }
+}
+
+// LogData for structured log entries
+message LogData {
+  LogLevel level = 1;
+  string message = 2;
+  map<string, string> fields = 3;
+  string stack_trace = 4;
+  
+  enum LogLevel {
+    LOG_LEVEL_UNSPECIFIED = 0;
+    LOG_LEVEL_TRACE = 1;
+    LOG_LEVEL_DEBUG = 2;
+    LOG_LEVEL_INFO = 3;
+    LOG_LEVEL_WARN = 4;
+    LOG_LEVEL_ERROR = 5;
+    LOG_LEVEL_FATAL = 6;
+  }
+}
+
+// TraceData for distributed tracing
+message TraceData {
+  string trace_id = 1;
+  string span_id = 2;
+  string parent_span_id = 3;
+  string operation_name = 4;
+  int64 start_time_ms = 5;
+  int64 duration_ms = 6;
+  map<string, string> attributes = 7;
+}
+
+// AlertData for alert notifications
+message AlertData {
+  AlertSeverity severity = 1;
+  string title = 2;
+  string description = 3;
+  string source_metric = 4;
+  double threshold = 5;
+  double current_value = 6;
+  
+  enum AlertSeverity {
+    ALERT_SEVERITY_UNSPECIFIED = 0;
+    ALERT_SEVERITY_INFO = 1;
+    ALERT_SEVERITY_WARNING = 2;
+    ALERT_SEVERITY_ERROR = 3;
+    ALERT_SEVERITY_CRITICAL = 4;
+  }
+}
+
+// TelemetryBatch for efficient bulk transmission
+message TelemetryBatch {
+  repeated TelemetryFrame frames = 1;
+  int32 frame_count = 2;
+  int64 batch_timestamp_ms = 3;
+}
+
+// ============================================================================
+// Command Messages
+// ============================================================================
+
+// CommandFrame represents a command to be executed
+message CommandFrame {
+  // Unique command identifier
+  string command_id = 1;
+  
+  // Target agent or service identifier
+  string target = 2;
+  
+  // Command name/action
+  string command = 3;
+  
+  // Command parameters
+  map<string, string> parameters = 4;
+  
+  // Timeout in milliseconds
+  int32 timeout_ms = 5;
+  
+  // Idempotency key for duplicate detection
+  string idempotency_key = 6;
+  
+  // Timestamp when command was issued
+  int64 issued_at_ms = 7;
+  
+  // Priority level
+  CommandPriority priority = 8;
+}
+
+// CommandPriority enumeration
+enum CommandPriority {
+  COMMAND_PRIORITY_UNSPECIFIED = 0;
+  COMMAND_PRIORITY_LOW = 1;
+  COMMAND_PRIORITY_NORMAL = 2;
+  COMMAND_PRIORITY_HIGH = 3;
+  COMMAND_PRIORITY_CRITICAL = 4;
+}
+
+// CommandResponse represents the result of command execution
+message CommandResponse {
+  // Command identifier
+  string command_id = 1;
+  
+  // Execution status
+  CommandStatus status = 2;
+  
+  // Result data
+  CommandResult result = 3;
+  
+  // Timestamps
+  int64 started_at_ms = 4;
+  int64 completed_at_ms = 5;
+  
+  // Error information (if failed)
+  ErrorInfo error = 6;
+}
+
+// CommandStatus enumeration
+enum CommandStatus {
+  COMMAND_STATUS_UNSPECIFIED = 0;
+  COMMAND_STATUS_PENDING = 1;
+  COMMAND_STATUS_RUNNING = 2;
+  COMMAND_STATUS_COMPLETED = 3;
+  COMMAND_STATUS_FAILED = 4;
+  COMMAND_STATUS_CANCELLED = 5;
+  COMMAND_STATUS_TIMEOUT = 6;
+}
+
+// CommandResult contains command execution results
+message CommandResult {
+  bool success = 1;
+  map<string, string> output = 2;
+  int32 exit_code = 3;
+  int64 duration_ms = 4;
+}
+
+// ErrorInfo contains error details
+message ErrorInfo {
+  string code = 1;
+  string message = 2;
+  map<string, string> details = 3;
+  string stack_trace = 4;
+}
+
+// ============================================================================
+// Task Messages
+// ============================================================================
+
+// TaskFrame represents a task to be executed
+message TaskFrame {
+  // Unique task identifier
+  string task_id = 1;
+  
+  // Task title
+  string title = 2;
+  
+  // Task description
+  string description = 3;
+  
+  // Task type
+  string type = 4;
+  
+  // Task status
+  TaskStatus status = 5;
+  
+  // Task priority
+  TaskPriority priority = 6;
+  
+  // Assigned agent
+  string assigned_to = 7;
+  
+  // Progress percentage (0-100)
+  int32 progress = 8;
+  
+  // Task parameters
+  map<string, string> parameters = 9;
+  
+  // Dependencies (task IDs that must complete first)
+  repeated string dependencies = 10;
+  
+  // Timestamps
+  int64 created_at_ms = 11;
+  int64 started_at_ms = 12;
+  int64 updated_at_ms = 13;
+  int64 completed_at_ms = 14;
+  int64 deadline_ms = 15;
+  
+  // Result data (when completed)
+  TaskResult result = 16;
+}
+
+// TaskStatus enumeration
+enum TaskStatus {
+  TASK_STATUS_UNSPECIFIED = 0;
+  TASK_STATUS_PENDING = 1;
+  TASK_STATUS_IN_PROGRESS = 2;
+  TASK_STATUS_COMPLETED = 3;
+  TASK_STATUS_FAILED = 4;
+  TASK_STATUS_CANCELLED = 5;
+}
+
+// TaskPriority enumeration
+enum TaskPriority {
+  TASK_PRIORITY_UNSPECIFIED = 0;
+  TASK_PRIORITY_LOW = 1;
+  TASK_PRIORITY_MEDIUM = 2;
+  TASK_PRIORITY_HIGH = 3;
+  TASK_PRIORITY_CRITICAL = 4;
+}
+
+// TaskResult contains task execution results
+message TaskResult {
+  bool success = 1;
+  map<string, string> output = 2;
+  ErrorInfo error = 3;
+  int64 duration_ms = 4;
+}
+
+// ============================================================================
+// Agent Messages
+// ============================================================================
+
+// AgentFrame represents an AI agent
+message AgentFrame {
+  // Unique agent identifier
+  string agent_id = 1;
+  
+  // Agent type/role
+  string agent_type = 2;
+  
+  // Agent status
+  AgentStatus status = 3;
+  
+  // Agent capabilities
+  repeated string capabilities = 4;
+  
+  // Current load (0.0 - 1.0)
+  float current_load = 5;
+  
+  // Number of active tasks
+  int32 current_tasks = 6;
+  
+  // Maximum concurrent tasks
+  int32 max_concurrent_tasks = 7;
+  
+  // Agent metadata
+  map<string, string> metadata = 8;
+  
+  // Timestamps
+  int64 registered_at_ms = 9;
+  int64 last_heartbeat_ms = 10;
+}
+
+// AgentStatus enumeration
+enum AgentStatus {
+  AGENT_STATUS_UNSPECIFIED = 0;
+  AGENT_STATUS_ACTIVE = 1;
+  AGENT_STATUS_IDLE = 2;
+  AGENT_STATUS_BUSY = 3;
+  AGENT_STATUS_OFFLINE = 4;
+  AGENT_STATUS_ERROR = 5;
+}
+
+// AgentHeartbeat for keep-alive messages
+message AgentHeartbeat {
+  string agent_id = 1;
+  AgentStatus status = 2;
+  float current_load = 3;
+  int32 current_tasks = 4;
+  map<string, MetricData> metrics = 5;
+  int64 timestamp_ms = 6;
+}
+
+// ============================================================================
+// Event Messages
+// ============================================================================
+
+// EventFrame represents a system event
+message EventFrame {
+  // Unique event identifier
+  string event_id = 1;
+  
+  // Event type identifier
+  string event_type = 2;
+  
+  // Event source
+  string source = 3;
+  
+  // Event payload
+  map<string, string> payload = 4;
+  
+  // Event metadata
+  map<string, string> metadata = 5;
+  
+  // Timestamp
+  int64 timestamp_ms = 6;
+  
+  // Related resource IDs
+  repeated string related_ids = 7;
+}
+
+// ============================================================================
+// WebSocket Messages
+// ============================================================================
+
+// WebSocketMessage wrapper for all WebSocket communications
+message WebSocketMessage {
+  // Message type
+  MessageType type = 1;
+  
+  // Message payload
+  oneof payload {
+    AuthMessage auth = 2;
+    SubscribeMessage subscribe = 3;
+    UnsubscribeMessage unsubscribe = 4;
+    PingMessage ping = 5;
+    PongMessage pong = 6;
+    TelemetryFrame telemetry = 7;
+    TaskFrame task = 8;
+    AgentFrame agent = 9;
+    EventFrame event = 10;
+    ErrorMessage error = 11;
+  }
+  
+  // Message timestamp
+  int64 timestamp_ms = 12;
+}
+
+// MessageType enumeration
+enum MessageType {
+  MESSAGE_TYPE_UNSPECIFIED = 0;
+  MESSAGE_TYPE_AUTH = 1;
+  MESSAGE_TYPE_SUBSCRIBE = 2;
+  MESSAGE_TYPE_UNSUBSCRIBE = 3;
+  MESSAGE_TYPE_PING = 4;
+  MESSAGE_TYPE_PONG = 5;
+  MESSAGE_TYPE_TELEMETRY = 6;
+  MESSAGE_TYPE_TASK = 7;
+  MESSAGE_TYPE_AGENT = 8;
+  MESSAGE_TYPE_EVENT = 9;
+  MESSAGE_TYPE_ERROR = 10;
+}
+
+// AuthMessage for authentication
+message AuthMessage {
+  string token = 1;
+  string client_id = 2;
+}
+
+// SubscribeMessage for channel subscription
+message SubscribeMessage {
+  repeated string channels = 1;
+}
+
+// UnsubscribeMessage for channel unsubscription
+message UnsubscribeMessage {
+  repeated string channels = 1;
+}
+
+// PingMessage for keep-alive
+message PingMessage {
+  int64 timestamp_ms = 1;
+}
+
+// PongMessage for ping response
+message PongMessage {
+  int64 timestamp_ms = 1;
+}
+
+// ErrorMessage for error responses
+message ErrorMessage {
+  string code = 1;
+  string message = 2;
+  map<string, string> details = 3;
+}
+
+// ============================================================================
+// Service Definitions (gRPC)
+// ============================================================================
+
+// TelemetryService for telemetry operations
+service TelemetryService {
+  // Submit a single telemetry frame
+  rpc SubmitTelemetry(TelemetryFrame) returns (TelemetryAck);
+  
+  // Submit a batch of telemetry frames
+  rpc SubmitTelemetryBatch(TelemetryBatch) returns (TelemetryAck);
+  
+  // Stream telemetry frames in real-time
+  rpc StreamTelemetry(stream TelemetryFrame) returns (stream TelemetryAck);
+}
+
+// TelemetryAck acknowledges telemetry submission
+message TelemetryAck {
+  string event_id = 1;
+  bool accepted = 2;
+  string message = 3;
+  int64 timestamp_ms = 4;
+}
+
+// TaskService for task operations
+service TaskService {
+  // Create a new task
+  rpc CreateTask(TaskFrame) returns (TaskFrame);
+  
+  // Get task status
+  rpc GetTask(TaskRequest) returns (TaskFrame);
+  
+  // Update task
+  rpc UpdateTask(TaskFrame) returns (TaskFrame);
+  
+  // Stream task updates
+  rpc StreamTaskUpdates(TaskRequest) returns (stream TaskFrame);
+}
+
+// TaskRequest for querying tasks
+message TaskRequest {
+  string task_id = 1;
+}
+
+// CommandService for command operations
+service CommandService {
+  // Execute a command
+  rpc ExecuteCommand(CommandFrame) returns (CommandResponse);
+  
+  // Get command status
+  rpc GetCommandStatus(CommandRequest) returns (CommandResponse);
+  
+  // Stream command status updates
+  rpc StreamCommandStatus(CommandRequest) returns (stream CommandResponse);
+}
+
+// CommandRequest for querying commands
+message CommandRequest {
+  string command_id = 1;
+}
+
+// AgentService for agent operations
+service AgentService {
+  // Register a new agent
+  rpc RegisterAgent(AgentFrame) returns (AgentFrame);
+  
+  // Send agent heartbeat
+  rpc Heartbeat(AgentHeartbeat) returns (HeartbeatAck);
+  
+  // Stream agent status updates
+  rpc StreamAgentStatus(AgentRequest) returns (stream AgentFrame);
+}
+
+// AgentRequest for querying agents
+message AgentRequest {
+  string agent_id = 1;
+}
+
+// HeartbeatAck acknowledges heartbeat
+message HeartbeatAck {
+  bool acknowledged = 1;
+  int64 next_heartbeat_expected_ms = 2;
+}

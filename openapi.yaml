@@ -1,0 +1,776 @@
+openapi: 3.1.0
+info:
+  title: Euystacio Nexus API
+  version: 1.0.0
+  description: |
+    The Nexus API provides a unified interface for coordinating AI agents, managing tasks,
+    processing telemetry, and facilitating secure communication between distributed systems.
+  contact:
+    name: Euystacio Support
+    email: support@euystacio.io
+    url: https://euystacio.io
+  license:
+    name: Sacred Commons License
+    url: https://github.com/hannesmitterer/Euystacio/blob/main/SACRED_COMMONS_LICENSE.md
+
+servers:
+  - url: https://nexus.euystacio.io/api/v1
+    description: Production server
+  - url: https://staging-nexus.euystacio.io/api/v1
+    description: Staging server
+  - url: http://localhost:8080/api/v1
+    description: Development server
+
+tags:
+  - name: Health
+    description: Health check and system status endpoints
+  - name: Tasks
+    description: Task management operations
+  - name: Telemetry
+    description: Telemetry data submission and querying
+  - name: Commands
+    description: Command execution endpoints
+  - name: Agents
+    description: AI agent registration and coordination
+  - name: Sessions
+    description: Session management
+  - name: Events
+    description: Event subscriptions and webhooks
+
+security:
+  - BearerAuth: []
+  - ApiKeyAuth: []
+
+paths:
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Health check
+      description: Returns API health status
+      security: []
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /status:
+    get:
+      tags:
+        - Health
+      summary: System status
+      description: Returns detailed system metrics
+      responses:
+        '200':
+          description: System status retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusResponse'
+
+  /tasks:
+    get:
+      tags:
+        - Tasks
+      summary: List tasks
+      description: Retrieve a list of tasks with filtering and pagination
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, in_progress, completed, failed]
+        - name: assigned_to
+          in: query
+          schema:
+            type: string
+        - name: type
+          in: query
+          schema:
+            type: string
+        - name: priority
+          in: query
+          schema:
+            type: string
+            enum: [low, medium, high, critical]
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: Tasks retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskListResponse'
+
+    post:
+      tags:
+        - Tasks
+      summary: Create task
+      description: Create a new task
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaskRequest'
+      responses:
+        '201':
+          description: Task created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /tasks/{taskId}:
+    get:
+      tags:
+        - Tasks
+      summary: Get task
+      description: Retrieve task details by ID
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Task retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    patch:
+      tags:
+        - Tasks
+      summary: Update task
+      description: Update task properties
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTaskRequest'
+      responses:
+        '200':
+          description: Task updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - Tasks
+      summary: Delete task
+      description: Delete a task (only if not started)
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Task deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteTaskResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /telemetry/events:
+    post:
+      tags:
+        - Telemetry
+      summary: Submit telemetry event
+      description: Submit a telemetry event for processing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TelemetryEvent'
+      responses:
+        '202':
+          description: Telemetry event accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TelemetryEventResponse'
+
+  /telemetry/query:
+    get:
+      tags:
+        - Telemetry
+      summary: Query telemetry
+      description: Query historical telemetry data
+      parameters:
+        - name: source
+          in: query
+          schema:
+            type: string
+        - name: event_type
+          in: query
+          schema:
+            type: string
+        - name: from
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 100
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: Telemetry data retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TelemetryQueryResponse'
+
+  /commands/execute:
+    post:
+      tags:
+        - Commands
+      summary: Execute command
+      description: Execute a command on a target agent or service
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExecuteCommandRequest'
+      responses:
+        '202':
+          description: Command accepted for execution
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommandResponse'
+
+  /commands/{commandId}:
+    get:
+      tags:
+        - Commands
+      summary: Get command status
+      description: Retrieve the status of a previously submitted command
+      parameters:
+        - name: commandId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Command status retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommandStatus'
+
+  /agents/register:
+    post:
+      tags:
+        - Agents
+      summary: Register agent
+      description: Register a new AI agent in the system
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterAgentRequest'
+      responses:
+        '201':
+          description: Agent registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterAgentResponse'
+
+  /agents/{agentId}:
+    get:
+      tags:
+        - Agents
+      summary: Get agent status
+      description: Retrieve agent information and status
+      parameters:
+        - name: agentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Agent status retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentStatus'
+
+  /sessions/create:
+    post:
+      tags:
+        - Sessions
+      summary: Create session
+      description: Create a new authenticated session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSessionRequest'
+      responses:
+        '201':
+          description: Session created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token obtained from OAuth 2.0 flow
+
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: API key with 'Bearer' prefix
+
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: healthy
+        version:
+          type: string
+          example: 1.0.0
+        uptime:
+          type: integer
+          example: 86400
+        timestamp:
+          type: string
+          format: date-time
+
+    StatusResponse:
+      type: object
+      properties:
+        services:
+          type: object
+          properties:
+            database:
+              type: string
+              example: healthy
+            event_bus:
+              type: string
+              example: healthy
+            task_processor:
+              type: string
+              example: healthy
+        metrics:
+          type: object
+          properties:
+            active_tasks:
+              type: integer
+            connected_clients:
+              type: integer
+            events_per_minute:
+              type: integer
+        version:
+          type: string
+
+    Task:
+      type: object
+      properties:
+        task_id:
+          type: string
+          example: task_1234567890
+        title:
+          type: string
+          example: Process user data import
+        description:
+          type: string
+        status:
+          type: string
+          enum: [pending, in_progress, completed, failed]
+        progress:
+          type: integer
+          minimum: 0
+          maximum: 100
+        assigned_to:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        started_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    CreateTaskRequest:
+      type: object
+      required:
+        - title
+        - type
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+        description:
+          type: string
+        type:
+          type: string
+          example: data_processing
+        priority:
+          type: string
+          enum: [low, medium, high, critical]
+          default: medium
+        assigned_to:
+          type: string
+        parameters:
+          type: object
+        deadline:
+          type: string
+          format: date-time
+
+    UpdateTaskRequest:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [pending, in_progress, completed, failed]
+        progress:
+          type: integer
+          minimum: 0
+          maximum: 100
+        result:
+          type: object
+
+    TaskResponse:
+      type: object
+      properties:
+        task_id:
+          type: string
+        status:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        estimated_start:
+          type: string
+          format: date-time
+
+    TaskListResponse:
+      type: object
+      properties:
+        tasks:
+          type: array
+          items:
+            $ref: '#/components/schemas/Task'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    DeleteTaskResponse:
+      type: object
+      properties:
+        task_id:
+          type: string
+        status:
+          type: string
+          example: deleted
+        deleted_at:
+          type: string
+          format: date-time
+
+    TelemetryEvent:
+      type: object
+      required:
+        - source
+        - event_type
+        - data
+      properties:
+        source:
+          type: string
+          example: agent-001
+        event_type:
+          type: string
+          example: metric
+        timestamp:
+          type: string
+          format: date-time
+        data:
+          type: object
+        tags:
+          type: object
+
+    TelemetryEventResponse:
+      type: object
+      properties:
+        event_id:
+          type: string
+        status:
+          type: string
+          example: accepted
+        timestamp:
+          type: string
+          format: date-time
+
+    TelemetryQueryResponse:
+      type: object
+      properties:
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/TelemetryEvent'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    ExecuteCommandRequest:
+      type: object
+      required:
+        - target
+        - command
+      properties:
+        target:
+          type: string
+          example: agent-001
+        command:
+          type: string
+          example: restart_service
+        parameters:
+          type: object
+        timeout_ms:
+          type: integer
+          default: 30000
+        idempotency_key:
+          type: string
+
+    CommandResponse:
+      type: object
+      properties:
+        command_id:
+          type: string
+        status:
+          type: string
+          enum: [pending, running, completed, failed, cancelled]
+        submitted_at:
+          type: string
+          format: date-time
+        estimated_completion:
+          type: string
+          format: date-time
+
+    CommandStatus:
+      type: object
+      properties:
+        command_id:
+          type: string
+        status:
+          type: string
+        result:
+          type: object
+        submitted_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+
+    RegisterAgentRequest:
+      type: object
+      required:
+        - agent_id
+        - agent_type
+        - capabilities
+      properties:
+        agent_id:
+          type: string
+          example: agent-003
+        agent_type:
+          type: string
+          example: task_processor
+        capabilities:
+          type: array
+          items:
+            type: string
+        metadata:
+          type: object
+
+    RegisterAgentResponse:
+      type: object
+      properties:
+        agent_id:
+          type: string
+        status:
+          type: string
+          example: registered
+        api_key:
+          type: string
+        registered_at:
+          type: string
+          format: date-time
+
+    AgentStatus:
+      type: object
+      properties:
+        agent_id:
+          type: string
+        status:
+          type: string
+          enum: [active, idle, offline]
+        capabilities:
+          type: array
+          items:
+            type: string
+        current_tasks:
+          type: integer
+        max_concurrent_tasks:
+          type: integer
+        last_heartbeat:
+          type: string
+          format: date-time
+
+    CreateSessionRequest:
+      type: object
+      required:
+        - user_id
+      properties:
+        user_id:
+          type: string
+        device_id:
+          type: string
+        ttl_seconds:
+          type: integer
+          default: 3600
+
+    SessionResponse:
+      type: object
+      properties:
+        session_id:
+          type: string
+        expires_at:
+          type: string
+          format: date-time
+        session_token:
+          type: string
+
+    Pagination:
+      type: object
+      properties:
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        total_pages:
+          type: integer
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            details:
+              type: object
+            request_id:
+              type: string
+            timestamp:
+              type: string
+              format: date-time
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    RateLimitExceeded:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

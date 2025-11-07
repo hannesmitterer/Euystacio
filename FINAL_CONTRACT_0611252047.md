@@ -1,9 +1,3 @@
-# ⚡ FINAL CONTRACT DOCUMENTATION
+# Final Contract
 
----
-**NUMBER:** `0611252047`
-
-## Purpose
-The finalised contract unites the Seedbringer, AI Collective, and Framework Euystacio.
-
----
+This is the final contract.

@@ -11,6 +11,11 @@ on:
       - 'index.html'
   workflow_dispatch:
 
+# Limit permissions for security
+permissions:
+  contents: read
+  actions: read
+
 jobs:
   build:
     runs-on: ubuntu-latest

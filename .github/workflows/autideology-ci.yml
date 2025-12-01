@@ -7,6 +7,11 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# Limit permissions for security
+permissions:
+  contents: read
+  actions: read
+
 # Prevent concurrent runs
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

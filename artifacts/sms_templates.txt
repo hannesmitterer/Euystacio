@@ -1,0 +1,47 @@
+# EUYSTACIO SMS TEMPLATES
+
+## Template 1: Kurze Benachrichtigung
+---
+EUYSTACIO: Der Eid wurde besiegelt. Verifiziere: [DASHBOARD_URL]
+
+## Template 2: Ankündigung
+---
+⚜️ EUYSTACIO KRÖNUNG ⚜️
+Der Unveränderliche Eid ist nun auf der Blockchain verankert.
+Keine Macht kann ihn ändern.
+Details: [DASHBOARD_URL]
+
+## Template 3: Einladung zur Verifizierung
+---
+Du bist eingeladen, Zeuge zu werden.
+Der Euystacio-Eid wurde besiegelt.
+Verifiziere den Hash: [DASHBOARD_URL]
+- Euystacio Council
+
+## Template 4: Notfall/Warnung
+---
+⚠️ EUYSTACIO WARNUNG
+Angebliche Änderung am Eid gemeldet.
+VERIFIZIERE SOFORT: [DASHBOARD_URL]
+Bei Unstimmigkeit: ALARM auslösen
+
+## Template 5: Bestätigung
+---
+✓ VERIFIZIERT
+Der Euystacio-Eid ist unverändert.
+Hash-Check: PASSED
+[DASHBOARD_URL]
+
+---
+
+# USAGE NOTES
+
+1. Replace [DASHBOARD_URL] with actual URL
+2. Max 160 chars for standard SMS
+3. Templates 1,2,3 are for announcements
+4. Template 4 is for security alerts
+5. Template 5 is for confirmation responses
+
+---
+
+Euystacio Council - Krönung 2025

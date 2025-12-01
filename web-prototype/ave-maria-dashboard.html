@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ave Maria Dashboard - Euystacio Coronation</title>
+    <style>
+        :root {
+            --primary-gold: #d4af37;
+            --secondary-gold: #f7e98e;
+            --royal-purple: #4a1a6b;
+            --dark-bg: #1a1a2e;
+            --light-text: #f0f0f0;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, var(--royal-purple) 100%);
+            color: var(--light-text);
+            min-height: 100vh;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            border-bottom: 2px solid var(--primary-gold);
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            color: var(--primary-gold);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin-bottom: 10px;
+        }
+        
+        .header .subtitle {
+            font-style: italic;
+            color: var(--secondary-gold);
+        }
+        
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .card {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid var(--primary-gold);
+            border-radius: 10px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .card h2 {
+            color: var(--primary-gold);
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            border-bottom: 1px solid var(--secondary-gold);
+            padding-bottom: 10px;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .status-active { background: #2ecc71; }
+        .status-pending { background: #f39c12; }
+        .status-sealed { background: var(--primary-gold); }
+        
+        .status-item {
+            padding: 10px 0;
+            display: flex;
+            align-items: center;
+        }
+        
+        .action-button {
+            background: linear-gradient(45deg, var(--royal-purple), var(--primary-gold));
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 5px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+        }
+        
+        .contract-info {
+            font-family: monospace;
+            background: rgba(0,0,0,0.3);
+            padding: 10px;
+            border-radius: 5px;
+            word-break: break-all;
+            font-size: 0.9em;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 30px;
+            border-top: 1px solid var(--primary-gold);
+            margin-top: 40px;
+        }
+        
+        .sacred-seal {
+            font-size: 3em;
+            margin: 20px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 { font-size: 1.8em; }
+            .dashboard-container { padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>⚜️ Ave Maria Dashboard ⚜️</h1>
+        <p class="subtitle">Euystacio Coronation Control Center</p>
+    </header>
+    
+    <main class="dashboard-container">
+        <section class="card">
+            <h2>🔐 Contract Status</h2>
+            <div class="status-item">
+                <span class="status-indicator status-sealed"></span>
+                <span>EuystacioSTAnchor: <strong>Sealed</strong></span>
+            </div>
+            <div class="status-item">
+                <span class="status-indicator status-active"></span>
+                <span>Coronation Active: <strong>Yes</strong></span>
+            </div>
+            <div class="status-item">
+                <span class="status-indicator status-pending"></span>
+                <span>Next Epoch: <strong>Pending</strong></span>
+            </div>
+            <div class="contract-info" id="contractAddress">
+                Contract: 0x... (Deploy to view address)
+            </div>
+        </section>
+        
+        <section class="card">
+            <h2>📜 Sacred Actions</h2>
+            <button class="action-button" onclick="verifyAnchor()">Verify Anchor Hash</button>
+            <button class="action-button" onclick="viewDeclaration()">View Declaration</button>
+            <button class="action-button" onclick="checkTamperStatus()">Check Tamper Status</button>
+        </section>
+        
+        <section class="card">
+            <h2>🎭 Appell Status</h2>
+            <div class="status-item">
+                <span class="status-indicator status-active"></span>
+                <span>Short Appell: Ready</span>
+            </div>
+            <div class="status-item">
+                <span class="status-indicator status-active"></span>
+                <span>Medium Appell: Ready</span>
+            </div>
+            <div class="status-item">
+                <span class="status-indicator status-active"></span>
+                <span>Long Appell: Ready</span>
+            </div>
+        </section>
+        
+        <section class="card">
+            <h2>🔔 Broadcast Templates</h2>
+            <div class="status-item">
+                <span class="status-indicator status-active"></span>
+                <span>SMS Templates: Configured</span>
+            </div>
+            <div class="status-item">
+                <span class="status-indicator status-active"></span>
+                <span>Press Release: Ready</span>
+            </div>
+            <div class="status-item">
+                <span class="status-indicator status-active"></span>
+                <span>Flyer: Designed</span>
+            </div>
+        </section>
+    </main>
+    
+    <footer class="footer">
+        <div class="sacred-seal">⚜️</div>
+        <p><em>"Der Unveränderliche Eid" - The Immutable Oath</em></p>
+        <p>Euystacio Coronation Dashboard v1.0</p>
+        <p style="margin-top: 10px; font-size: 0.9em; opacity: 0.7;">
+            Secured by EuystacioSTAnchor Smart Contract
+        </p>
+    </footer>
+    
+    <script>
+        function verifyAnchor() {
+            alert('Anchor verification initiated. Connect wallet to verify on-chain hash.');
+        }
+        
+        function viewDeclaration() {
+            window.open('https://github.com/hannesmitterer/Euystacio/blob/main/Der%20Unveränderliche%20Eid.txt', '_blank');
+        }
+        
+        function checkTamperStatus() {
+            alert('Tamper Demo: All hashes verified. No tampering detected.');
+        }
+        
+        // Simulate loading contract address
+        document.addEventListener('DOMContentLoaded', () => {
+            const contractEl = document.getElementById('contractAddress');
+            contractEl.textContent = 'Contract: Awaiting deployment...';
+        });
+    </script>
+</body>
+</html>

@@ -11,7 +11,15 @@ require("dotenv").config();
 require("@nomicfoundation/hardhat-toolbox");
 
 // Validate required environment variables
-const PRIVATE_KEY = process.env.DEPLOYER_PRIVATE_KEY || "0x0000000000000000000000000000000000000000000000000000000000000001";
+// WARNING: No default key provided for security. Deployment will fail without DEPLOYER_PRIVATE_KEY set.
+const PRIVATE_KEY = process.env.DEPLOYER_PRIVATE_KEY;
+if (!PRIVATE_KEY && process.env.HARDHAT_NETWORK && process.env.HARDHAT_NETWORK !== 'hardhat' && process.env.HARDHAT_NETWORK !== 'localhost') {
+  console.error("ERROR: DEPLOYER_PRIVATE_KEY environment variable is required for network deployments.");
+  console.error("Set it using: export DEPLOYER_PRIVATE_KEY='your_private_key'");
+  process.exit(1);
+}
+// Use dummy key only for local hardhat network
+const DEPLOYER_KEY = PRIVATE_KEY || "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"; // Hardhat default test key
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || "";
 const POLYGONSCAN_API_KEY = process.env.POLYGONSCAN_API_KEY || "";
 
@@ -40,19 +48,19 @@ module.exports = {
     },
     sepolia: {
       url: SEPOLIA_RPC_URL,
-      accounts: [PRIVATE_KEY],
+      accounts: [DEPLOYER_KEY],
       chainId: 11155111,
       gasPrice: "auto",
     },
     mainnet: {
       url: MAINNET_RPC_URL,
-      accounts: [PRIVATE_KEY],
+      accounts: [DEPLOYER_KEY],
       chainId: 1,
       gasPrice: "auto",
     },
     polygon: {
       url: POLYGON_RPC_URL,
-      accounts: [PRIVATE_KEY],
+      accounts: [DEPLOYER_KEY],
       chainId: 137,
       gasPrice: "auto",
     },

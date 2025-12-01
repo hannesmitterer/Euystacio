@@ -212,7 +212,8 @@
         }
         
         function viewDeclaration() {
-            window.open('https://github.com/hannesmitterer/Euystacio/blob/main/Der%20Unveränderliche%20Eid.txt', '_blank');
+            const newWindow = window.open('https://github.com/hannesmitterer/Euystacio/blob/main/Der%20Unveränderliche%20Eid.txt', '_blank', 'noopener,noreferrer');
+            if (newWindow) newWindow.opener = null;
         }
         
         function checkTamperStatus() {

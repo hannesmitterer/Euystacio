@@ -23,8 +23,8 @@ contract EuystacioSTAnchor {
     /// @notice Unix timestamp of contract deployment (Coronation moment)
     uint256 public immutable coronationTimestamp;
     
-    /// @notice Counter for anchored documents
-    uint256 public anchorCount;
+    /// @notice Counter for anchored documents (starts at 1 to avoid 0-index issues)
+    uint256 public anchorCount = 1;
     
     /// @notice Whether the contract has been sealed (no more anchors allowed)
     bool public sealed;
@@ -124,7 +124,8 @@ contract EuystacioSTAnchor {
         string calldata _documentName
     ) external onlyAuthorized notSealed returns (uint256 anchorId) {
         if (_documentHash == bytes32(0)) revert InvalidHash();
-        if (hashToAnchorId[_documentHash] != 0 || anchors[0].documentHash == _documentHash) {
+        // Check if already anchored (hashToAnchorId returns 0 for non-existent, but our IDs start at 1)
+        if (hashToAnchorId[_documentHash] != 0) {
             revert DocumentAlreadyAnchored();
         }
         
@@ -153,7 +154,7 @@ contract EuystacioSTAnchor {
      * @notice Verifies if a document hash matches an anchored document
      * @param _documentHash The hash to verify
      * @return isValid True if hash is anchored, false otherwise
-     * @return anchorId The anchor ID if found (0 if not found but could be valid)
+     * @return anchorId The anchor ID if found (0 if not found)
      * @return anchoredAt Timestamp when anchored (0 if not found)
      */
     function verifyDocument(bytes32 _documentHash) 
@@ -163,8 +164,8 @@ contract EuystacioSTAnchor {
     {
         anchorId = hashToAnchorId[_documentHash];
         
-        // Handle edge case where anchorId is 0
-        if (anchors[anchorId].documentHash == _documentHash && anchors[anchorId].exists) {
+        // Anchor IDs start at 1, so 0 means not found
+        if (anchorId != 0 && anchors[anchorId].exists) {
             return (true, anchorId, anchors[anchorId].anchoredAt);
         }
         

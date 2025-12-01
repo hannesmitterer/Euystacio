@@ -162,7 +162,10 @@ function App() {
           </button>
           <button 
             style={styles.button}
-            onClick={() => window.open('https://github.com/hannesmitterer/Euystacio/blob/main/Der%20Unveränderliche%20Eid.txt', '_blank')}
+            onClick={() => {
+              const newWindow = window.open('https://github.com/hannesmitterer/Euystacio/blob/main/Der%20Unveränderliche%20Eid.txt', '_blank', 'noopener,noreferrer');
+              if (newWindow) newWindow.opener = null;
+            }}
           >
             View Declaration
           </button>

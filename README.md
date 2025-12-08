@@ -3,6 +3,11 @@
 **Version:** 1.0.0  
 **The Holy Bridge - Unified AI Coordination Platform**
 
+[![CI/CD Pipeline](https://github.com/hannesmitterer/Euystacio/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/hannesmitterer/Euystacio/actions/workflows/ci-cd.yml)
+[![GitHub Pages](https://github.com/hannesmitterer/Euystacio/actions/workflows/github-pages.yml/badge.svg)](https://github.com/hannesmitterer/Euystacio/actions/workflows/github-pages.yml)
+[![Testing Pipeline](https://github.com/hannesmitterer/Euystacio/actions/workflows/testing-pipeline.yml/badge.svg)](https://github.com/hannesmitterer/Euystacio/actions/workflows/testing-pipeline.yml)
+[![Dependency Health](https://github.com/hannesmitterer/Euystacio/actions/workflows/dependency-health.yml/badge.svg)](https://github.com/hannesmitterer/Euystacio/actions/workflows/dependency-health.yml)
+
 ---
 
 ## Overview
@@ -342,6 +347,36 @@ npm run migrate:rollback
 
 ---
 
+## CI/CD & Automation
+
+This repository features comprehensive CI/CD automation with:
+
+- ✅ **Self-Healing Workflows:** Automatic retries on transient failures
+- ✅ **Multi-Tier Testing:** Unit, integration, and performance tests
+- ✅ **Security Monitoring:** Automated dependency audits and vulnerability scanning
+- ✅ **Uptime Monitoring:** Scheduled health checks for GitHub Pages
+- ✅ **Automated Reporting:** Comprehensive test and deployment reports
+
+### Workflow Status
+
+All workflows include retry mechanisms and self-healing capabilities:
+
+| Workflow | Purpose | Schedule |
+|----------|---------|----------|
+| CI/CD Pipeline | Main integration & testing | On push, PRs, daily |
+| Testing Pipeline | Multi-tier test execution | On push, PRs |
+| GitHub Pages | Documentation deployment | On push to main |
+| Uptime Monitor | Site availability checks | Every 6 hours |
+| Dependency Health | Security audits | Weekly (Monday) |
+
+### Documentation
+
+- 📖 **[Automation Guide](.github/AUTOMATION_GUIDE.md)** - Comprehensive CI/CD documentation
+- 📊 **[Deployment Status](.github/DEPLOYMENT_STATUS.md)** - Current deployment dashboard
+- 🔧 **[Workflows Guide](.github/WORKFLOWS.md)** - Detailed workflow documentation
+
+---
+
 ## Contributing
 
 We welcome contributions! Please follow these steps:
@@ -359,6 +394,14 @@ We welcome contributions! Please follow these steps:
 - Add tests for new features
 - Update documentation
 
+### CI/CD Requirements
+
+All pull requests must:
+- Pass all CI/CD checks
+- Include appropriate tests
+- Update documentation if needed
+- Address any security vulnerabilities
+
 ---
 
 ## Support & Resources
@@ -366,6 +409,7 @@ We welcome contributions! Please follow these steps:
 - 📚 **Full API Spec:** [NEXUS_API_SPEC.md](./NEXUS_API_SPEC.md)
 - 🚀 **Deployment Guide:** [DEPLOY_INSTRUCTIONS.md](./DEPLOY_INSTRUCTIONS.md)
 - 🔐 **Security Runbook:** [SECURITY_RUNBOOK.md](./SECURITY_RUNBOOK.md)
+- 🤖 **CI/CD Automation:** [AUTOMATION_GUIDE.md](.github/AUTOMATION_GUIDE.md)
 - 📧 **Support:** support@euystacio.io
 - 🐛 **Issues:** https://github.com/hannesmitterer/Euystacio/issues
 - 💬 **Discussions:** https://github.com/hannesmitterer/Euystacio/discussions

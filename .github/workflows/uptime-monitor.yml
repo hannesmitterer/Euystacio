@@ -1,0 +1,95 @@
+name: GitHub Pages Uptime Monitor
+
+on:
+  schedule:
+    # Check every 6 hours
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  monitor:
+    name: Monitor Site Availability
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Check site availability
+        id: check
+        run: |
+          SITE_URL="https://hannesmitterer.github.io/Euystacio"
+          echo "Checking: $SITE_URL"
+          
+          # Attempt to fetch the site with retries
+          RETRY_COUNT=0
+          MAX_RETRIES=3
+          SUCCESS=false
+          
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -L "$SITE_URL" || echo "000")
+            RESPONSE_TIME=$(curl -s -o /dev/null -w "%{time_total}" -L "$SITE_URL" 2>/dev/null || echo "0")
+            
+            echo "Attempt $((RETRY_COUNT + 1)): HTTP Code: $HTTP_CODE, Response Time: ${RESPONSE_TIME}s"
+            
+            if [ "$HTTP_CODE" = "200" ]; then
+              SUCCESS=true
+              echo "status=up" >> $GITHUB_OUTPUT
+              echo "http_code=$HTTP_CODE" >> $GITHUB_OUTPUT
+              echo "response_time=$RESPONSE_TIME" >> $GITHUB_OUTPUT
+              break
+            fi
+            
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+              echo "Retrying in 30 seconds..."
+              sleep 30
+            fi
+          done
+          
+          if [ "$SUCCESS" = false ]; then
+            echo "status=down" >> $GITHUB_OUTPUT
+            echo "http_code=$HTTP_CODE" >> $GITHUB_OUTPUT
+            echo "response_time=0" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+      
+      - name: Create uptime report
+        if: always()
+        run: |
+          cat > uptime-report.md << EOF
+          # Uptime Monitor Report
+          
+          **Date:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          **Site:** https://hannesmitterer.github.io/Euystacio
+          
+          ## Status
+          - Status: ${{ steps.check.outputs.status }}
+          - HTTP Code: ${{ steps.check.outputs.http_code }}
+          - Response Time: ${{ steps.check.outputs.response_time }}s
+          
+          ## Details
+          - Check Type: Scheduled Monitor
+          - Workflow Run: ${{ github.run_number }}
+          EOF
+          
+          cat uptime-report.md
+      
+      - name: Upload uptime report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: uptime-report-${{ github.run_number }}
+          path: uptime-report.md
+          retention-days: 90
+      
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "::warning::GitHub Pages site is not responding correctly"
+          echo "Site appears to be down or returning errors"
+          echo "Manual investigation may be required"

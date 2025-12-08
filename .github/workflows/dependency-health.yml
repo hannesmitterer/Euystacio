@@ -1,0 +1,198 @@
+name: Dependency Health Monitor
+
+on:
+  schedule:
+    # Run every Monday at 00:00 UTC
+    - cron: '0 0 * * 1'
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'package.json'
+      - 'package-lock.json'
+      - 'requirements.txt'
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  audit-dependencies:
+    name: Audit Dependencies
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: ./.github/actions/setup-node-env
+        with:
+          node-version: '18'
+          install-deps: 'false'
+      
+      - name: Install dependencies
+        uses: nick-fields/retry-action@v3
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          retry_wait_seconds: 10
+          command: npm ci
+      
+      - name: Run npm audit
+        run: |
+          echo "# Node.js Dependency Audit Report" > npm-audit.md
+          echo "" >> npm-audit.md
+          echo "**Date:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> npm-audit.md
+          echo "" >> npm-audit.md
+          
+          npm audit --json > npm-audit-raw.json || true
+          npm audit --audit-level=moderate > npm-audit.txt 2>&1 || true
+          
+          echo "## Audit Results" >> npm-audit.md
+          echo "\`\`\`" >> npm-audit.md
+          cat npm-audit.txt >> npm-audit.md
+          echo "\`\`\`" >> npm-audit.md
+          
+          cat npm-audit.md
+      
+      - name: Check for outdated packages
+        run: |
+          echo "# Outdated Node.js Packages" > npm-outdated.md
+          echo "" >> npm-outdated.md
+          echo "**Date:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> npm-outdated.md
+          echo "" >> npm-outdated.md
+          
+          npm outdated --json > npm-outdated.json || true
+          npm outdated > npm-outdated.txt 2>&1 || true
+          
+          echo "\`\`\`" >> npm-outdated.md
+          cat npm-outdated.txt >> npm-outdated.md
+          echo "\`\`\`" >> npm-outdated.md
+          
+          cat npm-outdated.md
+      
+      - name: Setup Python
+        uses: ./.github/actions/setup-python-env
+        with:
+          python-version: '3.9'
+          install-deps: 'false'
+      
+      - name: Install Python security tools
+        run: |
+          pip install --upgrade pip
+          pip install safety pip-audit
+      
+      - name: Audit Python dependencies
+        run: |
+          echo "# Python Dependency Audit Report" > python-audit.md
+          echo "" >> python-audit.md
+          echo "**Date:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> python-audit.md
+          echo "" >> python-audit.md
+          
+          if [ -f requirements.txt ]; then
+            echo "## Safety Check" >> python-audit.md
+            echo "\`\`\`" >> python-audit.md
+            safety check -r requirements.txt --json > safety-report.json 2>&1 || true
+            safety check -r requirements.txt > safety-report.txt 2>&1 || true
+            cat safety-report.txt >> python-audit.md
+            echo "\`\`\`" >> python-audit.md
+            
+            echo "" >> python-audit.md
+            echo "## Pip Audit" >> python-audit.md
+            echo "\`\`\`" >> python-audit.md
+            pip-audit -r requirements.txt > pip-audit.txt 2>&1 || true
+            cat pip-audit.txt >> python-audit.md
+            echo "\`\`\`" >> python-audit.md
+          else
+            echo "No requirements.txt found" >> python-audit.md
+          fi
+          
+          cat python-audit.md
+        continue-on-error: true
+      
+      - name: Generate comprehensive report
+        if: always()
+        run: |
+          cat > DEPENDENCY_HEALTH_REPORT.md << 'EOF'
+          # Comprehensive Dependency Health Report
+          
+          **Generated:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          **Repository:** ${{ github.repository }}
+          **Branch:** ${{ github.ref_name }}
+          
+          ---
+          
+          ## Executive Summary
+          
+          This report provides an overview of dependency health across Node.js and Python ecosystems.
+          
+          ### Quick Stats
+          - Workflow Run: #${{ github.run_number }}
+          - Triggered by: ${{ github.event_name }}
+          - Status: ${{ job.status }}
+          
+          ---
+          
+          EOF
+          
+          if [ -f npm-audit.md ]; then
+            cat npm-audit.md >> DEPENDENCY_HEALTH_REPORT.md
+            echo "" >> DEPENDENCY_HEALTH_REPORT.md
+            echo "---" >> DEPENDENCY_HEALTH_REPORT.md
+            echo "" >> DEPENDENCY_HEALTH_REPORT.md
+          fi
+          
+          if [ -f npm-outdated.md ]; then
+            cat npm-outdated.md >> DEPENDENCY_HEALTH_REPORT.md
+            echo "" >> DEPENDENCY_HEALTH_REPORT.md
+            echo "---" >> DEPENDENCY_HEALTH_REPORT.md
+            echo "" >> DEPENDENCY_HEALTH_REPORT.md
+          fi
+          
+          if [ -f python-audit.md ]; then
+            cat python-audit.md >> DEPENDENCY_HEALTH_REPORT.md
+          fi
+          
+          echo "" >> DEPENDENCY_HEALTH_REPORT.md
+          echo "---" >> DEPENDENCY_HEALTH_REPORT.md
+          echo "" >> DEPENDENCY_HEALTH_REPORT.md
+          echo "## Recommendations" >> DEPENDENCY_HEALTH_REPORT.md
+          echo "" >> DEPENDENCY_HEALTH_REPORT.md
+          echo "1. Review and update outdated packages regularly" >> DEPENDENCY_HEALTH_REPORT.md
+          echo "2. Address security vulnerabilities immediately" >> DEPENDENCY_HEALTH_REPORT.md
+          echo "3. Test thoroughly before deploying updates" >> DEPENDENCY_HEALTH_REPORT.md
+          echo "4. Keep an eye on major version changes" >> DEPENDENCY_HEALTH_REPORT.md
+          
+          cat DEPENDENCY_HEALTH_REPORT.md
+      
+      - name: Upload dependency reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-health-report-${{ github.run_number }}
+          path: |
+            DEPENDENCY_HEALTH_REPORT.md
+            npm-audit.md
+            npm-audit-raw.json
+            npm-outdated.md
+            npm-outdated.json
+            python-audit.md
+            safety-report.json
+            pip-audit.txt
+          retention-days: 90
+      
+      - name: Check for critical vulnerabilities
+        run: |
+          CRITICAL_COUNT=0
+          
+          if [ -f npm-audit-raw.json ]; then
+            CRITICAL_COUNT=$(jq '.metadata.vulnerabilities.critical // 0' npm-audit-raw.json)
+            echo "Critical Node.js vulnerabilities: $CRITICAL_COUNT"
+          fi
+          
+          if [ "$CRITICAL_COUNT" -gt 0 ]; then
+            echo "::warning::Found $CRITICAL_COUNT critical vulnerabilities in Node.js dependencies"
+          fi

@@ -18,3 +18,32 @@ Thumbs.db
 # Logs
 *.log
 npm-debug.log*
+
+# Test artifacts
+test-results/
+coverage/
+htmlcov/
+.pytest_cache/
+*.json.test
+test-results.json
+pytest-results.json
+
+# CI/CD artifacts
+audit-results.txt
+npm-audit*.json
+npm-audit*.txt
+npm-outdated*.json
+npm-outdated*.txt
+python-audit.md
+safety-report.*
+pip-audit.txt
+workflow-report.md
+deployment-status.md
+health-check.md
+uptime-report.md
+*-test-report.json
+TEST_REPORT.md
+DEPENDENCY_HEALTH_REPORT.md
+
+# GitHub Pages build
+_site/

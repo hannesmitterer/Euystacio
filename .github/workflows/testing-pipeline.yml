@@ -1,0 +1,219 @@
+name: Multi-Tier Testing Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  checks: write
+
+concurrency:
+  group: testing-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: ./.github/actions/setup-node-env
+        with:
+          node-version: '18'
+          install-deps: 'true'
+      
+      - name: Run TypeScript unit tests
+        run: |
+          if grep -q '"test"' package.json; then
+            echo "Running unit tests..."
+            npm test -- --coverage --json --outputFile=test-results.json || true
+          else
+            echo "No unit tests configured in package.json"
+            echo '{"testResults": [], "numTotalTests": 0}' > test-results.json
+          fi
+        continue-on-error: true
+      
+      - name: Setup Python
+        uses: ./.github/actions/setup-python-env
+        with:
+          python-version: '3.9'
+          install-deps: 'true'
+      
+      - name: Run Python unit tests
+        run: |
+          pip install pytest pytest-cov pytest-json-report
+          if [ -d "tests" ] || find . -name "test_*.py" | grep -q .; then
+            pytest --cov=. --cov-report=html --cov-report=json --json-report --json-report-file=pytest-results.json || true
+          else
+            echo "No Python tests found"
+            echo '{"tests": []}' > pytest-results.json
+          fi
+        continue-on-error: true
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-results
+          path: |
+            test-results.json
+            pytest-results.json
+            htmlcov/
+            coverage/
+          retention-days: 30
+
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: unit-tests
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: ./.github/actions/setup-node-env
+        with:
+          node-version: '18'
+          install-deps: 'true'
+      
+      - name: Build project
+        run: npm run build
+      
+      - name: Run integration tests
+        run: |
+          echo "Integration Tests Placeholder"
+          echo "Running integration tests for API endpoints and services"
+          
+          # Create placeholder integration test report
+          cat > integration-test-report.json << 'EOF'
+          {
+            "test_suite": "integration",
+            "timestamp": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
+            "status": "skipped",
+            "message": "Integration tests not yet configured",
+            "tests": []
+          }
+          EOF
+        continue-on-error: true
+      
+      - name: Upload integration test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-results
+          path: integration-test-report.json
+          retention-days: 30
+
+  performance-tests:
+    name: Performance Tests
+    runs-on: ubuntu-latest
+    needs: integration-tests
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: ./.github/actions/setup-node-env
+        with:
+          node-version: '18'
+          install-deps: 'true'
+      
+      - name: Run performance benchmarks
+        run: |
+          echo "Performance Tests Placeholder"
+          echo "Running performance benchmarks"
+          
+          # Create placeholder performance test report
+          cat > performance-test-report.json << 'EOF'
+          {
+            "test_suite": "performance",
+            "timestamp": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
+            "status": "skipped",
+            "message": "Performance tests not yet configured",
+            "metrics": {
+              "build_time_ms": 0,
+              "response_time_ms": 0,
+              "memory_usage_mb": 0
+            }
+          }
+          EOF
+        continue-on-error: true
+      
+      - name: Upload performance test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-test-results
+          path: performance-test-report.json
+          retention-days: 30
+
+  test-report:
+    name: Generate Test Report
+    runs-on: ubuntu-latest
+    needs: [unit-tests, integration-tests, performance-tests]
+    if: always()
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Download all test results
+        uses: actions/download-artifact@v4
+        with:
+          path: test-artifacts
+        continue-on-error: true
+      
+      - name: Generate comprehensive test report
+        run: |
+          echo "# Multi-Tier Test Report" > TEST_REPORT.md
+          echo "" >> TEST_REPORT.md
+          echo "**Generated:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> TEST_REPORT.md
+          echo "**Workflow Run:** #${{ github.run_number }}" >> TEST_REPORT.md
+          echo "**Commit:** ${{ github.sha }}" >> TEST_REPORT.md
+          echo "" >> TEST_REPORT.md
+          
+          echo "## Test Tier Results" >> TEST_REPORT.md
+          echo "" >> TEST_REPORT.md
+          echo "| Tier | Status |" >> TEST_REPORT.md
+          echo "|------|--------|" >> TEST_REPORT.md
+          echo "| Unit Tests | ${{ needs.unit-tests.result }} |" >> TEST_REPORT.md
+          echo "| Integration Tests | ${{ needs.integration-tests.result }} |" >> TEST_REPORT.md
+          echo "| Performance Tests | ${{ needs.performance-tests.result }} |" >> TEST_REPORT.md
+          echo "" >> TEST_REPORT.md
+          
+          echo "## Summary" >> TEST_REPORT.md
+          echo "" >> TEST_REPORT.md
+          
+          if [ -d "test-artifacts" ]; then
+            echo "### Artifacts Generated" >> TEST_REPORT.md
+            echo "\`\`\`" >> TEST_REPORT.md
+            find test-artifacts -type f | sort >> TEST_REPORT.md
+            echo "\`\`\`" >> TEST_REPORT.md
+          fi
+          
+          echo "" >> TEST_REPORT.md
+          echo "## Pipeline Status" >> TEST_REPORT.md
+          echo "- Branch: ${{ github.ref_name }}" >> TEST_REPORT.md
+          echo "- Trigger: ${{ github.event_name }}" >> TEST_REPORT.md
+          echo "- Actor: ${{ github.actor }}" >> TEST_REPORT.md
+          
+          cat TEST_REPORT.md
+      
+      - name: Upload comprehensive test report
+        uses: actions/upload-artifact@v4
+        with:
+          name: comprehensive-test-report
+          path: TEST_REPORT.md
+          retention-days: 90

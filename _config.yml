@@ -1,0 +1,64 @@
+# Euystacio - GitHub Pages Configuration
+
+# Site settings
+title: Euystacio Nexus API
+description: >-
+  The Holy Bridge - Unified AI Coordination Platform.
+  A comprehensive API platform for coordinating AI agents, managing distributed tasks,
+  processing real-time telemetry, and facilitating secure communication.
+
+baseurl: ""
+url: "https://hannesmitterer.github.io/Euystacio"
+
+# Build settings
+markdown: kramdown
+theme: minima
+
+# Exclude from processing
+exclude:
+  - node_modules/
+  - dist/
+  - src/
+  - scripts/
+  - "*.py"
+  - "*.js"
+  - "*.ts"
+  - "*.json"
+  - "*.md"
+  - "*.rtf"
+  - "*.txt"
+  - "*.log"
+  - "*.zip"
+  - .git/
+  - .github/
+  - .env*
+  - Gemfile*
+  - package*.json
+  - tsconfig.json
+  - requirements.txt
+  - Procfile
+  - LICENSE*
+  - contracts/
+  - manifesto/
+  - red_code/
+
+# Include files
+include:
+  - "*.html"
+  - "*.css"
+  - public/
+
+# GitHub Pages plugins
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+
+# SEO settings
+author: hannesmitterer
+social:
+  name: Euystacio
+  links:
+    - https://github.com/hannesmitterer/Euystacio
+
+# GitHub metadata
+repository: hannesmitterer/Euystacio

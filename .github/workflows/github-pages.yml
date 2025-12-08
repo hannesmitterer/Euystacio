@@ -1,0 +1,121 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build Site
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      
+      - name: Prepare site content
+        run: |
+          mkdir -p _site
+          
+          # Copy main index.html
+          cp index.html _site/
+          
+          # Copy all HTML files
+          find . -maxdepth 1 -name "*.html" -type f ! -name "index.html" -exec cp {} _site/ \;
+          
+          # Copy static assets if they exist
+          if [ -d "public" ]; then
+            cp -r public/* _site/
+          fi
+          
+          # Copy images and assets
+          for ext in png jpg jpeg gif svg webp; do
+            find . -maxdepth 1 -name "*.$ext" -type f -exec cp {} _site/ \;
+          done
+          
+          # Ensure proper structure
+          ls -la _site/
+      
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    name: Deploy to Pages
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+      
+      - name: Report deployment
+        run: |
+          echo "Deployed to: ${{ steps.deployment.outputs.page_url }}"
+          echo "Deployment completed at: $(date)"
+      
+      - name: Verify deployment
+        uses: nick-fields/retry-action@v3
+        with:
+          timeout_minutes: 2
+          max_attempts: 5
+          retry_wait_seconds: 30
+          command: |
+            URL="${{ steps.deployment.outputs.page_url }}"
+            echo "Verifying deployment at: $URL"
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$URL" || echo "000")
+            echo "HTTP Status Code: $HTTP_CODE"
+            if [ "$HTTP_CODE" = "200" ]; then
+              echo "✓ Deployment verified successfully!"
+              exit 0
+            else
+              echo "✗ Deployment verification failed with code: $HTTP_CODE"
+              exit 1
+            fi
+      
+      - name: Create deployment status report
+        if: always()
+        run: |
+          cat > deployment-status.md << 'EOF'
+          # GitHub Pages Deployment Status
+          
+          **Date:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          **URL:** ${{ steps.deployment.outputs.page_url }}
+          **Commit:** ${{ github.sha }}
+          **Branch:** ${{ github.ref_name }}
+          
+          ## Deployment Details
+          - Workflow Run: ${{ github.run_number }}
+          - Triggered by: ${{ github.event_name }}
+          - Status: ${{ job.status }}
+          EOF
+          
+          cat deployment-status.md
+      
+      - name: Upload deployment report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-status
+          path: deployment-status.md
+          retention-days: 90
+        continue-on-error: true

@@ -8,10 +8,10 @@ This example demonstrates the basic usage of the Protocollo Meta Salvage system.
 import sys
 import os
 
-# Add parent directory to path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+# Add parent directory to path to allow importing protocollo_meta_salvage as a package
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
-from coordinator import ProtocolloMetaSalvage
+from protocollo_meta_salvage.coordinator import ProtocolloMetaSalvage
 
 
 def main():

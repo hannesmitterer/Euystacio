@@ -26,6 +26,11 @@ jobs:
   dispatcher:
     name: Workflow Dispatcher
     runs-on: ubuntu-latest
+    outputs:
+      run_integration: ${{ steps.determine.outputs.run_integration }}
+      run_e2e: ${{ steps.determine.outputs.run_e2e }}
+      run_deploy: ${{ steps.determine.outputs.run_deploy }}
+      run_monitoring: ${{ steps.determine.outputs.run_monitoring }}
     
     steps:
       - name: Checkout repository

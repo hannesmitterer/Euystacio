@@ -218,7 +218,7 @@ def test_score_calculation_parametrized(trust, cooperation, compliance, expected
     }
     
     score = calculator.calculate_score(metrics)
-    assert score >= expected_min or score >= 0.0, f"Score {score} should be >= {expected_min}"
+    assert score >= expected_min, f"Score {score} should be >= {expected_min}"
     assert score <= 1.0, f"Score {score} should be <= 1.0"
 
 

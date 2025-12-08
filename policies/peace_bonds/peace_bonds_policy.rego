@@ -136,8 +136,13 @@ get_recommendation(violation_type) := recommendation if {
     recommendation := "Review security policies and strengthen access controls"
 } else := "Review and correct the violation"
 
-# Test data for authorized users (in production, this would come from external data)
-authorized_users := {
+# SECURITY NOTE: This is test/example data only
+# In production, authorized users MUST be loaded from external data source:
+# Example: opa run --set-file data.authorized_users=authorized_users.json
+# The data.authorized_users reference should replace this hardcoded set
+authorized_users := data.authorized_users_override {
+    data.authorized_users_override
+} else := {
     "user-001",
     "user-002",
     "admin-001"

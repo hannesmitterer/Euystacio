@@ -75,12 +75,13 @@ runs:
         echo "Running policy enforcement tests..."
         
         if [ -d "tests/policy_enforcement" ]; then
-          pytest tests/policy_enforcement -v --tb=short || true
+          pytest tests/policy_enforcement -v --tb=short 2>&1 | tee test_output.log || true
         else
           echo "Warning: tests/policy_enforcement directory not found. Skipping tests."
+          echo "No tests found" > test_output.log
         fi
         
-        violations=$(grep -c "VIOLATION" test_output.log 2>/dev/null || echo "0")
+        violations=$(grep -c "VIOLATION\|FAILED" test_output.log 2>/dev/null || echo "0")
         echo "violations=$violations" >> $GITHUB_OUTPUT
         echo "results=Policy enforcement tests completed with $violations violations" >> $GITHUB_OUTPUT
     

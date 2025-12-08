@@ -75,7 +75,13 @@ class PeaceBondsPolicyEngine:
         }
     
     def _is_authorized(self, user: Dict[str, Any]) -> bool:
-        """Check if user is authorized"""
+        """
+        Check if user is authorized
+        
+        NOTE: This is test-only mock implementation.
+        In production, this should validate against actual authentication system.
+        """
+        # Test-only hardcoded values - DO NOT use in production
         authorized_users = {'user-001', 'user-002', 'admin-001'}
         authorized_roles = {'admin', 'operator', 'trusted_agent'}
         

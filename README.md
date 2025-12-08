@@ -3,6 +3,12 @@
 **Version:** 1.0.0  
 **The Holy Bridge - Unified AI Coordination Platform**
 
+[![CI Status](https://github.com/hannesmitterer/Euystacio/actions/workflows/ci.yml/badge.svg)](https://github.com/hannesmitterer/Euystacio/actions/workflows/ci.yml)
+[![Tests](https://github.com/hannesmitterer/Euystacio/actions/workflows/test.yml/badge.svg)](https://github.com/hannesmitterer/Euystacio/actions/workflows/test.yml)
+[![Lint](https://github.com/hannesmitterer/Euystacio/actions/workflows/lint.yml/badge.svg)](https://github.com/hannesmitterer/Euystacio/actions/workflows/lint.yml)
+[![Security](https://github.com/hannesmitterer/Euystacio/actions/workflows/security.yml/badge.svg)](https://github.com/hannesmitterer/Euystacio/actions/workflows/security.yml)
+[![Deploy Pages](https://github.com/hannesmitterer/Euystacio/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/hannesmitterer/Euystacio/actions/workflows/deploy-pages.yml)
+
 ---
 
 ## Overview
@@ -279,26 +285,58 @@ See [SECURITY_RUNBOOK.md](./SECURITY_RUNBOOK.md) for the complete security check
 
 ---
 
+## CI/CD & Automation
+
+This repository features comprehensive CI/CD automation with GitHub Actions:
+
+- ✅ **Automated Building** - TypeScript and Python components
+- ✅ **Automated Testing** - Jest (TypeScript) and pytest (Python)
+- ✅ **Code Quality Checks** - ESLint, Flake8, PyLint, Prettier
+- ✅ **Security Scanning** - CodeQL, Semgrep, Gitleaks, dependency audits
+- ✅ **GitHub Pages Deployment** - Automatic deployment on push to main
+- ✅ **Uptime Monitoring** - Checks every 30 minutes with alerts
+- ✅ **Dependency Updates** - Automated via Dependabot
+
+**Documentation:** See [CI_CD_DOCUMENTATION.md](./CI_CD_DOCUMENTATION.md) for complete details.
+
+**GitHub Pages:** https://hannesmitterer.github.io/Euystacio/
+
+---
+
 ## Development
 
 ### Running Tests
 
 ```bash
-# Node.js
+# TypeScript tests
 npm test
+npm run test:coverage
 
-# Python
+# Python tests
 pytest
+pytest --cov
 ```
 
 ### Linting
 
 ```bash
-# Node.js
+# TypeScript/JavaScript
 npm run lint
+npm run lint:fix
 
 # Python
-flake8 .
+flake8 *.py
+pylint *.py
+black --check *.py
+
+# Format code
+npm run format
+```
+
+### Type Checking
+
+```bash
+npm run typecheck
 ```
 
 ### Database Migrations

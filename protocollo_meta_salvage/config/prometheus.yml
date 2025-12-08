@@ -1,0 +1,67 @@
+# Prometheus configuration for Protocollo Meta Salvage
+# Monitors symbiosis scores, Peace Bond metrics, and system health
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'protocollo-meta-salvage'
+    environment: 'production'
+
+# Alerting configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - 'alertmanager:9093'
+
+# Rule files
+rule_files:
+  - 'alerts/peace_bond_alerts.yml'
+  - 'alerts/symbiosis_alerts.yml'
+
+# Scrape configurations
+scrape_configs:
+  # Monitoring system metrics
+  - job_name: 'symbiosis_monitor'
+    static_configs:
+      - targets: ['localhost:8001']
+    metrics_path: '/metrics/symbiosis'
+    scrape_interval: 30s
+
+  # Decision engine metrics
+  - job_name: 'peace_bond_engine'
+    static_configs:
+      - targets: ['localhost:8002']
+    metrics_path: '/metrics/decisions'
+    scrape_interval: 1m
+
+  # Enforcement metrics
+  - job_name: 'resource_enforcer'
+    static_configs:
+      - targets: ['localhost:8003']
+    metrics_path: '/metrics/enforcement'
+    scrape_interval: 1m
+
+  # CaaS provider metrics
+  - job_name: 'caas_providers'
+    static_configs:
+      - targets:
+          - 'provider1.metrics:9090'
+          - 'provider2.metrics:9090'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: provider
+
+  # Kubernetes metrics
+  - job_name: 'kubernetes-pods'
+    kubernetes_sd_configs:
+      - role: pod
+        namespaces:
+          names:
+            - protocollo-meta-salvage
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_label_app]
+        target_label: app
+      - source_labels: [__meta_kubernetes_pod_name]
+        target_label: pod

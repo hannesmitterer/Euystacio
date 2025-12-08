@@ -24,7 +24,7 @@ exclude:
   - "*.js"
   - "*.ts"
   - "*.json"
-  - "*.md"
+  - "README.md"
   - "*.rtf"
   - "*.txt"
   - "*.log"

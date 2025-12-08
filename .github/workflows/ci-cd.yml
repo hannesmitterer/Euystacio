@@ -24,14 +24,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Node.js environment
+        uses: ./.github/actions/setup-node-env
         with:
           node-version: '18'
-          cache: 'npm'
-      
-      - name: Install dependencies
-        run: npm ci
+          install-deps: 'true'
       
       - name: Lint TypeScript
         run: |
@@ -50,18 +47,11 @@ jobs:
           fi
           echo "Build artifacts verified ✓"
       
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - name: Setup Python environment
+        uses: ./.github/actions/setup-python-env
         with:
           python-version: '3.9'
-          cache: 'pip'
-      
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then
-            pip install -r requirements.txt
-          fi
+          install-deps: 'true'
       
       - name: Lint Python code
         run: |
@@ -88,11 +78,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Node.js environment
+        uses: ./.github/actions/setup-node-env
         with:
           node-version: '18'
-          cache: 'npm'
+          install-deps: 'true'
       
       - name: Run npm audit
         run: npm audit --audit-level=moderate || echo "Security audit completed with warnings"
@@ -114,14 +104,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Node.js environment
+        uses: ./.github/actions/setup-node-env
         with:
           node-version: '18'
-          cache: 'npm'
-      
-      - name: Install dependencies
-        run: npm ci
+          install-deps: 'true'
       
       - name: Build project
         run: npm run build

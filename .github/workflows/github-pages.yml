@@ -34,17 +34,21 @@ jobs:
           # Copy main index.html
           cp index.html _site/
           
-          # Copy all HTML files
+          # Copy all HTML files (root and docs)
           find . -maxdepth 1 -name "*.html" -type f ! -name "index.html" -exec cp {} _site/ \;
+          if [ -d "docs" ]; then
+            mkdir -p _site/docs
+            find docs -name "*.html" -type f -exec cp {} _site/docs/ \;
+          fi
           
           # Copy static assets if they exist
           if [ -d "public" ]; then
             cp -r public/* _site/
           fi
           
-          # Copy images and assets
+          # Copy images and assets (root and subdirectories)
           for ext in png jpg jpeg gif svg webp; do
-            find . -maxdepth 1 -name "*.$ext" -type f -exec cp {} _site/ \;
+            find . -name "*.$ext" -type f ! -path "*/node_modules/*" ! -path "*/.git/*" -exec cp --parents {} _site/ \;
           done
           
           # Ensure proper structure

@@ -62,9 +62,11 @@ jobs:
           done
       
       - name: Test GitHub Pages URL
+        env:
+          PAGES_URL: ${{ vars.PAGES_URL || 'https://hannesmitterer.github.io/Euystacio/' }}
         run: |
           # This will be available after first deployment
-          curl -s -o /dev/null -w "%{http_code}" https://hannesmitterer.github.io/Euystacio/ || echo "Pages not yet deployed or unavailable"
+          curl -s -o /dev/null -w "%{http_code}" "$PAGES_URL" || echo "Pages not yet deployed or unavailable"
         continue-on-error: true
       
       - name: Create issue on failure

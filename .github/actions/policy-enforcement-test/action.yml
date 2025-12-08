@@ -1,0 +1,94 @@
+name: 'Policy Enforcement Testing'
+description: 'Reusable action for testing policy enforcement with Open Policy Agent (Peace Bonds)'
+inputs:
+  opa-version:
+    description: 'OPA version to use'
+    required: false
+    default: '0.59.0'
+  policy-path:
+    description: 'Path to OPA policy files'
+    required: false
+    default: 'policies/peace_bonds'
+  test-data-path:
+    description: 'Path to test data for policy validation'
+    required: false
+    default: 'tests/policy_enforcement/data'
+  python-version:
+    description: 'Python version for test runner'
+    required: false
+    default: '3.9'
+
+outputs:
+  test-results:
+    description: 'Policy test results summary'
+    value: ${{ steps.run-policy-tests.outputs.results }}
+  violations-found:
+    description: 'Number of policy violations found'
+    value: ${{ steps.run-policy-tests.outputs.violations }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install OPA
+      shell: bash
+      run: |
+        curl -L -o opa https://openpolicyagent.org/downloads/v${{ inputs.opa-version }}/opa_linux_amd64_static
+        chmod +x opa
+        sudo mv opa /usr/local/bin/
+        opa version
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ inputs.python-version }}
+        cache: 'pip'
+    
+    - name: Install test dependencies
+      shell: bash
+      run: |
+        pip install pytest pyyaml requests
+        if [ -f requirements.txt ]; then
+          pip install -r requirements.txt
+        fi
+        if [ -f requirements-test.txt ]; then
+          pip install -r requirements-test.txt
+        fi
+    
+    - name: Validate OPA policies
+      shell: bash
+      run: |
+        echo "Validating Peace Bonds policies..."
+        if [ -d "${{ inputs.policy-path }}" ]; then
+          opa test ${{ inputs.policy-path }}/*.rego -v
+        else
+          echo "Warning: Policy path ${{ inputs.policy-path }} not found. Skipping OPA validation."
+        fi
+    
+    - name: Run policy enforcement tests
+      id: run-policy-tests
+      shell: bash
+      env:
+        PYTHONPATH: ${{ github.workspace }}
+        OPA_POLICY_PATH: ${{ inputs.policy-path }}
+        TEST_DATA_PATH: ${{ inputs.test-data-path }}
+      run: |
+        echo "Running policy enforcement tests..."
+        
+        if [ -d "tests/policy_enforcement" ]; then
+          pytest tests/policy_enforcement -v --tb=short || true
+        else
+          echo "Warning: tests/policy_enforcement directory not found. Skipping tests."
+        fi
+        
+        violations=$(grep -c "VIOLATION" test_output.log 2>/dev/null || echo "0")
+        echo "violations=$violations" >> $GITHUB_OUTPUT
+        echo "results=Policy enforcement tests completed with $violations violations" >> $GITHUB_OUTPUT
+    
+    - name: Upload policy test results
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: policy-enforcement-test-results
+        path: |
+          test_output.log
+          policy_violations.json

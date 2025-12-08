@@ -1,0 +1,189 @@
+name: 'Integration Test Setup'
+description: 'Setup infrastructure services for integration testing (Kafka, Prometheus, etc.)'
+inputs:
+  enable-kafka:
+    description: 'Enable Kafka service'
+    required: false
+    default: 'true'
+  enable-prometheus:
+    description: 'Enable Prometheus service'
+    required: false
+    default: 'true'
+  enable-grafana:
+    description: 'Enable Grafana service'
+    required: false
+    default: 'false'
+  kafka-version:
+    description: 'Kafka version to use'
+    required: false
+    default: '3.6'
+  wait-timeout:
+    description: 'Timeout in seconds to wait for services'
+    required: false
+    default: '60'
+
+outputs:
+  kafka-ready:
+    description: 'Kafka service status'
+    value: ${{ steps.check-services.outputs.kafka }}
+  prometheus-ready:
+    description: 'Prometheus service status'
+    value: ${{ steps.check-services.outputs.prometheus }}
+  services-endpoint:
+    description: 'Services connection endpoints'
+    value: ${{ steps.check-services.outputs.endpoints }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Docker Compose
+      shell: bash
+      run: |
+        # Create docker-compose configuration for test services
+        cat > docker-compose.test.yml << 'EOF'
+        version: '3.8'
+        services:
+          zookeeper:
+            image: confluentinc/cp-zookeeper:7.5.0
+            environment:
+              ZOOKEEPER_CLIENT_PORT: 2181
+              ZOOKEEPER_TICK_TIME: 2000
+            ports:
+              - "2181:2181"
+            healthcheck:
+              test: ["CMD", "echo", "ruok", "|", "nc", "localhost", "2181"]
+              interval: 10s
+              timeout: 5s
+              retries: 5
+
+          kafka:
+            image: confluentinc/cp-kafka:7.5.0
+            depends_on:
+              - zookeeper
+            ports:
+              - "9092:9092"
+            environment:
+              KAFKA_BROKER_ID: 1
+              KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+              KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+              KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+              KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+              KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+            healthcheck:
+              test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
+              interval: 10s
+              timeout: 10s
+              retries: 5
+
+          prometheus:
+            image: prom/prometheus:latest
+            ports:
+              - "9090:9090"
+            volumes:
+              - ./config/prometheus:/etc/prometheus
+            command:
+              - '--config.file=/etc/prometheus/prometheus.yml'
+            healthcheck:
+              test: ["CMD", "wget", "--spider", "-q", "http://localhost:9090/-/healthy"]
+              interval: 10s
+              timeout: 5s
+              retries: 3
+
+          grafana:
+            image: grafana/grafana:latest
+            ports:
+              - "3000:3000"
+            environment:
+              GF_SECURITY_ADMIN_PASSWORD: admin
+              GF_USERS_ALLOW_SIGN_UP: false
+            healthcheck:
+              test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/api/health"]
+              interval: 10s
+              timeout: 5s
+              retries: 3
+        EOF
+    
+    - name: Start services
+      shell: bash
+      run: |
+        echo "Starting integration test services..."
+        
+        # Start only enabled services
+        services=""
+        if [ "${{ inputs.enable-kafka }}" = "true" ]; then
+          services="$services zookeeper kafka"
+        fi
+        if [ "${{ inputs.enable-prometheus }}" = "true" ]; then
+          services="$services prometheus"
+        fi
+        if [ "${{ inputs.enable-grafana }}" = "true" ]; then
+          services="$services grafana"
+        fi
+        
+        if [ -n "$services" ]; then
+          docker-compose -f docker-compose.test.yml up -d $services
+        fi
+    
+    - name: Wait for services to be ready
+      shell: bash
+      run: |
+        echo "Waiting for services to be ready..."
+        timeout=${{ inputs.wait-timeout }}
+        elapsed=0
+        
+        while [ $elapsed -lt $timeout ]; do
+          all_ready=true
+          
+          if [ "${{ inputs.enable-kafka }}" = "true" ]; then
+            if ! docker-compose -f docker-compose.test.yml exec -T kafka kafka-broker-api-versions --bootstrap-server localhost:9092 >/dev/null 2>&1; then
+              all_ready=false
+            fi
+          fi
+          
+          if [ "${{ inputs.enable-prometheus }}" = "true" ]; then
+            if ! curl -sf http://localhost:9090/-/healthy >/dev/null 2>&1; then
+              all_ready=false
+            fi
+          fi
+          
+          if [ "$all_ready" = "true" ]; then
+            echo "All services are ready!"
+            break
+          fi
+          
+          sleep 5
+          elapsed=$((elapsed + 5))
+        done
+        
+        if [ $elapsed -ge $timeout ]; then
+          echo "Warning: Timeout waiting for services"
+        fi
+    
+    - name: Check services status
+      id: check-services
+      shell: bash
+      run: |
+        kafka_status="false"
+        prometheus_status="false"
+        endpoints=""
+        
+        if [ "${{ inputs.enable-kafka }}" = "true" ]; then
+          if docker-compose -f docker-compose.test.yml ps kafka | grep -q "Up"; then
+            kafka_status="true"
+            endpoints="${endpoints}kafka=localhost:9092;"
+          fi
+        fi
+        
+        if [ "${{ inputs.enable-prometheus }}" = "true" ]; then
+          if docker-compose -f docker-compose.test.yml ps prometheus | grep -q "Up"; then
+            prometheus_status="true"
+            endpoints="${endpoints}prometheus=http://localhost:9090;"
+          fi
+        fi
+        
+        echo "kafka=$kafka_status" >> $GITHUB_OUTPUT
+        echo "prometheus=$prometheus_status" >> $GITHUB_OUTPUT
+        echo "endpoints=$endpoints" >> $GITHUB_OUTPUT
+        
+        echo "Services status: Kafka=$kafka_status, Prometheus=$prometheus_status"
+        echo "Endpoints: $endpoints"

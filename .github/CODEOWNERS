@@ -1,0 +1,30 @@
+# Code owners for the Euystacio repository
+# These owners will be requested for review when someone opens a PR
+
+# Default owners for everything in the repo
+* @hannesmitterer
+
+# Workflow files
+/.github/ @hannesmitterer
+
+# TypeScript/Node.js components
+/src/ @hannesmitterer
+tsconfig.json @hannesmitterer
+package.json @hannesmitterer
+
+# Python components
+*.py @hannesmitterer
+requirements.txt @hannesmitterer
+
+# Documentation
+*.md @hannesmitterer
+/manifesto/ @hannesmitterer
+
+# Configuration files
+.eslintrc.json @hannesmitterer
+.prettierrc.json @hannesmitterer
+.flake8 @hannesmitterer
+
+# Security and deployment
+/SECURITY_RUNBOOK.md @hannesmitterer
+/DEPLOY_INSTRUCTIONS.md @hannesmitterer

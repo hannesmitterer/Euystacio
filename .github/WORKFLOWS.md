@@ -116,6 +116,78 @@ The repository uses multiple GitHub Actions workflows to ensure code quality, se
 
 ---
 
+### 5. Dependency Review (`dependency-review.yml`)
+
+**Triggers:**
+- Pull requests to `main` branch
+
+**Jobs:**
+
+#### Review Dependencies
+- Reviews dependencies added in PRs
+- Checks for known vulnerabilities
+- Fails on moderate+ severity issues
+- Comments summary in PR
+- Denies problematic licenses (AGPL, GPL)
+
+**Purpose:**
+- Prevents introduction of vulnerable dependencies
+- Ensures license compliance
+- Provides automated security review
+
+---
+
+### 6. PR Auto-Labeler (`pr-labeler.yml`)
+
+**Triggers:**
+- Pull request opened, synchronized, or reopened
+
+**Jobs:**
+
+#### Label Pull Request
+- Automatically labels PRs based on changed files
+- Uses configuration from `.github/labeler.yml`
+
+**Labels Applied:**
+- `documentation` - Markdown or docs changes
+- `workflows` - GitHub Actions changes
+- `typescript` - TypeScript code changes
+- `python` - Python code changes
+- `configuration` - Config file changes
+- `frontend` - HTML/CSS changes
+- `dependencies` - Dependency updates
+- `security` - Security-related changes
+
+---
+
+### 7. Scheduled Health Checks (`scheduled-checks.yml`)
+
+**Triggers:**
+- Daily at 6 AM UTC (cron schedule)
+- Manual dispatch
+
+**Jobs:**
+
+#### Health Check
+- Performs daily build verification
+- Runs security audits
+- Checks Python dependencies
+- Verifies critical files exist
+- Tests GitHub Pages URL
+- Creates GitHub issue on failure
+
+#### Dependency Updates
+- Checks for outdated npm packages
+- Checks for outdated pip packages
+- Reports available updates
+
+**Purpose:**
+- Catches regressions early
+- Monitors dependency health
+- Ensures continuous deployability
+
+---
+
 ## Composite Actions
 
 ### Setup Node.js Environment (`.github/actions/setup-node-env`)

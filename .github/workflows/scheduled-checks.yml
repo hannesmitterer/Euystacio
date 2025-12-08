@@ -1,0 +1,133 @@
+name: Scheduled Health Checks
+
+on:
+  schedule:
+    # Run daily at 6 AM UTC
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  health-check:
+    name: Daily Health Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: ./.github/actions/setup-node-env
+        with:
+          node-version: '18'
+      
+      - name: Build project
+        run: npm run build
+      
+      - name: Security audit
+        id: audit
+        run: npm audit --audit-level=moderate
+        continue-on-error: true
+      
+      - name: Setup Python
+        uses: ./.github/actions/setup-python-env
+        with:
+          python-version: '3.9'
+      
+      - name: Check Python dependencies
+        run: |
+          pip list --outdated || echo "Some packages may be outdated"
+        continue-on-error: true
+      
+      - name: Verify critical files
+        run: |
+          critical_files=(
+            "package.json"
+            "tsconfig.json"
+            "requirements.txt"
+            ".env.example"
+            "index.html"
+            "_config.yml"
+          )
+          
+          for file in "${critical_files[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "ERROR: Critical file missing: $file"
+              exit 1
+            fi
+            echo "✓ $file exists"
+          done
+      
+      - name: Test GitHub Pages URL
+        run: |
+          # This will be available after first deployment
+          curl -s -o /dev/null -w "%{http_code}" https://hannesmitterer.github.io/Euystacio/ || echo "Pages not yet deployed or unavailable"
+        continue-on-error: true
+      
+      - name: Create issue on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = '🚨 Scheduled Health Check Failed';
+            const body = `
+            ## Health Check Failure
+            
+            The scheduled health check has failed. Please investigate.
+            
+            **Run:** ${{ github.run_id }}
+            **Workflow:** ${{ github.workflow }}
+            **Time:** ${{ github.event.repository.updated_at }}
+            
+            ### Quick Links
+            - [Workflow Run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            - [Repository](https://github.com/${{ github.repository }})
+            
+            ### Recommended Actions
+            1. Check the workflow logs
+            2. Verify all dependencies are up to date
+            3. Test the build locally
+            4. Fix any issues and re-run the workflow
+            
+            _This issue was automatically created by the scheduled health check workflow._
+            `;
+            
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['automated', 'health-check', 'priority']
+            });
+
+  dependency-updates:
+    name: Check for Dependency Updates
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: ./.github/actions/setup-node-env
+        with:
+          node-version: '18'
+          install-deps: 'false'
+      
+      - name: Check for npm updates
+        run: |
+          echo "Checking for outdated npm packages..."
+          npm outdated || echo "Some packages may have updates available"
+      
+      - name: Setup Python
+        uses: ./.github/actions/setup-python-env
+        with:
+          python-version: '3.9'
+      
+      - name: Check for pip updates
+        run: |
+          echo "Checking for outdated pip packages..."
+          pip list --outdated || echo "All packages up to date"

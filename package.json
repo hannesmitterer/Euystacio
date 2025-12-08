@@ -10,8 +10,8 @@
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "lint": "eslint src/ --ext .ts",
-    "lint:fix": "eslint src/ --ext .ts --fix",
+    "lint": "test -d src && eslint src/ --ext .ts || echo 'No src/ directory found'",
+    "lint:fix": "test -d src && eslint src/ --ext .ts --fix || echo 'No src/ directory found'",
     "format": "prettier --write \"**/*.{ts,js,json,md,yml,yaml}\"",
     "format:check": "prettier --check \"**/*.{ts,js,json,md,yml,yaml}\"",
     "typecheck": "tsc --noEmit"

@@ -204,7 +204,8 @@ jobs:
       
       - name: Convert Markdown to HTML
         run: |
-          pip install markdown
+          pip install markdown || { echo "Failed to install markdown"; exit 1; }
+          python3 -c "import markdown; print('✓ markdown module available')" || { echo "Failed to import markdown"; exit 1; }
           
           for md in _site/*.md; do
             if [ -f "$md" ]; then

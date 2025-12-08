@@ -35,7 +35,8 @@ jobs:
           echo "Response time: ${RESPONSE_TIME}s"
           
           # Alert if response time is too slow (> 3 seconds)
-          if (( $(echo "$RESPONSE_TIME > 3.0" | bc -l) )); then
+          # Using awk for portable arithmetic comparison
+          if awk "BEGIN {exit !($RESPONSE_TIME > 3.0)}"; then
             echo "⚠ Warning: Site is slow (${RESPONSE_TIME}s)"
           fi
       

@@ -55,44 +55,51 @@ enforce_peace_bonds := result if {
 
 # Detect violations based on input data
 detected_violations := violations if {
-    violations := [v |
-        violation_check := violation_checks[_]
-        violation_check.condition
-        v := {
-            "type": violation_check.type,
-            "severity": violation_check.severity,
-            "message": violation_check.message
-        }
-    ]
+    violations := array.concat(
+        symbiosis_violations,
+        array.concat(auth_violations, array.concat(resource_violations, anomaly_violations))
+    )
 }
 
-# Violation check definitions
-violation_checks := [
-    {
+# Symbiosis score violations
+symbiosis_violations := [v] if {
+    input.symbiosis_score < 0.75
+    v := {
         "type": "symbiosis_score_low",
-        "condition": input.symbiosis_score < 0.75,
         "severity": "high",
         "message": "Symbiosis Score below acceptable threshold"
-    },
-    {
+    }
+} else := []
+
+# Authorization violations
+auth_violations := [v] if {
+    not is_authorized_user
+    v := {
         "type": "unauthorized_access",
-        "condition": not is_authorized_user,
         "severity": "critical",
         "message": "Unauthorized access attempt detected"
-    },
-    {
+    }
+} else := []
+
+# Resource abuse violations
+resource_violations := [v] if {
+    input.resource_usage > input.resource_limit
+    v := {
         "type": "resource_abuse",
-        "condition": input.resource_usage > input.resource_limit,
         "severity": "medium",
         "message": "Resource usage exceeds allocated limit"
-    },
-    {
+    }
+} else := []
+
+# Anomaly detection violations
+anomaly_violations := [v] if {
+    input.anomaly_detected == true
+    v := {
         "type": "anomalous_behavior",
-        "condition": input.anomaly_detected == true,
         "severity": "high",
         "message": "Anomalous behavior pattern detected"
     }
-]
+} else := []
 
 # Check if user is authorized
 is_authorized_user if {
@@ -105,21 +112,29 @@ is_authorized_user if {
 
 # Generate recommendations based on violations
 generate_recommendations := recommendations if {
-    recommendations := [r |
+    recommendations := [recommendation |
         violation := detected_violations[_]
-        recommendation := violation_recommendations[violation.type]
-        r := recommendation
+        recommendation := get_recommendation(violation.type)
     ]
 }
 
-# Recommendations for each violation type
-violation_recommendations := {
-    "symbiosis_score_low": "Increase symbiosis score through positive interactions and trust-building activities",
-    "unauthorized_access": "Verify user credentials and permissions before granting access",
-    "resource_abuse": "Reduce resource consumption or request additional allocation",
-    "anomalous_behavior": "Investigate the source of anomalous behavior and take corrective action",
-    "policy_bypass_attempt": "Review security policies and strengthen access controls"
-}
+# Get recommendation for violation type
+get_recommendation(violation_type) := recommendation if {
+    violation_type == "symbiosis_score_low"
+    recommendation := "Increase symbiosis score through positive interactions and trust-building activities"
+} else := recommendation if {
+    violation_type == "unauthorized_access"
+    recommendation := "Verify user credentials and permissions before granting access"
+} else := recommendation if {
+    violation_type == "resource_abuse"
+    recommendation := "Reduce resource consumption or request additional allocation"
+} else := recommendation if {
+    violation_type == "anomalous_behavior"
+    recommendation := "Investigate the source of anomalous behavior and take corrective action"
+} else := recommendation if {
+    violation_type == "policy_bypass_attempt"
+    recommendation := "Review security policies and strengthen access controls"
+} else := "Review and correct the violation"
 
 # Test data for authorized users (in production, this would come from external data)
 authorized_users := {

@@ -14,6 +14,8 @@ jobs:
   typescript-tests:
     name: TypeScript Tests
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
       - name: Checkout code
@@ -51,6 +53,8 @@ jobs:
   python-tests:
     name: Python Tests
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
       - name: Checkout code
@@ -83,6 +87,8 @@ jobs:
   integration-tests:
     name: Integration Tests
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
       - name: Checkout code
@@ -133,6 +139,8 @@ jobs:
   test-status:
     name: Test Status
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     needs: [typescript-tests, python-tests, integration-tests]
     if: always()
     

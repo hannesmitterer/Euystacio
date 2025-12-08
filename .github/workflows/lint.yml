@@ -14,6 +14,8 @@ jobs:
   eslint:
     name: ESLint
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
       - name: Checkout code
@@ -39,6 +41,8 @@ jobs:
   python-lint:
     name: Python Linting
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
       - name: Checkout code
@@ -69,6 +73,8 @@ jobs:
   prettier:
     name: Prettier Format Check
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
       - name: Checkout code
@@ -90,6 +96,8 @@ jobs:
   markdownlint:
     name: Markdown Linting
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
       - name: Checkout code
@@ -102,6 +110,8 @@ jobs:
   lint-status:
     name: Lint Status
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     needs: [eslint, python-lint, prettier, markdownlint]
     if: always()
     

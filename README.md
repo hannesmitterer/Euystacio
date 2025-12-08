@@ -3,6 +3,10 @@
 **Version:** 1.0.0  
 **The Holy Bridge - Unified AI Coordination Platform**
 
+[![CI/CD Pipeline](https://github.com/hannesmitterer/Euystacio/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/hannesmitterer/Euystacio/actions/workflows/ci-cd.yml)
+[![CodeQL Security Scan](https://github.com/hannesmitterer/Euystacio/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/hannesmitterer/Euystacio/actions/workflows/codeql-analysis.yml)
+[![Deploy to GitHub Pages](https://github.com/hannesmitterer/Euystacio/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/hannesmitterer/Euystacio/actions/workflows/deploy-pages.yml)
+
 ---
 
 ## Overview

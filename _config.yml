@@ -18,8 +18,8 @@ exclude:
   - package-lock.json
   - tsconfig.json
   - requirements.txt
-  - *.py
-  - *.pyc
+  - "*.py"
+  - "*.pyc"
   - contracts/
   - scripts/
   - src/

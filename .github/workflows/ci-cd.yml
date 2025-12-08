@@ -234,21 +234,29 @@ jobs:
           
           # Generate workflow report
           TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          RUN_NUM="${{ github.run_number }}"
+          EVENT="${{ github.event_name }}"
+          LINT_RESULT="${{ needs.lint-and-test.result }}"
+          SEC_RESULT="${{ needs.security-scan.result }}"
+          BUILD_RESULT="${{ needs.build-verification.result }}"
+          BRANCH="${{ github.ref_name }}"
+          COMMIT="${{ github.sha }}"
+          
           cat > workflow-report.md << EOF
           # CI/CD Pipeline Report
           
           **Date:** $TIMESTAMP
-          **Workflow Run:** \${{ github.run_number }}
-          **Trigger:** \${{ github.event_name }}
+          **Workflow Run:** $RUN_NUM
+          **Trigger:** $EVENT
           
           ## Job Results
-          - Lint & Test: \${{ needs.lint-and-test.result }}
-          - Security Scan: \${{ needs.security-scan.result }}
-          - Build Verification: \${{ needs.build-verification.result }}
+          - Lint & Test: $LINT_RESULT
+          - Security Scan: $SEC_RESULT
+          - Build Verification: $BUILD_RESULT
           
           ## Repository
-          - Branch: \${{ github.ref_name }}
-          - Commit: \${{ github.sha }}
+          - Branch: $BRANCH
+          - Commit: $COMMIT
           EOF
           
           cat workflow-report.md

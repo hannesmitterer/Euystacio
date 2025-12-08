@@ -96,18 +96,25 @@ jobs:
         if: always()
         run: |
           TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          PAGE_URL="${{ steps.deployment.outputs.page_url }}"
+          COMMIT_SHA="${{ github.sha }}"
+          BRANCH="${{ github.ref_name }}"
+          RUN_NUM="${{ github.run_number }}"
+          EVENT="${{ github.event_name }}"
+          STATUS="${{ job.status }}"
+          
           cat > deployment-status.md << EOF
           # GitHub Pages Deployment Status
           
           **Date:** $TIMESTAMP
-          **URL:** \${{ steps.deployment.outputs.page_url }}
-          **Commit:** \${{ github.sha }}
-          **Branch:** \${{ github.ref_name }}
+          **URL:** $PAGE_URL
+          **Commit:** $COMMIT_SHA
+          **Branch:** $BRANCH
           
           ## Deployment Details
-          - Workflow Run: \${{ github.run_number }}
-          - Triggered by: \${{ github.event_name }}
-          - Status: \${{ job.status }}
+          - Workflow Run: $RUN_NUM
+          - Triggered by: $EVENT
+          - Status: $STATUS
           EOF
           
           cat deployment-status.md

@@ -117,12 +117,18 @@ jobs:
         if: always()
         run: |
           TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          REPO="${{ github.repository }}"
+          BRANCH="${{ github.ref_name }}"
+          RUN_NUM="${{ github.run_number }}"
+          EVENT="${{ github.event_name }}"
+          STATUS="${{ job.status }}"
+          
           cat > DEPENDENCY_HEALTH_REPORT.md << EOF
           # Comprehensive Dependency Health Report
           
           **Generated:** $TIMESTAMP
-          **Repository:** \${{ github.repository }}
-          **Branch:** \${{ github.ref_name }}
+          **Repository:** $REPO
+          **Branch:** $BRANCH
           
           ---
           
@@ -131,9 +137,9 @@ jobs:
           This report provides an overview of dependency health across Node.js and Python ecosystems.
           
           ### Quick Stats
-          - Workflow Run: #\${{ github.run_number }}
-          - Triggered by: \${{ github.event_name }}
-          - Status: \${{ job.status }}
+          - Workflow Run: #$RUN_NUM
+          - Triggered by: $EVENT
+          - Status: $STATUS
           
           ---
           

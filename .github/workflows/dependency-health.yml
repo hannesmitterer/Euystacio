@@ -116,12 +116,13 @@ jobs:
       - name: Generate comprehensive report
         if: always()
         run: |
-          cat > DEPENDENCY_HEALTH_REPORT.md << 'EOF'
+          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          cat > DEPENDENCY_HEALTH_REPORT.md << EOF
           # Comprehensive Dependency Health Report
           
-          **Generated:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")
-          **Repository:** ${{ github.repository }}
-          **Branch:** ${{ github.ref_name }}
+          **Generated:** $TIMESTAMP
+          **Repository:** \${{ github.repository }}
+          **Branch:** \${{ github.ref_name }}
           
           ---
           
@@ -130,9 +131,9 @@ jobs:
           This report provides an overview of dependency health across Node.js and Python ecosystems.
           
           ### Quick Stats
-          - Workflow Run: #${{ github.run_number }}
-          - Triggered by: ${{ github.event_name }}
-          - Status: ${{ job.status }}
+          - Workflow Run: #\${{ github.run_number }}
+          - Triggered by: \${{ github.event_name }}
+          - Status: \${{ job.status }}
           
           ---
           
@@ -189,7 +190,8 @@ jobs:
           CRITICAL_COUNT=0
           
           if [ -f npm-audit-raw.json ]; then
-            CRITICAL_COUNT=$(jq '.metadata.vulnerabilities.critical // 0' npm-audit-raw.json)
+            # Use Python to parse JSON instead of jq
+            CRITICAL_COUNT=$(python3 -c "import json; data=json.load(open('npm-audit-raw.json')); print(data.get('metadata', {}).get('vulnerabilities', {}).get('critical', 0))")
             echo "Critical Node.js vulnerabilities: $CRITICAL_COUNT"
           fi
           

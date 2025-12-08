@@ -233,21 +233,22 @@ jobs:
           echo "Build Verification: ${{ needs.build-verification.result }}"
           
           # Generate workflow report
-          cat > workflow-report.md << 'EOF'
+          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          cat > workflow-report.md << EOF
           # CI/CD Pipeline Report
           
-          **Date:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")
-          **Workflow Run:** ${{ github.run_number }}
-          **Trigger:** ${{ github.event_name }}
+          **Date:** $TIMESTAMP
+          **Workflow Run:** \${{ github.run_number }}
+          **Trigger:** \${{ github.event_name }}
           
           ## Job Results
-          - Lint & Test: ${{ needs.lint-and-test.result }}
-          - Security Scan: ${{ needs.security-scan.result }}
-          - Build Verification: ${{ needs.build-verification.result }}
+          - Lint & Test: \${{ needs.lint-and-test.result }}
+          - Security Scan: \${{ needs.security-scan.result }}
+          - Build Verification: \${{ needs.build-verification.result }}
           
           ## Repository
-          - Branch: ${{ github.ref_name }}
-          - Commit: ${{ github.sha }}
+          - Branch: \${{ github.ref_name }}
+          - Commit: \${{ github.sha }}
           EOF
           
           cat workflow-report.md

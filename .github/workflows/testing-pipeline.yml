@@ -39,7 +39,10 @@ jobs:
             npm test -- --coverage --json --outputFile=test-results.json || true
           else
             echo "No unit tests configured in package.json"
-            echo '{"testResults": [], "numTotalTests": 0}' > test-results.json
+            TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+            cat > test-results.json << EOF
+          {"testResults": [], "numTotalTests": 0, "timestamp": "$TIMESTAMP"}
+          EOF
           fi
         continue-on-error: true
       
@@ -56,7 +59,10 @@ jobs:
             pytest --cov=. --cov-report=html --cov-report=json --json-report --json-report-file=pytest-results.json || true
           else
             echo "No Python tests found"
-            echo '{"tests": []}' > pytest-results.json
+            TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+            cat > pytest-results.json << EOF
+          {"tests": [], "timestamp": "$TIMESTAMP"}
+          EOF
           fi
         continue-on-error: true
       
@@ -96,10 +102,11 @@ jobs:
           echo "Running integration tests for API endpoints and services"
           
           # Create placeholder integration test report
-          cat > integration-test-report.json << 'EOF'
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          cat > integration-test-report.json << EOF
           {
             "test_suite": "integration",
-            "timestamp": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
+            "timestamp": "$TIMESTAMP",
             "status": "skipped",
             "message": "Integration tests not yet configured",
             "tests": []
@@ -136,10 +143,11 @@ jobs:
           echo "Running performance benchmarks"
           
           # Create placeholder performance test report
-          cat > performance-test-report.json << 'EOF'
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          cat > performance-test-report.json << EOF
           {
             "test_suite": "performance",
-            "timestamp": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
+            "timestamp": "$TIMESTAMP",
             "status": "skipped",
             "message": "Performance tests not yet configured",
             "metrics": {

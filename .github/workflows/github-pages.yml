@@ -95,18 +95,19 @@ jobs:
       - name: Create deployment status report
         if: always()
         run: |
-          cat > deployment-status.md << 'EOF'
+          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          cat > deployment-status.md << EOF
           # GitHub Pages Deployment Status
           
-          **Date:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")
-          **URL:** ${{ steps.deployment.outputs.page_url }}
-          **Commit:** ${{ github.sha }}
-          **Branch:** ${{ github.ref_name }}
+          **Date:** $TIMESTAMP
+          **URL:** \${{ steps.deployment.outputs.page_url }}
+          **Commit:** \${{ github.sha }}
+          **Branch:** \${{ github.ref_name }}
           
           ## Deployment Details
-          - Workflow Run: ${{ github.run_number }}
-          - Triggered by: ${{ github.event_name }}
-          - Status: ${{ job.status }}
+          - Workflow Run: \${{ github.run_number }}
+          - Triggered by: \${{ github.event_name }}
+          - Status: \${{ job.status }}
           EOF
           
           cat deployment-status.md

@@ -1,7 +1,7 @@
 # Euystacio CI/CD Automation Guide
 
 **Version:** 2.0  
-**Last Updated:** December 2025  
+**Last Updated:** December 2024  
 **Status:** Production Ready
 
 ---
@@ -493,4 +493,4 @@ If deployment fails:
 
 **Document Version:** 2.0  
 **Maintained By:** Euystacio DevOps Team  
-**Last Review:** December 2025
+**Last Review:** December 2024

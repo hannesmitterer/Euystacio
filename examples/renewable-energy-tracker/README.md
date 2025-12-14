@@ -275,9 +275,16 @@ class SolarTracker {
   }
 
   calculateCarbonOffset(readings) {
-    // Average grid carbon intensity: 0.5 kg CO2 per kWh
+    // IMPORTANT: Carbon intensity varies by region and grid composition
+    // This example uses 0.5 kg CO2 per kWh (global average)
+    // Replace with your local grid's carbon intensity:
+    // - US average: ~0.4 kg/kWh
+    // - EU average: ~0.3 kg/kWh
+    // - Coal-heavy grids: ~0.8-1.0 kg/kWh
+    // - Renewable-heavy grids: ~0.1-0.2 kg/kWh
+    const CARBON_INTENSITY = 0.5; // kg CO2 per kWh - CUSTOMIZE FOR YOUR REGION
     const totalKwh = readings.reduce((sum, r) => sum + r.production.dailyKwh, 0);
-    return totalKwh * 0.5; // kg CO2 offset
+    return totalKwh * CARBON_INTENSITY;
   }
 
   validateReading(reading) {

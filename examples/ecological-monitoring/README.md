@@ -182,10 +182,29 @@ class EcologicalMonitor:
         return observation
     
     def get_current_location(self):
-        """Get GPS coordinates"""
-        # In real implementation, use actual GPS library
+        """Get GPS coordinates
+        
+        PRODUCTION IMPLEMENTATION: Use one of these GPS libraries:
+        - gpsd + gpsd-py3 (Linux with GPS hardware)
+        - geopy (geocoding from address)
+        - Mobile HTML5 Geolocation API (browser/mobile)
+        
+        Example with gpsd:
+        ```python
+        from gpsd import connect, get_current
+        connect()
+        packet = get_current()
         return {
-            'lat': 40.7128,
+            'lat': packet.lat,
+            'lon': packet.lon,
+            'accuracy': packet.error['x'],  # meters
+            'name': 'GPS Location'
+        }
+        ```
+        """
+        # PLACEHOLDER: Replace with actual GPS implementation
+        return {
+            'lat': 40.7128,  # Example coordinates
             'lon': -74.0060,
             'accuracy': 5,
             'name': 'Current Location'

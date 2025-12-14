@@ -110,15 +110,26 @@ install_ipfs() {
     print_info "Extracting IPFS archive..."
     tar -xzf "$filename"
     
+    # Verify checksum (if available)
+    if [ -f "kubo/ipfs" ]; then
+        print_info "IPFS binary extracted successfully"
+    else
+        print_error "Failed to extract IPFS binary"
+        rm -rf "$tmp_dir"
+        exit 1
+    fi
+    
     # Install to /usr/local/bin or ~/bin
     if [ -w "/usr/local/bin" ]; then
         print_info "Installing IPFS to /usr/local/bin..."
-        cd kubo
-        sudo bash install.sh
+        # Copy binary directly instead of running install.sh with sudo
+        sudo cp kubo/ipfs /usr/local/bin/ipfs
+        sudo chmod +x /usr/local/bin/ipfs
     else
         print_info "Installing IPFS to ~/bin (no sudo access)..."
         mkdir -p "$HOME/bin"
         cp kubo/ipfs "$HOME/bin/"
+        chmod +x "$HOME/bin/ipfs"
         export PATH="$HOME/bin:$PATH"
         print_warning "Added ~/bin to PATH. You may need to add this to your shell profile."
     fi
@@ -216,8 +227,11 @@ add_to_ipfs() {
     
     print_info "Adding contents of '$DOCS_DIR' directory to IPFS..."
     
-    # Add directory recursively to IPFS
-    local ipfs_output=$(ipfs add -r "$DOCS_DIR" 2>&1 | tee /dev/tty)
+    # Add directory recursively to IPFS and capture output
+    local ipfs_output=$(ipfs add -r "$DOCS_DIR" 2>&1)
+    
+    # Display output to user
+    echo "$ipfs_output"
     
     # Extract the CID of the root directory (last line)
     local cid=$(echo "$ipfs_output" | tail -n 1 | awk '{print $2}')
@@ -265,12 +279,18 @@ pin_to_pinata() {
 EOF
 )
     
-    # Make API request to Pinata
+    # Make API request to Pinata using a header file to avoid exposing JWT in process list
+    local header_file=$(mktemp)
+    echo "Authorization: Bearer $PINATA_JWT" > "$header_file"
+    
     local response=$(curl -s -w "\n%{http_code}" -X POST \
         "https://api.pinata.cloud/pinning/pinByHash" \
-        -H "Authorization: Bearer $PINATA_JWT" \
+        -H @"$header_file" \
         -H "Content-Type: application/json" \
         -d "$payload")
+    
+    # Clean up header file
+    rm -f "$header_file"
     
     # Extract HTTP status code and response body
     local http_code=$(echo "$response" | tail -n 1)

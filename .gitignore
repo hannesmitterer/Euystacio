@@ -18,3 +18,7 @@ Thumbs.db
 # Logs
 *.log
 npm-debug.log*
+
+# IPFS
+.ipfs/
+ipfs-daemon.log

@@ -254,6 +254,33 @@ docker run -p 8080:8080 \
 
 ---
 
+## IPFS Eternalization
+
+Euystacio supports eternalizing documentation on IPFS for permanent, decentralized access.
+
+### Quick Start
+
+1. Export your Pinata JWT token:
+   ```bash
+   export PINATA_JWT="your_pinata_jwt_token"
+   ```
+
+2. Run the eternalization script:
+   ```bash
+   ./eternalize.sh
+   ```
+
+The script will automatically:
+- Install IPFS CLI if needed
+- Initialize IPFS and start the daemon
+- Add your documentation from the `docs/` directory to IPFS
+- Pin the content to Pinata for persistence
+- Provide you with the CID and gateway URLs
+
+For detailed information, see [docs/IPFS_GUIDE.md](./docs/IPFS_GUIDE.md)
+
+---
+
 ## Security
 
 ### Best Practices

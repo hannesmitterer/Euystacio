@@ -1,5 +1,21 @@
 # Twitter Thread Templates for Final Distribution
 
+## ⚠️ Important: Wallet Address Management
+
+**Security Note:** The wallet addresses in these templates are hardcoded for consistency across communications. 
+
+**Current Addresses:**
+- Ethereum (ERC-20): `0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb2`
+- Bitcoin: `bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh`
+
+**If wallet addresses need to be rotated:**
+1. Update addresses in all template files (use find/replace)
+2. Announce change through all official channels
+3. Maintain old addresses for 30-day transition period
+4. Update SUPPORT.md as the single source of truth
+
+---
+
 ## Thread 1: Survival Announcement (Urgent)
 
 ### Tweet 1/8 (Opening)

@@ -44,6 +44,10 @@ setup_discord() {
         return 1
     fi
     
+    # Security: Mask webhook URL in output
+    MASKED_WEBHOOK=$(echo "$DISCORD_WEBHOOK" | sed 's/\(.*\/\).*$/\1***MASKED***/g')
+    echo "Webhook URL saved (masked): $MASKED_WEBHOOK"
+    
     echo "DISCORD_WEBHOOK=$DISCORD_WEBHOOK" >> "$CONFIG_FILE"
     
     # Test webhook

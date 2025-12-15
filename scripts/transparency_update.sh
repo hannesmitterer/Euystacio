@@ -40,16 +40,20 @@ command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
-# Function to get Ethereum balance (requires curl)
+# Function to get Ethereum balance (requires curl and Etherscan API key)
+# Note: This is a placeholder. To enable:
+# 1. Get API key from https://etherscan.io/myapikey
+# 2. Set ETHERSCAN_API_KEY environment variable
+# 3. Uncomment the implementation below
 get_eth_balance() {
-    if command_exists curl; then
-        echo "Fetching Ethereum balance..."
-        # Using Etherscan API (requires API key for production)
-        # For now, just return placeholder
-        echo "[Requires Etherscan API integration]"
-    else
-        echo "[curl not installed - cannot fetch balance]"
-    fi
+    # if command_exists curl && [[ -n "$ETHERSCAN_API_KEY" ]]; then
+    #     echo "Fetching Ethereum balance..."
+    #     BALANCE=$(curl -s "https://api.etherscan.io/api?module=account&action=balance&address=${ETHEREUM_ADDRESS}&tag=latest&apikey=${ETHERSCAN_API_KEY}")
+    #     # Parse and return balance
+    #     echo "$BALANCE"
+    # else
+        echo "[Etherscan API integration not configured - set ETHERSCAN_API_KEY environment variable]"
+    # fi
 }
 
 # Function to generate report template

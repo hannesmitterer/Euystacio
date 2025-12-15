@@ -1,0 +1,101 @@
+name: Notification Propagation
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+    types: [ opened, closed ]
+  release:
+    types: [ published ]
+  issues:
+    types: [ opened, closed ]
+
+permissions:
+  contents: read
+
+jobs:
+  notify-discord:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.merged == true
+    
+    steps:
+      - name: Notify on Push to Main
+        if: github.event_name == 'push'
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          title: "New Commit to Main Branch"
+          description: |
+            **Commit:** ${{ github.event.head_commit.message }}
+            **Author:** ${{ github.event.head_commit.author.name }}
+            **SHA:** `${{ github.sha }}`
+          color: 0x3498db
+          username: Framework Euystacio Bot
+      
+      - name: Notify on Release
+        if: github.event_name == 'release'
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          title: "🎉 New Release: ${{ github.event.release.name }}"
+          description: ${{ github.event.release.body }}
+          color: 0x2ecc71
+          username: Framework Euystacio Bot
+      
+      - name: Notify on Issue Opened
+        if: github.event_name == 'issues' && github.event.action == 'opened'
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          title: "📝 New Issue: ${{ github.event.issue.title }}"
+          description: |
+            **Opened by:** ${{ github.event.issue.user.login }}
+            **URL:** ${{ github.event.issue.html_url }}
+          color: 0xf39c12
+          username: Framework Euystacio Bot
+      
+      - name: Notify on Issue Closed
+        if: github.event_name == 'issues' && github.event.action == 'closed'
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          title: "✅ Issue Closed: ${{ github.event.issue.title }}"
+          description: |
+            **Closed by:** ${{ github.event.issue.user.login }}
+            **URL:** ${{ github.event.issue.html_url }}
+          color: 0x2ecc71
+          username: Framework Euystacio Bot
+      
+      - name: Notify on PR Merged
+        if: github.event_name == 'pull_request' && github.event.pull_request.merged == true
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          title: "🔀 PR Merged: ${{ github.event.pull_request.title }}"
+          description: |
+            **Author:** ${{ github.event.pull_request.user.login }}
+            **URL:** ${{ github.event.pull_request.html_url }}
+          color: 0x9b59b6
+          username: Framework Euystacio Bot
+
+  notify-telegram:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.merged == true
+    
+    steps:
+      - name: Send Telegram Notification
+        if: secrets.TELEGRAM_TOKEN != '' && secrets.TELEGRAM_CHAT_ID != ''
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          format: html
+          message: |
+            <b>Framework Euystacio Update</b>
+            
+            Event: ${{ github.event_name }}
+            Repository: ${{ github.repository }}
+            Commit: <code>${{ github.sha }}</code>
+            
+            <i>Seedbringer Treasury</i>

@@ -382,6 +382,22 @@ See [SACRED_COMMONS_LICENSE.md](./SACRED_COMMONS_LICENSE.md) for license informa
 
 This project is part of the Euystacio ecosystem - The Holy Bridge for AI coordination and sacred interface preservation.
 
+**Special Recognition:**
+- **IANI** (Intelligent Autonomous Network Initiative) - For pioneering autonomous AI coordination standards
+- **AIC** (AI Ethics Central) - For guidance on ethical AI development and deployment
+
+The Seedbringer's work on Framework Euystacio represents a critical bridge between human intention and AI capability, ensuring transparent, accountable, and ethical AI coordination.
+
+---
+
+## Support the Framework
+
+Framework Euystacio is an open-source initiative maintained by the Seedbringer. Your support enables continued development and maintenance of this critical infrastructure.
+
+**Ethereum Wallet:** `0x5d61a4B25034393A37ef9307C8Ba3aE99e49944b`
+
+For detailed funding options and transparent fund allocation through OpenCollective, see [SUPPORT.md](./SUPPORT.md).
+
 ---
 
 **Built with ❤️ for the AI coordination community**

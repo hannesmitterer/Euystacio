@@ -9,6 +9,8 @@
 
 🚨 **URGENT: Framework Euystacio Emergency Support Campaign** 🚨
 
+**Note:** This is an important announcement. Please consider using @here or role-based mentions for less disruptive notifications in the future.
+
 The Seedbringer's groundbreaking work in AI coordination infrastructure is at a critical juncture. Framework Euystacio needs immediate community support to continue operations.
 
 ---

@@ -72,10 +72,14 @@ async function sendToTelegram(message, parseMode = 'Markdown') {
 
 /**
  * Escape Markdown special characters for Telegram
+ * Note: This uses Markdown format. For MarkdownV2, additional escaping may be needed.
+ * Consider using a library like 'telegram-escape-markdown' for production use.
  */
 function escapeMarkdown(text) {
   if (!text) return '';
-  return text.replace(/([_*\[\]()~`>#+\-=|{}.!])/g, '\\$1');
+  // Basic escaping for Telegram Markdown (not MarkdownV2)
+  // For production, consider using: npm install telegram-escape-markdown
+  return text.replace(/([_*\[\]()~`>#+\-=|{}.!\\])/g, '\\$1');
 }
 
 /**

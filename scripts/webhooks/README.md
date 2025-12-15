@@ -126,6 +126,12 @@ openssl rand -hex 32
 export GITHUB_WEBHOOK_SECRET="your_generated_secret"
 ```
 
+**Important:** Store webhook secrets securely:
+- Use environment variables (never commit to git)
+- Use a secrets manager (AWS Secrets Manager, HashiCorp Vault, etc.)
+- Rotate secrets every 90 days or after suspected compromise
+- Document secret rotation procedures
+
 ### 2. Use HTTPS
 
 Always use HTTPS for webhook endpoints:

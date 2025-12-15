@@ -71,10 +71,15 @@ async function sendToDiscord(payload) {
 function formatIssueEvent(event) {
   const { action, issue, repository } = event;
   
+  // Sanitize and truncate description
+  const sanitizedBody = issue.body 
+    ? issue.body.replace(/[<>]/g, '').substring(0, 300)
+    : 'No description provided';
+  
   const embed = {
     title: `Issue ${action}: #${issue.number} ${issue.title}`,
     url: issue.html_url,
-    description: issue.body?.substring(0, 300) || 'No description provided',
+    description: sanitizedBody,
     color: CONFIG.colors.issue,
     author: {
       name: issue.user.login,
@@ -117,10 +122,15 @@ function formatIssueEvent(event) {
 function formatPullRequestEvent(event) {
   const { action, pull_request, repository } = event;
   
+  // Sanitize and truncate description
+  const sanitizedBody = pull_request.body 
+    ? pull_request.body.replace(/[<>]/g, '').substring(0, 300)
+    : 'No description provided';
+  
   const embed = {
     title: `PR ${action}: #${pull_request.number} ${pull_request.title}`,
     url: pull_request.html_url,
-    description: pull_request.body?.substring(0, 300) || 'No description provided',
+    description: sanitizedBody,
     color: CONFIG.colors.pullRequest,
     author: {
       name: pull_request.user.login,

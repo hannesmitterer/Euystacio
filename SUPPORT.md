@@ -46,6 +46,12 @@ Your support directly funds:
 - USDC, USDT, DAI (Stablecoins)
 - WBTC (Wrapped Bitcoin)
 
+**Security Note:**
+- This wallet address is publicly disclosed for transparent funding
+- All transactions are on-chain and verifiable
+- Funds are managed with multi-sig security (where applicable)
+- Regular financial reports published via OpenCollective
+
 ### OpenCollective (Transparent Funding)
 
 For transparent fund allocation and financial accountability:

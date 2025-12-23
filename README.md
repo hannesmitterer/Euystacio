@@ -3,6 +3,10 @@
 **Version:** 1.0.0  
 **The Holy Bridge - Unified AI Coordination Platform**
 
+[![CI/CD Pipeline](https://github.com/hannesmitterer/Euystacio/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/hannesmitterer/Euystacio/actions/workflows/ci-cd.yml)
+[![CodeQL Security Scan](https://github.com/hannesmitterer/Euystacio/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/hannesmitterer/Euystacio/actions/workflows/codeql-analysis.yml)
+[![Deploy to GitHub Pages](https://github.com/hannesmitterer/Euystacio/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/hannesmitterer/Euystacio/actions/workflows/deploy-pages.yml)
+
 ---
 
 ## Overview
@@ -363,9 +367,18 @@ We welcome contributions! Please follow these steps:
 
 ## Support & Resources
 
+### Documentation
 - 📚 **Full API Spec:** [NEXUS_API_SPEC.md](./NEXUS_API_SPEC.md)
 - 🚀 **Deployment Guide:** [DEPLOY_INSTRUCTIONS.md](./DEPLOY_INSTRUCTIONS.md)
 - 🔐 **Security Runbook:** [SECURITY_RUNBOOK.md](./SECURITY_RUNBOOK.md)
+
+### CI/CD & Workflows
+- ⚙️ **Workflow Documentation:** [.github/workflows/README.md](./.github/workflows/README.md)
+- 🔍 **Workflow Status:** [.github/WORKFLOW_STATUS.md](./.github/WORKFLOW_STATUS.md)
+- 📖 **Usage Examples:** [.github/WORKFLOW_USAGE_EXAMPLES.md](./.github/WORKFLOW_USAGE_EXAMPLES.md)
+- 🛠️ **Troubleshooting:** [.github/WORKFLOW_TROUBLESHOOTING.md](./.github/WORKFLOW_TROUBLESHOOTING.md)
+
+### Community
 - 📧 **Support:** support@euystacio.io
 - 🐛 **Issues:** https://github.com/hannesmitterer/Euystacio/issues
 - 💬 **Discussions:** https://github.com/hannesmitterer/Euystacio/discussions

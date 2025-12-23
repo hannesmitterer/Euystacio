@@ -1,0 +1,118 @@
+{
+  "test_scenarios": [
+    {
+      "name": "High Symbiosis Score - Allow Access",
+      "input": {
+        "symbiosis_score": 0.85,
+        "user": {
+          "id": "user-001",
+          "role": "trusted_agent"
+        },
+        "resource_usage": 50,
+        "resource_limit": 100,
+        "anomaly_detected": false,
+        "violations": []
+      },
+      "expected": {
+        "allowed": true,
+        "risk_level": "low",
+        "violation_count": 0
+      }
+    },
+    {
+      "name": "Low Symbiosis Score - Deny Access",
+      "input": {
+        "symbiosis_score": 0.60,
+        "user": {
+          "id": "user-001",
+          "role": "trusted_agent"
+        },
+        "resource_usage": 50,
+        "resource_limit": 100,
+        "anomaly_detected": false,
+        "violations": []
+      },
+      "expected": {
+        "allowed": false,
+        "risk_level": "medium",
+        "violation_count": 1
+      }
+    },
+    {
+      "name": "Unauthorized Access Attempt",
+      "input": {
+        "symbiosis_score": 0.85,
+        "user": {
+          "id": "unknown-user",
+          "role": "guest"
+        },
+        "resource_usage": 50,
+        "resource_limit": 100,
+        "anomaly_detected": false,
+        "violations": []
+      },
+      "expected": {
+        "allowed": false,
+        "risk_level": "critical",
+        "violation_count": 1
+      }
+    },
+    {
+      "name": "Resource Abuse Detection",
+      "input": {
+        "symbiosis_score": 0.85,
+        "user": {
+          "id": "user-001",
+          "role": "trusted_agent"
+        },
+        "resource_usage": 150,
+        "resource_limit": 100,
+        "anomaly_detected": false,
+        "violations": []
+      },
+      "expected": {
+        "allowed": false,
+        "risk_level": "low",
+        "violation_count": 1
+      }
+    },
+    {
+      "name": "Anomalous Behavior Detection",
+      "input": {
+        "symbiosis_score": 0.85,
+        "user": {
+          "id": "user-001",
+          "role": "trusted_agent"
+        },
+        "resource_usage": 50,
+        "resource_limit": 100,
+        "anomaly_detected": true,
+        "violations": []
+      },
+      "expected": {
+        "allowed": false,
+        "risk_level": "medium",
+        "violation_count": 1
+      }
+    },
+    {
+      "name": "Multiple Violations",
+      "input": {
+        "symbiosis_score": 0.40,
+        "user": {
+          "id": "unknown-user",
+          "role": "guest"
+        },
+        "resource_usage": 150,
+        "resource_limit": 100,
+        "anomaly_detected": true,
+        "violations": []
+      },
+      "expected": {
+        "allowed": false,
+        "risk_level": "critical",
+        "violation_count": 4
+      }
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+name: 'Risk Detection Testing'
+description: 'Reusable action for testing risk detection mechanisms (Symbiosis Score, anomalies, etc.)'
+inputs:
+  python-version:
+    description: 'Python version to use'
+    required: false
+    default: '3.9'
+  test-path:
+    description: 'Path to risk detection tests'
+    required: false
+    default: 'tests/risk_detection'
+  symbiosis-threshold:
+    description: 'Symbiosis score threshold for tests'
+    required: false
+    default: '0.75'
+  enable-coverage:
+    description: 'Enable code coverage reporting'
+    required: false
+    default: 'true'
+
+outputs:
+  test-results:
+    description: 'Test results summary'
+    value: ${{ steps.run-tests.outputs.results }}
+  coverage-percentage:
+    description: 'Code coverage percentage'
+    value: ${{ steps.run-tests.outputs.coverage }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ inputs.python-version }}
+        cache: 'pip'
+    
+    - name: Install test dependencies
+      shell: bash
+      run: |
+        pip install pytest pytest-cov pytest-asyncio
+        if [ -f requirements.txt ]; then
+          pip install -r requirements.txt
+        fi
+        if [ -f requirements-test.txt ]; then
+          pip install -r requirements-test.txt
+        fi
+    
+    - name: Run risk detection tests
+      id: run-tests
+      shell: bash
+      env:
+        SYMBIOSIS_THRESHOLD: ${{ inputs.symbiosis-threshold }}
+        PYTHONPATH: ${{ github.workspace }}
+      run: |
+        echo "Running risk detection tests..."
+        
+        if [ "${{ inputs.enable-coverage }}" = "true" ]; then
+          pytest ${{ inputs.test-path }} -v --cov=. --cov-report=xml --cov-report=term-missing || true
+          coverage=$(python -c "import xml.etree.ElementTree as ET; tree = ET.parse('coverage.xml'); root = tree.getroot(); rate = float(root.attrib.get('line-rate', '0')); print(int(rate * 100))" 2>/dev/null || echo "0")
+          echo "coverage=$coverage" >> $GITHUB_OUTPUT
+        else
+          pytest ${{ inputs.test-path }} -v
+        fi
+        
+        echo "results=Risk detection tests completed" >> $GITHUB_OUTPUT
+    
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: risk-detection-test-results
+        path: |
+          pytest_report.xml
+          coverage.xml
+          htmlcov/

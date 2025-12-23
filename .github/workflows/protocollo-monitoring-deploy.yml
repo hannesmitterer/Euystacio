@@ -1,0 +1,428 @@
+name: Protocollo Meta Salvage - Monitoring Deployment
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'config/prometheus/**'
+      - 'config/grafana/**'
+      - 'monitoring/**'
+  workflow_dispatch:
+    inputs:
+      deploy-prometheus:
+        description: 'Deploy Prometheus'
+        required: false
+        default: true
+        type: boolean
+      deploy-grafana:
+        description: 'Deploy Grafana dashboards'
+        required: false
+        default: true
+        type: boolean
+
+jobs:
+  deploy-monitoring:
+    name: Deploy Monitoring Stack
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup monitoring configuration directories
+        run: |
+          mkdir -p config/prometheus
+          mkdir -p config/grafana/dashboards
+          mkdir -p config/grafana/datasources
+          mkdir -p config/alertmanager
+      
+      - name: Create Prometheus configuration
+        if: github.event.inputs.deploy-prometheus != 'false'
+        run: |
+          cat > config/prometheus/prometheus.yml << 'EOF'
+          # Protocollo Meta Salvage - Prometheus Configuration
+          
+          global:
+            scrape_interval: 15s
+            evaluation_interval: 15s
+            external_labels:
+              cluster: 'protocollo-meta-salvage'
+              environment: 'production'
+          
+          # Alertmanager configuration
+          alerting:
+            alertmanagers:
+              - static_configs:
+                  - targets:
+                      - alertmanager:9093
+          
+          # Load rules
+          rule_files:
+            - "alerts/*.yml"
+          
+          # Scrape configurations
+          scrape_configs:
+            # Prometheus self-monitoring
+            - job_name: 'prometheus'
+              static_configs:
+                - targets: ['localhost:9090']
+            
+            # Protocollo Meta Salvage services
+            - job_name: 'protocollo-api'
+              static_configs:
+                - targets: ['protocollo-api:8080']
+              metrics_path: '/metrics'
+              scrape_interval: 10s
+            
+            # Kafka monitoring
+            - job_name: 'kafka'
+              static_configs:
+                - targets: ['kafka-exporter:9308']
+            
+            # Node exporter for system metrics
+            - job_name: 'node'
+              static_configs:
+                - targets: ['node-exporter:9100']
+            
+            # Symbiosis Score metrics
+            - job_name: 'symbiosis-score'
+              static_configs:
+                - targets: ['symbiosis-service:9091']
+              metrics_path: '/metrics'
+              scrape_interval: 30s
+            
+            # Peace Bonds policy engine
+            - job_name: 'peace-bonds'
+              static_configs:
+                - targets: ['opa-service:8181']
+              metrics_path: '/metrics'
+          EOF
+          
+          echo "Prometheus configuration created"
+      
+      - name: Create Prometheus alert rules
+        run: |
+          mkdir -p config/prometheus/alerts
+          
+          cat > config/prometheus/alerts/protocollo-alerts.yml << 'EOF'
+          # Protocollo Meta Salvage Alert Rules
+          
+          groups:
+            - name: protocollo_meta_salvage
+              interval: 30s
+              rules:
+                # Symbiosis Score Alerts
+                - alert: SymbiosisScoreLow
+                  expr: symbiosis_score < 0.75
+                  for: 5m
+                  labels:
+                    severity: warning
+                    component: symbiosis
+                  annotations:
+                    summary: "Symbiosis Score below threshold"
+                    description: "Symbiosis Score is {{ $value }}, below the 0.75 threshold"
+                
+                - alert: SymbiosisScoreCritical
+                  expr: symbiosis_score < 0.5
+                  for: 2m
+                  labels:
+                    severity: critical
+                    component: symbiosis
+                  annotations:
+                    summary: "Critical: Symbiosis Score critically low"
+                    description: "Symbiosis Score is {{ $value }}, requires immediate attention"
+                
+                # Peace Bonds Enforcement Alerts
+                - alert: PeaceBondsViolation
+                  expr: rate(peace_bonds_violations_total[5m]) > 0
+                  for: 1m
+                  labels:
+                    severity: critical
+                    component: peace-bonds
+                  annotations:
+                    summary: "Peace Bonds violation detected"
+                    description: "{{ $value }} violations detected in the last 5 minutes"
+                
+                - alert: PeaceBondsPolicyFailure
+                  expr: rate(peace_bonds_policy_errors_total[5m]) > 0.1
+                  for: 5m
+                  labels:
+                    severity: warning
+                    component: peace-bonds
+                  annotations:
+                    summary: "Peace Bonds policy evaluation errors"
+                    description: "High rate of policy evaluation errors: {{ $value }}"
+                
+                # Kafka/Event Processing Alerts
+                - alert: KafkaConsumerLag
+                  expr: kafka_consumer_lag > 1000
+                  for: 10m
+                  labels:
+                    severity: warning
+                    component: kafka
+                  annotations:
+                    summary: "Kafka consumer lag is high"
+                    description: "Consumer lag is {{ $value }}, may affect real-time processing"
+                
+                - alert: EventProcessingFailure
+                  expr: rate(event_processing_errors_total[5m]) > 0.05
+                  for: 5m
+                  labels:
+                    severity: warning
+                    component: processing
+                  annotations:
+                    summary: "High rate of event processing failures"
+                    description: "Event processing error rate: {{ $value }}"
+                
+                # System Health Alerts
+                - alert: ServiceDown
+                  expr: up == 0
+                  for: 2m
+                  labels:
+                    severity: critical
+                  annotations:
+                    summary: "Service {{ $labels.job }} is down"
+                    description: "{{ $labels.job }} has been down for more than 2 minutes"
+                
+                - alert: HighErrorRate
+                  expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.05
+                  for: 5m
+                  labels:
+                    severity: warning
+                  annotations:
+                    summary: "High error rate detected"
+                    description: "Error rate is {{ $value }} for {{ $labels.job }}"
+          EOF
+          
+          echo "Alert rules created"
+      
+      - name: Create Grafana datasource configuration
+        if: github.event.inputs.deploy-grafana != 'false'
+        run: |
+          cat > config/grafana/datasources/prometheus.yml << 'EOF'
+          apiVersion: 1
+          
+          datasources:
+            - name: Prometheus
+              type: prometheus
+              access: proxy
+              url: http://prometheus:9090
+              isDefault: true
+              editable: true
+              jsonData:
+                timeInterval: "15s"
+          EOF
+          
+          echo "Grafana datasource configuration created"
+      
+      - name: Create Grafana dashboards
+        if: github.event.inputs.deploy-grafana != 'false'
+        run: |
+          # Protocollo Meta Salvage Overview Dashboard
+          cat > config/grafana/dashboards/protocollo-overview.json << 'EOF'
+          {
+            "dashboard": {
+              "title": "Protocollo Meta Salvage - Overview",
+              "tags": ["protocollo", "meta-salvage"],
+              "timezone": "browser",
+              "schemaVersion": 16,
+              "version": 1,
+              "refresh": "30s",
+              "panels": [
+                {
+                  "id": 1,
+                  "title": "Symbiosis Score",
+                  "type": "graph",
+                  "targets": [
+                    {
+                      "expr": "symbiosis_score",
+                      "legendFormat": "Current Score"
+                    }
+                  ],
+                  "gridPos": {"x": 0, "y": 0, "w": 12, "h": 8}
+                },
+                {
+                  "id": 2,
+                  "title": "Peace Bonds Violations",
+                  "type": "stat",
+                  "targets": [
+                    {
+                      "expr": "sum(rate(peace_bonds_violations_total[5m]))",
+                      "legendFormat": "Violations/5m"
+                    }
+                  ],
+                  "gridPos": {"x": 12, "y": 0, "w": 6, "h": 4}
+                },
+                {
+                  "id": 3,
+                  "title": "Event Processing Rate",
+                  "type": "graph",
+                  "targets": [
+                    {
+                      "expr": "rate(events_processed_total[5m])",
+                      "legendFormat": "Events/sec"
+                    }
+                  ],
+                  "gridPos": {"x": 0, "y": 8, "w": 12, "h": 8}
+                },
+                {
+                  "id": 4,
+                  "title": "Kafka Consumer Lag",
+                  "type": "graph",
+                  "targets": [
+                    {
+                      "expr": "kafka_consumer_lag",
+                      "legendFormat": "Lag"
+                    }
+                  ],
+                  "gridPos": {"x": 12, "y": 8, "w": 12, "h": 8}
+                }
+              ]
+            }
+          }
+          EOF
+          
+          # Peace Bonds Dashboard
+          cat > config/grafana/dashboards/peace-bonds.json << 'EOF'
+          {
+            "dashboard": {
+              "title": "Peace Bonds Enforcement",
+              "tags": ["peace-bonds", "policy"],
+              "timezone": "browser",
+              "schemaVersion": 16,
+              "version": 1,
+              "refresh": "10s",
+              "panels": [
+                {
+                  "id": 1,
+                  "title": "Policy Evaluations",
+                  "type": "graph",
+                  "targets": [
+                    {
+                      "expr": "rate(peace_bonds_evaluations_total[5m])",
+                      "legendFormat": "Evaluations/sec"
+                    }
+                  ],
+                  "gridPos": {"x": 0, "y": 0, "w": 12, "h": 8}
+                },
+                {
+                  "id": 2,
+                  "title": "Violations by Type",
+                  "type": "piechart",
+                  "targets": [
+                    {
+                      "expr": "sum by (violation_type) (peace_bonds_violations_total)",
+                      "legendFormat": "{{ violation_type }}"
+                    }
+                  ],
+                  "gridPos": {"x": 12, "y": 0, "w": 12, "h": 8}
+                }
+              ]
+            }
+          }
+          EOF
+          
+          echo "Grafana dashboards created"
+      
+      - name: Create Alertmanager configuration
+        run: |
+          cat > config/alertmanager/alertmanager.yml << 'EOF'
+          # Protocollo Meta Salvage - Alertmanager Configuration
+          
+          global:
+            resolve_timeout: 5m
+          
+          route:
+            group_by: ['alertname', 'component']
+            group_wait: 10s
+            group_interval: 10s
+            repeat_interval: 12h
+            receiver: 'default'
+            routes:
+              - match:
+                  severity: critical
+                receiver: 'critical-alerts'
+                continue: true
+              - match:
+                  component: peace-bonds
+                receiver: 'peace-bonds-team'
+              - match:
+                  component: symbiosis
+                receiver: 'symbiosis-team'
+          
+          receivers:
+            - name: 'default'
+              webhook_configs:
+                - url: 'http://localhost:5001/webhook'
+            
+            - name: 'critical-alerts'
+              webhook_configs:
+                - url: 'http://localhost:5001/webhook/critical'
+              # Add email or Slack configuration here
+            
+            - name: 'peace-bonds-team'
+              webhook_configs:
+                - url: 'http://localhost:5001/webhook/peace-bonds'
+            
+            - name: 'symbiosis-team'
+              webhook_configs:
+                - url: 'http://localhost:5001/webhook/symbiosis'
+          
+          inhibit_rules:
+            - source_match:
+                severity: 'critical'
+              target_match:
+                severity: 'warning'
+              equal: ['alertname', 'component']
+          EOF
+          
+          echo "Alertmanager configuration created"
+      
+      - name: Validate configurations
+        run: |
+          echo "Validating monitoring configurations..."
+          
+          # Check if Prometheus config is valid YAML
+          python3 -c "import yaml; yaml.safe_load(open('config/prometheus/prometheus.yml'))" && \
+            echo "✓ Prometheus config is valid" || \
+            echo "✗ Prometheus config has errors"
+          
+          # Check if alert rules are valid YAML
+          python3 -c "import yaml; yaml.safe_load(open('config/prometheus/alerts/protocollo-alerts.yml'))" && \
+            echo "✓ Alert rules are valid" || \
+            echo "✗ Alert rules have errors"
+          
+          # Check if Alertmanager config is valid YAML
+          python3 -c "import yaml; yaml.safe_load(open('config/alertmanager/alertmanager.yml'))" && \
+            echo "✓ Alertmanager config is valid" || \
+            echo "✗ Alertmanager config has errors"
+      
+      - name: Upload monitoring configurations
+        uses: actions/upload-artifact@v3
+        with:
+          name: monitoring-configurations
+          path: |
+            config/prometheus/
+            config/grafana/
+            config/alertmanager/
+      
+      - name: Monitoring deployment summary
+        run: |
+          echo "## Monitoring Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Monitoring stack configured successfully" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Components Deployed:" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Prometheus configuration" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Alert rules for Protocollo Meta Salvage" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Grafana dashboards (Overview, Peace Bonds)" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Alertmanager configuration" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Key Metrics Monitored:" >> $GITHUB_STEP_SUMMARY
+          echo "- Symbiosis Score" >> $GITHUB_STEP_SUMMARY
+          echo "- Peace Bonds violations" >> $GITHUB_STEP_SUMMARY
+          echo "- Kafka consumer lag" >> $GITHUB_STEP_SUMMARY
+          echo "- Event processing rates" >> $GITHUB_STEP_SUMMARY

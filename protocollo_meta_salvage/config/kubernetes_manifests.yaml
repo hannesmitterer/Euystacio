@@ -1,0 +1,230 @@
+# Kubernetes manifests for Protocollo Meta Salvage
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: protocollo-meta-salvage
+  labels:
+    name: protocollo-meta-salvage
+    purpose: ethical-preservation
+
+---
+# ConfigMap for system configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: protocollo-config
+  namespace: protocollo-meta-salvage
+data:
+  symbiosis_threshold_critical: "0.3"
+  symbiosis_threshold_high: "0.5"
+  symbiosis_threshold_medium: "0.7"
+  monitoring_interval: "15m"
+  feedback_training_schedule: "0 2 * * *"
+
+---
+# Deployment for Monitoring System
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: symbiosis-monitor
+  namespace: protocollo-meta-salvage
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: symbiosis-monitor
+  template:
+    metadata:
+      labels:
+        app: symbiosis-monitor
+    spec:
+      containers:
+      - name: monitor
+        image: protocollo-meta-salvage:latest
+        command: ["python", "-m", "protocollo_meta_salvage.monitoring"]
+        ports:
+        - containerPort: 8001
+          name: metrics
+        env:
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: "kafka:9092"
+        - name: MONITORING_INTERVAL
+          valueFrom:
+            configMapKeyRef:
+              name: protocollo-config
+              key: monitoring_interval
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+
+---
+# Deployment for Decision Engine
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: peace-bond-engine
+  namespace: protocollo-meta-salvage
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: peace-bond-engine
+  template:
+    metadata:
+      labels:
+        app: peace-bond-engine
+    spec:
+      containers:
+      - name: engine
+        image: protocollo-meta-salvage:latest
+        command: ["python", "-m", "protocollo_meta_salvage.decision_engine"]
+        ports:
+        - containerPort: 8002
+          name: metrics
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+
+---
+# Deployment for Resource Enforcer
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: resource-enforcer
+  namespace: protocollo-meta-salvage
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: resource-enforcer
+  template:
+    metadata:
+      labels:
+        app: resource-enforcer
+    spec:
+      serviceAccountName: resource-enforcer-sa
+      containers:
+      - name: enforcer
+        image: protocollo-meta-salvage:latest
+        command: ["python", "-m", "protocollo_meta_salvage.automation"]
+        ports:
+        - containerPort: 8003
+          name: metrics
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+
+---
+# ServiceAccount for Resource Enforcer
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: resource-enforcer-sa
+  namespace: protocollo-meta-salvage
+
+---
+# ClusterRole for Resource Enforcer
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: resource-enforcer-role
+rules:
+- apiGroups: [""]
+  resources: ["resourcequotas", "limitranges"]
+  verbs: ["get", "list", "create", "update", "patch"]
+- apiGroups: ["networking.k8s.io"]
+  resources: ["networkpolicies"]
+  verbs: ["get", "list", "create", "update", "patch"]
+
+---
+# ClusterRoleBinding for Resource Enforcer
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: resource-enforcer-binding
+subjects:
+- kind: ServiceAccount
+  name: resource-enforcer-sa
+  namespace: protocollo-meta-salvage
+roleRef:
+  kind: ClusterRole
+  name: resource-enforcer-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# Service for Monitoring
+apiVersion: v1
+kind: Service
+metadata:
+  name: symbiosis-monitor
+  namespace: protocollo-meta-salvage
+spec:
+  selector:
+    app: symbiosis-monitor
+  ports:
+  - port: 8001
+    targetPort: 8001
+    name: metrics
+
+---
+# Service for Decision Engine
+apiVersion: v1
+kind: Service
+metadata:
+  name: peace-bond-engine
+  namespace: protocollo-meta-salvage
+spec:
+  selector:
+    app: peace-bond-engine
+  ports:
+  - port: 8002
+    targetPort: 8002
+    name: metrics
+
+---
+# Service for Resource Enforcer
+apiVersion: v1
+kind: Service
+metadata:
+  name: resource-enforcer
+  namespace: protocollo-meta-salvage
+spec:
+  selector:
+    app: resource-enforcer
+  ports:
+  - port: 8003
+    targetPort: 8003
+    name: metrics
+
+---
+# CronJob for Feedback Loop
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ml-feedback-loop
+  namespace: protocollo-meta-salvage
+spec:
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: feedback
+            image: protocollo-meta-salvage:latest
+            command: ["python", "-m", "protocollo_meta_salvage.feedback"]
+            args: ["--train"]
+          restartPolicy: OnFailure

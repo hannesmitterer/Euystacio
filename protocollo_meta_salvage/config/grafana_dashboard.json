@@ -1,0 +1,126 @@
+{
+  "dashboard": {
+    "title": "Protocollo Meta Salvage - Peace Bonds Dashboard",
+    "tags": ["protocollo", "peace-bonds", "ethical-preservation"],
+    "timezone": "utc",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Symbiosis Score Trend",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "symbiosis_score",
+            "legendFormat": "{{provider}}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+        "alert": {
+          "conditions": [
+            {
+              "evaluator": {"params": [0.7], "type": "lt"},
+              "operator": {"type": "and"},
+              "query": {"params": ["A", "5m", "now"]},
+              "reducer": {"params": [], "type": "avg"},
+              "type": "query"
+            }
+          ],
+          "message": "Symbiosis score below threshold - Peace Bond may be required"
+        }
+      },
+      {
+        "id": 2,
+        "title": "Active Peace Bonds",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "count(peace_bonds_active)"
+          }
+        ],
+        "gridPos": {"h": 4, "w": 6, "x": 12, "y": 0}
+      },
+      {
+        "id": 3,
+        "title": "Lock-in Risk Indicator",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "lock_in_risk",
+            "legendFormat": "{{provider}}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 6, "x": 18, "y": 0},
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "steps": [
+                {"color": "green", "value": 0},
+                {"color": "yellow", "value": 0.3},
+                {"color": "orange", "value": 0.5},
+                {"color": "red", "value": 0.7}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 4,
+        "title": "Enforcement Actions",
+        "type": "table",
+        "targets": [
+          {
+            "expr": "enforcement_actions",
+            "format": "table"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+      },
+      {
+        "id": 5,
+        "title": "Compliance Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(compliance_checks_passed[5m]) / rate(compliance_checks_total[5m])",
+            "legendFormat": "{{provider}}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+      },
+      {
+        "id": 6,
+        "title": "Transparency Score",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "transparency_completeness_score",
+            "legendFormat": "{{provider}}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16}
+      },
+      {
+        "id": 7,
+        "title": "ML Model Performance",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "ml_model_accuracy"
+          }
+        ],
+        "gridPos": {"h": 4, "w": 6, "x": 12, "y": 16}
+      },
+      {
+        "id": 8,
+        "title": "Audit Events",
+        "type": "logs",
+        "targets": [
+          {
+            "expr": "{job=\"audit_logger\"}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 20}
+      }
+    ]
+  }
+}

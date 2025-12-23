@@ -1,0 +1,54 @@
+# Automatically label PRs based on changed files
+
+'documentation':
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*.md'
+      - 'docs/**/*'
+
+'workflows':
+  - changed-files:
+    - any-glob-to-any-file:
+      - '.github/workflows/**/*'
+      - '.github/actions/**/*'
+
+'typescript':
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*.ts'
+      - 'src/**/*'
+
+'python':
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*.py'
+      - 'requirements.txt'
+
+'configuration':
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*.yml'
+      - '**/*.yaml'
+      - '**/*.json'
+      - 'tsconfig.json'
+      - '_config.yml'
+
+'frontend':
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*.html'
+      - '**/*.css'
+      - 'public/**/*'
+
+'dependencies':
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'package.json'
+      - 'package-lock.json'
+      - 'requirements.txt'
+
+'security':
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'SECURITY*.md'
+      - '.github/workflows/dependency-review.yml'

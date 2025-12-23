@@ -3,6 +3,10 @@
 **Version:** 1.0.0  
 **The Holy Bridge - Unified AI Coordination Platform**
 
+[![CI/CD Pipeline](https://github.com/hannesmitterer/Euystacio/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/hannesmitterer/Euystacio/actions/workflows/ci-cd.yml)
+[![GitHub Pages](https://github.com/hannesmitterer/Euystacio/actions/workflows/github-pages.yml/badge.svg)](https://github.com/hannesmitterer/Euystacio/actions/workflows/github-pages.yml)
+[![ALO-001 CI](https://github.com/hannesmitterer/Euystacio/actions/workflows/alo-001-ci.yml/badge.svg)](https://github.com/hannesmitterer/Euystacio/actions/workflows/alo-001-ci.yml)
+
 ---
 
 ## Overview
@@ -281,6 +285,17 @@ See [SECURITY_RUNBOOK.md](./SECURITY_RUNBOOK.md) for the complete security check
 
 ## Development
 
+### CI/CD Automation
+
+This repository uses GitHub Actions for continuous integration and deployment:
+
+- **CI/CD Pipeline** - Automated linting, testing, and building on every push and PR
+- **GitHub Pages** - Automatic deployment of documentation to GitHub Pages
+- **Security Scanning** - Dependency vulnerability checks and security audits
+- **Build Artifacts** - Automatic build and artifact uploads for every workflow run
+
+See [Workflows Documentation](.github/WORKFLOWS.md) for detailed information.
+
 ### Running Tests
 
 ```bash
@@ -299,6 +314,16 @@ npm run lint
 
 # Python
 flake8 .
+```
+
+### Building
+
+```bash
+# Build TypeScript
+npm run build
+
+# Development mode with auto-reload
+npm run dev
 ```
 
 ### Database Migrations

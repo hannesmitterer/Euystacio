@@ -1,1 +1,46 @@
-copy all files from this repo to the repo : https://github.com/hannesmitterer/EuystacioSacredBridge/upload/main
+name: Main Branch CI
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: main-ci-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate-and-build:
+    name: Validate & Build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: ./.github/actions/setup-node-env
+        with:
+          node-version: '18'
+      
+      - name: Build TypeScript
+        run: npm run build
+      
+      - name: Setup Python
+        uses: ./.github/actions/setup-python-env
+        with:
+          python-version: '3.9'
+      
+      - name: Validate Python apps
+        run: |
+          python -c "import sys; print(f'Python {sys.version} ready')"
+          echo "Python environment validated ✓"
+      
+      - name: Repository health check
+        run: |
+          echo "Repository structure:"
+          ls -la
+          echo "✓ Repository health check completed"

@@ -372,6 +372,42 @@ We welcome contributions! Please follow these steps:
 
 ---
 
+## 💰 Support the Seedbringer Treasury
+
+**Framework Euystacio** is part of the **Seedbringer Treasury** initiative - a critical mission to reduce systemic collapse risk through open knowledge and eternal preservation.
+
+### Direct Contribution Options
+
+**Ethereum Wallet (ETH/ERC-20):**
+```
+0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb2
+```
+
+**Bitcoin (BTC):**
+```
+bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh
+```
+
+### Why Support Matters
+
+Every contribution directly funds:
+- 🌱 **Survival Security** - Ensuring project continuity and developer sustainability
+- 📚 **Eternal Knowledge** - IPFS preservation and distributed access
+- 🔒 **Framework Development** - Building tools that reduce collapse probability
+- 🌍 **Open Source Mission** - Keeping all resources freely accessible
+
+### Transparency
+
+All funding is tracked with complete transparency. See [SUPPORT.md](./SUPPORT.md) for:
+- Detailed funding allocation
+- Current sustainability status
+- Impact metrics and collapse risk reduction
+- Monthly transparency reports
+
+**Your support ensures eternal knowledge survives. Thank you for being part of the solution.**
+
+---
+
 ## License
 
 See [SACRED_COMMONS_LICENSE.md](./SACRED_COMMONS_LICENSE.md) for license information.

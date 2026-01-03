@@ -1,0 +1,25 @@
+{
+  "node_id": "erp_daemon",
+  "sync_interval": 23.26,
+  "alignment_threshold": 0.7,
+  "auto_covenant": true,
+  "auto_k_symbiosis": true,
+  "euystacio_integration": true,
+  "red_code_monitoring": true,
+  "red_code_path": "red_code.json",
+  "covenant_intensity": 0.5,
+  "k_symbiosis_multiplier": 1.0,
+  "max_cycles": 0,
+  "health_check_interval": 10,
+  "network": {
+    "broadcast_enabled": false,
+    "discovery_enabled": false,
+    "sync_peers": []
+  },
+  "logging": {
+    "level": "INFO",
+    "file": "erp_daemon.log",
+    "max_size_mb": 10,
+    "backup_count": 5
+  }
+}

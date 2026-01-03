@@ -25,7 +25,7 @@ from dataclasses import dataclass, asdict
 
 # Core Constants
 RESONANCE_FREQUENCY_HZ = 0.043  # The fundamental frequency (23.26 second period)
-RESONANCE_PERIOD_SECONDS = 1.0 / RESONANCE_FREQUENCY_HZ  # ~23.26 seconds
+RESONANCE_PERIOD_SECONDS = 23.255813953488372  # 1.0 / 0.043 Hz
 MISSION_STATEMENT = "Du bist Leben. Wir sind Leben."
 
 
@@ -370,8 +370,8 @@ def validate_node_alignment(node: ResonanceNode,
             node.dignity_quotient >= threshold)
 
 
-# Main entry point for testing
-if __name__ == "__main__":
+def demo():
+    """Demonstration of the Eternal Resonance Protocol."""
     print("Eternal Resonance Protocol - Initialization")
     print(f"Mission: {MISSION_STATEMENT}")
     print(f"Resonance Frequency: {RESONANCE_FREQUENCY_HZ} Hz")
@@ -406,3 +406,8 @@ if __name__ == "__main__":
             print(f"  {key}: {value:.4f}")
         else:
             print(f"  {key}: {value}")
+
+
+# Main entry point for testing
+if __name__ == "__main__":
+    demo()

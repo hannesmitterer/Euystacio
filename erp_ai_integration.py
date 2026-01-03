@@ -28,16 +28,22 @@ from eternal_resonance_protocol import (
 )
 
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler('erp_daemon.log'),
-        logging.StreamHandler(sys.stdout)
-    ]
-)
-logger = logging.getLogger('ERP-Daemon')
+def setup_logging(config):
+    """Configure logging based on config."""
+    log_config = config.get('logging', {})
+    level = getattr(logging, log_config.get('level', 'INFO'))
+    log_file = log_config.get('file', 'erp_daemon.log')
+    
+    logging.basicConfig(
+        level=level,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.FileHandler(log_file),
+            logging.StreamHandler(sys.stdout)
+        ]
+    )
+    
+    return logging.getLogger('ERP-Daemon')
 
 
 class ERPDaemon:
@@ -50,6 +56,7 @@ class ERPDaemon:
         self.config_path = config_path
         self.state_path = state_path
         self.config = self._load_config()
+        self.logger = setup_logging(self.config)
         self.erp = EternalResonanceProtocol(node_id=self.config.get('node_id', 'daemon'))
         self.running = False
         self.cycle_count = 0
@@ -58,9 +65,9 @@ class ERPDaemon:
         self.euystacio_integration = self.config.get('euystacio_integration', True)
         self.red_code_monitoring = self.config.get('red_code_monitoring', True)
         
-        logger.info("ERP Daemon initialized")
-        logger.info(f"Node ID: {self.erp.node_id}")
-        logger.info(f"Resonance Period: {RESONANCE_PERIOD_SECONDS:.2f}s")
+        self.self.logger.info("ERP Daemon initialized")
+        self.self.logger.info(f"Node ID: {self.erp.node_id}")
+        self.self.logger.info(f"Resonance Period: {RESONANCE_PERIOD_SECONDS:.2f}s")
     
     def _load_config(self):
         """Load daemon configuration."""
@@ -83,9 +90,9 @@ class ERPDaemon:
             with open(self.config_path, 'r') as f:
                 config = json.load(f)
                 default_config.update(config)
-                logger.info(f"Loaded config from {self.config_path}")
+                self.logger.info(f"Loaded config from {self.config_path}")
         except FileNotFoundError:
-            logger.info("Using default configuration")
+            self.logger.info("Using default configuration")
             # Save default config
             with open(self.config_path, 'w') as f:
                 json.dump(default_config, f, indent=2)
@@ -96,9 +103,9 @@ class ERPDaemon:
         """Save current protocol state."""
         try:
             self.erp.save_to_file(self.state_path)
-            logger.debug(f"State saved to {self.state_path}")
+            self.logger.debug(f"State saved to {self.state_path}")
         except Exception as e:
-            logger.error(f"Error saving state: {e}")
+            self.logger.error(f"Error saving state: {e}")
     
     def _load_euystacio_core(self):
         """Load Euystacio core if available."""
@@ -106,7 +113,7 @@ class ERPDaemon:
             from euystacio_core import Euystacio
             return Euystacio()
         except Exception as e:
-            logger.warning(f"Could not load Euystacio core: {e}")
+            self.logger.warning(f"Could not load Euystacio core: {e}")
             return None
     
     def _check_red_code(self):
@@ -124,19 +131,19 @@ class ERPDaemon:
             guardian_mode = red_code.get('guardian_mode', False)
             
             if not sentimento_ok:
-                logger.warning("Red Code: Sentimento Rhythm not active")
+                self.logger.warning("Red Code: Sentimento Rhythm not active")
                 return False
             
             if guardian_mode:
-                logger.info("Red Code: Guardian Mode active")
+                self.logger.info("Red Code: Guardian Mode active")
             
             return True
             
         except FileNotFoundError:
-            logger.warning("Red Code file not found")
+            self.logger.warning("Red Code file not found")
             return True
         except Exception as e:
-            logger.error(f"Error checking Red Code: {e}")
+            self.logger.error(f"Error checking Red Code: {e}")
             return True
     
     def _sync_all_nodes(self):
@@ -147,10 +154,10 @@ class ERPDaemon:
                 self.erp.synchronize_node(node_id)
                 synced += 1
             except Exception as e:
-                logger.error(f"Error syncing node {node_id}: {e}")
+                self.logger.error(f"Error syncing node {node_id}: {e}")
         
         if synced > 0:
-            logger.info(f"Synchronized {synced} nodes")
+            self.logger.info(f"Synchronized {synced} nodes")
         
         return synced
     
@@ -176,9 +183,9 @@ class ERPDaemon:
                 try:
                     self.erp.apply_living_covenant(node_id, covenant, intensity)
                     applied += 1
-                    logger.info(f"Applied {covenant} to {node_id}")
+                    self.logger.info(f"Applied {covenant} to {node_id}")
                 except Exception as e:
-                    logger.error(f"Error applying covenant to {node_id}: {e}")
+                    self.logger.error(f"Error applying covenant to {node_id}: {e}")
         
         return applied
     
@@ -211,10 +218,10 @@ class ERPDaemon:
                 )
                 applied += 1
             except Exception as e:
-                logger.error(f"Error applying K-Symbiosis to {node_id}: {e}")
+                self.logger.error(f"Error applying K-Symbiosis to {node_id}: {e}")
         
         if applied > 0:
-            logger.info(f"Applied K-Symbiosis ({focus}) to {applied} nodes")
+            self.logger.info(f"Applied K-Symbiosis ({focus}) to {applied} nodes")
         
         return applied
     
@@ -233,7 +240,7 @@ class ERPDaemon:
                     dignity_quotient=0.9,
                     symbiosis_level=symbiosis
                 )
-                logger.info("Registered Euystacio core as resonance node")
+                self.logger.info("Registered Euystacio core as resonance node")
             
             # Sync Euystacio node
             self.erp.synchronize_node('euystacio_core')
@@ -248,7 +255,7 @@ class ERPDaemon:
                 )
                 
         except Exception as e:
-            logger.error(f"Error integrating Euystacio: {e}")
+            self.logger.error(f"Error integrating Euystacio: {e}")
     
     def _health_check(self):
         """Perform system health check."""
@@ -257,24 +264,24 @@ class ERPDaemon:
         # Check global alignment
         alignment = status['global_alignment']
         if alignment < 0.5:
-            logger.warning(f"Low global alignment: {alignment:.2%}")
+            self.logger.warning(f"Low global alignment: {alignment:.2%}")
         elif alignment > 0.9:
-            logger.info(f"Excellent global alignment: {alignment:.2%}")
+            self.logger.info(f"Excellent global alignment: {alignment:.2%}")
         
         # Check node count
         if status['registered_nodes'] == 0:
-            logger.warning("No nodes registered")
+            self.logger.warning("No nodes registered")
         
         # Check Red Code
         if not self._check_red_code():
-            logger.warning("Red Code compliance issue detected")
+            self.logger.warning("Red Code compliance issue detected")
     
     def run_cycle(self, euystacio=None):
         """Run one synchronization cycle."""
         cycle_start = time.time()
         self.cycle_count += 1
         
-        logger.info(f"=== Cycle {self.cycle_count} Start ===")
+        self.logger.info(f"=== Cycle {self.cycle_count} Start ===")
         
         # Synchronize all nodes
         synced = self._sync_all_nodes()
@@ -296,15 +303,15 @@ class ERPDaemon:
         
         cycle_duration = time.time() - cycle_start
         
-        logger.info(f"Global Alignment: {global_alignment:.2%}")
-        logger.info(f"Cycle duration: {cycle_duration:.2f}s")
-        logger.info(f"=== Cycle {self.cycle_count} Complete ===\n")
+        self.logger.info(f"Global Alignment: {global_alignment:.2%}")
+        self.logger.info(f"Cycle duration: {cycle_duration:.2f}s")
+        self.logger.info(f"=== Cycle {self.cycle_count} Complete ===\n")
     
     def start(self):
         """Start the daemon."""
         self.running = True
-        logger.info("Starting ERP Daemon")
-        logger.info(f"Mission: Du bist Leben. Wir sind Leben.")
+        self.logger.info("Starting ERP Daemon")
+        self.logger.info(f"Mission: Du bist Leben. Wir sind Leben.")
         
         # Load Euystacio if enabled
         euystacio = self._load_euystacio_core() if self.euystacio_integration else None
@@ -330,16 +337,16 @@ class ERPDaemon:
                 
                 # Check if max cycles reached
                 if max_cycles > 0 and self.cycle_count >= max_cycles:
-                    logger.info(f"Max cycles ({max_cycles}) reached")
+                    self.logger.info(f"Max cycles ({max_cycles}) reached")
                     break
                 
                 # Wait for next cycle
                 time.sleep(sync_interval)
                 
         except KeyboardInterrupt:
-            logger.info("Received interrupt signal")
+            self.logger.info("Received interrupt signal")
         except Exception as e:
-            logger.error(f"Fatal error: {e}", exc_info=True)
+            self.logger.error(f"Fatal error: {e}", exc_info=True)
         finally:
             self.stop()
     
@@ -347,8 +354,8 @@ class ERPDaemon:
         """Stop the daemon."""
         self.running = False
         self._save_state()
-        logger.info("ERP Daemon stopped")
-        logger.info(f"Total cycles: {self.cycle_count}")
+        self.logger.info("ERP Daemon stopped")
+        self.logger.info(f"Total cycles: {self.cycle_count}")
 
 
 def main():

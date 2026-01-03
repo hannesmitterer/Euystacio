@@ -277,7 +277,7 @@ def example_k_symbiosis_focus():
         print(f"  Symbiosis: {node.symbiosis_level:.2%}\n")
 
 
-def run_all_examples():
+def run_all_examples(interactive=True):
     """Run all integration examples."""
     examples = [
         ("Basic Usage", example_basic_usage),
@@ -299,7 +299,7 @@ def run_all_examples():
         except Exception as e:
             print(f"\n⚠️  Error in {name}: {e}\n")
         
-        if i < len(examples):
+        if i < len(examples) and interactive:
             input("\nPress Enter to continue to next example...")
     
     print("\n" + "="*70)
@@ -310,7 +310,10 @@ def run_all_examples():
 if __name__ == "__main__":
     import sys
     
-    if len(sys.argv) > 1:
+    # Check for non-interactive flag
+    interactive = '--no-interactive' not in sys.argv
+    
+    if len(sys.argv) > 1 and sys.argv[1] != '--no-interactive':
         example_name = sys.argv[1]
         examples_map = {
             'basic': example_basic_usage,
@@ -328,4 +331,4 @@ if __name__ == "__main__":
             print(f"Unknown example: {example_name}")
             print(f"Available: {', '.join(examples_map.keys())}")
     else:
-        run_all_examples()
+        run_all_examples(interactive=interactive)

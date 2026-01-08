@@ -1,0 +1,85 @@
+name: Reusable Build Workflow
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: 'Node.js version to use'
+        required: false
+        type: string
+        default: '18'
+      python-version:
+        description: 'Python version to use'
+        required: false
+        type: string
+        default: '3.9'
+      skip-python:
+        description: 'Skip Python build steps'
+        required: false
+        type: boolean
+        default: false
+      skip-typescript:
+        description: 'Skip TypeScript build steps'
+        required: false
+        type: boolean
+        default: false
+    outputs:
+      build-status:
+        description: 'Status of the build'
+        value: ${{ jobs.build.outputs.status }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      status: ${{ steps.final-status.outputs.status }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        if: ${{ !inputs.skip-typescript }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: 'npm'
+      
+      - name: Install Node dependencies
+        if: ${{ !inputs.skip-typescript }}
+        run: npm ci
+      
+      - name: Build TypeScript
+        if: ${{ !inputs.skip-typescript }}
+        run: npm run build
+      
+      - name: Upload TypeScript artifacts
+        if: ${{ !inputs.skip-typescript }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: typescript-build
+          path: dist/
+          retention-days: 7
+      
+      - name: Setup Python
+        if: ${{ !inputs.skip-python }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version }}
+          cache: 'pip'
+      
+      - name: Install Python dependencies
+        if: ${{ !inputs.skip-python }}
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Verify Python imports
+        if: ${{ !inputs.skip-python }}
+        run: |
+          python -c "import app; print('✓')"
+          python -c "import euystacio_core; print('✓')"
+      
+      - name: Set final status
+        id: final-status
+        run: echo "status=success" >> $GITHUB_OUTPUT

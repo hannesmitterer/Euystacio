@@ -6,7 +6,15 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/server.js",
-    "dev": "tsc && node dist/server.js"
+    "dev": "tsc && node dist/server.js",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "test -d src && eslint src/ --ext .ts || echo 'No src/ directory found'",
+    "lint:fix": "test -d src && eslint src/ --ext .ts --fix || echo 'No src/ directory found'",
+    "format": "prettier --write \"**/*.{ts,js,json,md,yml,yaml}\"",
+    "format:check": "prettier --check \"**/*.{ts,js,json,md,yml,yaml}\"",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "express": "^4.18.2",

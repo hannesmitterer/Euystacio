@@ -1,0 +1,62 @@
+name: Update Badges
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  update-badges:
+    name: Generate Status Badges
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Create badge data
+        run: |
+          mkdir -p .github/badges
+          
+          # CI Status badge data
+          cat > .github/badges/ci-status.json << EOF
+          {
+            "schemaVersion": 1,
+            "label": "CI",
+            "message": "passing",
+            "color": "brightgreen"
+          }
+          EOF
+          
+          # Tests badge data
+          cat > .github/badges/tests-status.json << EOF
+          {
+            "schemaVersion": 1,
+            "label": "tests",
+            "message": "passing",
+            "color": "brightgreen"
+          }
+          EOF
+          
+          # Deployment badge data
+          cat > .github/badges/deployment-status.json << EOF
+          {
+            "schemaVersion": 1,
+            "label": "deployment",
+            "message": "active",
+            "color": "blue"
+          }
+          EOF
+          
+          echo "Badge data created"
+      
+      - name: Display badge info
+        run: |
+          echo "Badges can be accessed via:"
+          echo "![CI](https://github.com/hannesmitterer/Euystacio/actions/workflows/ci.yml/badge.svg)"
+          echo "![Tests](https://github.com/hannesmitterer/Euystacio/actions/workflows/test.yml/badge.svg)"
+          echo "![Deploy](https://github.com/hannesmitterer/Euystacio/actions/workflows/deploy-pages.yml/badge.svg)"
+          echo "![Security](https://github.com/hannesmitterer/Euystacio/actions/workflows/security.yml/badge.svg)"

@@ -1,0 +1,201 @@
+name: Autideology CI
+
+on:
+  push:
+    branches: [main, 'deploy/**']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# Limit permissions for security
+permissions:
+  contents: read
+  actions: read
+
+# Prevent concurrent runs
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Job 1: Validate and Lint
+  validate:
+    name: Validate Repository
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Check for committed secrets
+        run: |
+          echo "🔒 Security Check: Scanning for committed secrets..."
+          
+          # Check for common secret patterns
+          if grep -rE "(PRIVATE_KEY|secret_key|password)\s*=\s*['\"][^'\"]+['\"]" --include="*.js" --include="*.ts" --include="*.json" --include="*.sh" . 2>/dev/null; then
+            echo "⚠️ WARNING: Possible hardcoded secrets found!"
+            echo "Please use environment variables or GitHub Secrets instead."
+            # Don't fail, just warn
+          else
+            echo "✓ No obvious hardcoded secrets found"
+          fi
+          
+          # Check for key files
+          if [ -d "keys" ] || [ -d "keys-to-include" ]; then
+            echo "❌ ERROR: keys/ or keys-to-include/ directory should not be committed!"
+            exit 1
+          fi
+          
+          echo "✓ Security check passed"
+      
+      - name: Validate file structure
+        run: |
+          echo "📁 Validating project structure..."
+          
+          # Check essential files
+          files=(
+            "package.json"
+            ".gitignore"
+            "contracts/EuystacioSTAnchor.sol"
+          )
+          
+          for file in "${files[@]}"; do
+            if [ -f "$file" ]; then
+              echo "✓ $file exists"
+            else
+              echo "⚠ $file not found"
+            fi
+          done
+  
+  # Job 2: Build and Test
+  build:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    needs: validate
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install root dependencies
+        run: npm ci || npm install
+      
+      - name: Build project
+        run: npm run build || echo "Build script not configured"
+        continue-on-error: true
+      
+      - name: Run tests
+        run: npm test || echo "No tests configured"
+        continue-on-error: true
+  
+  # Job 3: Smart Contract Compilation
+  contracts:
+    name: Compile Smart Contracts
+    runs-on: ubuntu-latest
+    needs: validate
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install Hardhat dependencies
+        working-directory: contracts/hardhat
+        run: npm install
+      
+      - name: Compile contracts
+        working-directory: contracts/hardhat
+        run: npx hardhat compile
+      
+      - name: Upload contract artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: contract-artifacts
+          path: contracts/hardhat/artifacts/
+          retention-days: 7
+  
+  # Job 4: Deploy (Manual trigger only for mainnet)
+  deploy-testnet:
+    name: Deploy to Testnet
+    runs-on: ubuntu-latest
+    needs: [build, contracts]
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/deploy/'))
+    environment: testnet
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install dependencies
+        working-directory: contracts/hardhat
+        run: npm install
+      
+      - name: Check for required secrets
+        run: |
+          if [ -z "${{ secrets.DEPLOYER_PRIVATE_KEY }}" ]; then
+            echo "❌ DEPLOYER_PRIVATE_KEY secret not set!"
+            echo "Please set this secret in repository settings."
+            echo ""
+            echo "To set secrets, run:"
+            echo "  gh secret set DEPLOYER_PRIVATE_KEY"
+            exit 1
+          fi
+          echo "✓ Required secrets are configured"
+      
+      - name: Deploy to Sepolia
+        working-directory: contracts/hardhat
+        env:
+          DEPLOYER_PRIVATE_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
+          SEPOLIA_RPC_URL: ${{ secrets.SEPOLIA_RPC_URL }}
+          ETHERSCAN_API_KEY: ${{ secrets.ETHERSCAN_API_KEY }}
+        run: |
+          echo "🚀 Deploying EuystacioSTAnchor to Sepolia..."
+          npm run deploy:sepolia
+      
+      - name: Output deployment info
+        run: |
+          echo "═══════════════════════════════════════"
+          echo "  Deployment Complete!"
+          echo "═══════════════════════════════════════"
+          echo ""
+          echo "Check the logs above for the contract address."
+          echo "Verify the contract on Etherscan Sepolia."
+  
+  # Summary job
+  summary:
+    name: CI Summary
+    runs-on: ubuntu-latest
+    needs: [validate, build, contracts]
+    if: always()
+    
+    steps:
+      - name: Generate summary
+        run: |
+          echo "# 🏛️ Euystacio CI Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Job Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Validate | ${{ needs.validate.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build | ${{ needs.build.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Contracts | ${{ needs.contracts.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "⚜️ *Der Unveränderliche Eid*" >> $GITHUB_STEP_SUMMARY

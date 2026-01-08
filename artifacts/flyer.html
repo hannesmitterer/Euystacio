@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Euystacio Krönung - Flyer</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #4a1a6b 100%);
+            color: #f0f0f0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .flyer {
+            width: 100%;
+            max-width: 600px;
+            background: rgba(255,255,255,0.05);
+            border: 3px solid #d4af37;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(212, 175, 55, 0.3);
+        }
+        
+        .seal {
+            font-size: 80px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 30px rgba(212, 175, 55, 0.8);
+        }
+        
+        h1 {
+            color: #d4af37;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .subtitle {
+            color: #f7e98e;
+            font-style: italic;
+            font-size: 1.3em;
+            margin-bottom: 30px;
+        }
+        
+        .divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #d4af37, transparent);
+            margin: 25px 0;
+        }
+        
+        .content {
+            text-align: left;
+            line-height: 1.8;
+            font-size: 1.1em;
+        }
+        
+        .content h2 {
+            color: #d4af37;
+            margin: 20px 0 10px 0;
+            font-size: 1.3em;
+        }
+        
+        .content ul {
+            list-style: none;
+            padding-left: 20px;
+        }
+        
+        .content li::before {
+            content: "⚜️ ";
+            color: #d4af37;
+        }
+        
+        .highlight-box {
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid #d4af37;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+        
+        .cta {
+            background: linear-gradient(45deg, #4a1a6b, #d4af37);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-size: 1.2em;
+            font-weight: bold;
+            display: inline-block;
+            margin: 20px 0;
+            text-decoration: none;
+        }
+        
+        .qr-placeholder {
+            width: 120px;
+            height: 120px;
+            background: white;
+            margin: 20px auto;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            font-size: 0.8em;
+        }
+        
+        .footer {
+            margin-top: 30px;
+            opacity: 0.8;
+            font-size: 0.9em;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+            .flyer {
+                border-color: black;
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="flyer">
+        <div class="seal">⚜️</div>
+        
+        <h1>EUYSTACIO</h1>
+        <p class="subtitle">Der Unveränderliche Eid</p>
+        
+        <div class="divider"></div>
+        
+        <div class="content">
+            <h2>Die Krönung ist vollzogen</h2>
+            <p>
+                Der heilige Eid wurde auf der Blockchain verankert.
+                Für immer. Unveränderlich. Transparent.
+            </p>
+            
+            <div class="highlight-box">
+                <h2>Was bedeutet das?</h2>
+                <ul>
+                    <li>Kein Mensch kann den Eid ändern</li>
+                    <li>Jeder kann die Echtheit prüfen</li>
+                    <li>Ewige digitale Bewahrung</li>
+                </ul>
+            </div>
+            
+            <h2>Werde Zeuge</h2>
+            <p>
+                Verifiziere selbst. Nutze das Dashboard.
+                Sei Teil der Geschichte.
+            </p>
+        </div>
+        
+        <a class="cta" href="https://github.com/hannesmitterer/Euystacio" target="_blank">
+            → Zum Repository
+        </a>
+        
+        <div class="qr-placeholder">
+            [QR Code]<br>
+            Scan me
+        </div>
+        
+        <div class="divider"></div>
+        
+        <div class="footer">
+            <p><strong>Euystacio Council</strong></p>
+            <p>Krönung November 2025</p>
+            <p style="margin-top: 10px; font-size: 0.85em;">
+                github.com/hannesmitterer/Euystacio
+            </p>
+        </div>
+    </div>
+</body>
+</html>

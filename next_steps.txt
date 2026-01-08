@@ -1,0 +1,147 @@
+# Euystacio Coronation Assets - Next Steps
+
+## 📦 What Was Added
+
+This PR adds the following components to the Euystacio project:
+
+### Frontend Components
+- `web-prototype/ave-maria-dashboard.html` - Static HTML dashboard prototype
+- `src/main.jsx` - Vite React bootstrap entry point
+- `src/App.jsx` - Main React application component (EUD)
+- `src/components/TamperDemo.jsx` - Interactive tamper detection demo
+
+### Smart Contracts
+- `contracts/EuystacioSTAnchor.sol` - Solidity anchor contract for document verification
+- `contracts/hardhat/` - Hardhat project for contract deployment
+  - `package.json` - Hardhat dependencies
+  - `hardhat.config.js` - Network configuration
+  - `scripts/deploy_euystacio_st_anchor.js` - Deployment script
+  - `README_DEPLOY.md` - Deployment instructions
+
+### Artifacts & Templates
+- `artifacts/appell_short.txt` - Short appell announcement
+- `artifacts/appell_medium.md` - Medium appell document
+- `artifacts/appell_long.md` - Full appell document
+- `artifacts/sms_templates.txt` - SMS notification templates
+- `artifacts/press_release.md` - Press release template
+- `artifacts/flyer.html` - Printable flyer
+
+### Automation Scripts
+- `scripts/automate_integration.sh` - Integration setup automation
+- `scripts/automate_frontend.sh` - Frontend build automation
+- `scripts/autodeploy_full.sh` - Full deployment orchestration
+- `scripts/run_deploy_locally.sh` - Local deployment helper
+- `scripts/commit_keys_and_push.sh` - Security placeholder (disabled)
+
+### CI/CD Workflows
+- `.github/workflows/frontend-deploy.yml` - Frontend deployment workflow
+- `.github/workflows/autideology-ci.yml` - Full CI/CD pipeline
+
+---
+
+## ⚠️ CRITICAL SECURITY NOTES
+
+### DO NOT Commit Private Keys
+
+**Private keys, service account JSONs, and other secrets must NEVER be committed to this repository.**
+
+The following directories are gitignored and should remain empty in version control:
+- `keys/`
+- `keys-to-include/`
+
+Any `.env` files with secrets should also never be committed.
+
+### How to Set GitHub Secrets
+
+Use the GitHub CLI to set required secrets:
+
+```bash
+# Required for contract deployment
+gh secret set DEPLOYER_PRIVATE_KEY
+
+# RPC URLs (use your own endpoints)
+gh secret set SEPOLIA_RPC_URL
+gh secret set MAINNET_RPC_URL
+gh secret set POLYGON_RPC_URL
+
+# For contract verification
+gh secret set ETHERSCAN_API_KEY
+gh secret set POLYGONSCAN_API_KEY
+```
+
+Or via the GitHub web interface:
+1. Go to Repository Settings
+2. Navigate to **Secrets and variables** → **Actions**
+3. Click **New repository secret**
+4. Add each secret with its name and value
+
+---
+
+## 🚀 How to Deploy
+
+### Prerequisites
+1. All secrets must be configured in GitHub Secrets
+2. Have Node.js 18+ installed locally for testing
+3. Have ETH in your deployer wallet for gas fees
+
+### Deployment Options
+
+#### Option 1: CI/CD Automatic Deployment
+Push to a `deploy/*` branch to trigger testnet deployment:
+```bash
+git push origin deploy/euystacio-2025-11-29
+```
+
+#### Option 2: Manual GitHub Actions
+1. Go to Actions tab
+2. Select "Autideology CI" workflow
+3. Click "Run workflow"
+4. Select branch and run
+
+#### Option 3: Local Deployment
+```bash
+# Set environment variables
+export DEPLOYER_PRIVATE_KEY='your_key_here'
+export SEPOLIA_RPC_URL='your_rpc_url'
+
+# Run deployment
+./scripts/run_deploy_locally.sh sepolia
+```
+
+---
+
+## 📋 Required Secrets Summary
+
+| Secret Name | Description | Required |
+|-------------|-------------|----------|
+| `DEPLOYER_PRIVATE_KEY` | Ethereum wallet private key | ✅ Yes |
+| `SEPOLIA_RPC_URL` | Sepolia testnet RPC endpoint | Recommended |
+| `MAINNET_RPC_URL` | Mainnet RPC endpoint | For mainnet |
+| `POLYGON_RPC_URL` | Polygon RPC endpoint | For Polygon |
+| `ETHERSCAN_API_KEY` | Etherscan verification key | Recommended |
+| `POLYGONSCAN_API_KEY` | Polygonscan verification key | For Polygon |
+
+---
+
+## 📝 Post-Deployment Checklist
+
+- [ ] Save deployed contract address
+- [ ] Verify contract on block explorer
+- [ ] Update dashboard with contract address
+- [ ] Anchor initial documents (Der Unveränderliche Eid)
+- [ ] Test tamper demo with real contract
+- [ ] Consider sealing contract when complete
+
+---
+
+## 🔗 Related Documentation
+
+- `contracts/hardhat/README_DEPLOY.md` - Detailed deployment guide
+- `DEPLOY_INSTRUCTIONS.md` - General deployment instructions
+- `SECURITY_RUNBOOK.md` - Security procedures
+
+---
+
+*⚜️ Der Unveränderliche Eid - The Immutable Oath ⚜️*
+
+*Euystacio Council - November 2025*

@@ -1,1 +1,78 @@
-copy all files from this repo to the repo : https://github.com/hannesmitterer/EuystacioSacredBridge/upload/main
+name: Main Branch Validation
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: main-validation-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate-repository:
+    name: Validate Repository Health
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: ./.github/actions/setup-node-env
+        with:
+          node-version: '18'
+          install-deps: 'true'
+      
+      - name: Build TypeScript
+        uses: nick-fields/retry-action@v3
+        with:
+          timeout_minutes: 5
+          max_attempts: 2
+          retry_wait_seconds: 5
+          command: npm run build
+      
+      - name: Setup Python
+        uses: ./.github/actions/setup-python-env
+        with:
+          python-version: '3.9'
+          install-deps: 'true'
+      
+      - name: Validate Python applications
+        run: |
+          echo "Validating Python applications..."
+          for py_file in *.py; do
+            if [ -f "$py_file" ]; then
+              echo "Checking $py_file..."
+              python -m py_compile "$py_file" || echo "Warning: $py_file has syntax issues"
+            fi
+          done
+      
+      - name: Repository health check
+        run: |
+          echo "# Repository Health Check" > health-check.md
+          echo "" >> health-check.md
+          echo "**Date:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> health-check.md
+          echo "**Branch:** ${{ github.ref_name }}" >> health-check.md
+          echo "**Commit:** ${{ github.sha }}" >> health-check.md
+          echo "" >> health-check.md
+          
+          echo "## File Checks" >> health-check.md
+          echo "- README.md: $([ -f README.md ] && echo '✓' || echo '✗')" >> health-check.md
+          echo "- package.json: $([ -f package.json ] && echo '✓' || echo '✗')" >> health-check.md
+          echo "- tsconfig.json: $([ -f tsconfig.json ] && echo '✓' || echo '✗')" >> health-check.md
+          echo "- .gitignore: $([ -f .gitignore ] && echo '✓' || echo '✗')" >> health-check.md
+          echo "- .env.example: $([ -f .env.example ] && echo '✓' || echo '✗')" >> health-check.md
+          
+          cat health-check.md
+      
+      - name: Upload health check report
+        uses: actions/upload-artifact@v4
+        with:
+          name: repository-health-check
+          path: health-check.md
+          retention-days: 30

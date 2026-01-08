@@ -1,0 +1,28 @@
+# Code Owners for Euystacio Repository
+# These owners will be requested for review when someone opens a PR
+
+# Default owners for everything in the repo
+*                           @hannesmitterer
+
+# Workflows and CI/CD
+/.github/workflows/         @hannesmitterer
+/.github/actions/           @hannesmitterer
+
+# TypeScript/Node.js code
+/src/                       @hannesmitterer
+*.ts                        @hannesmitterer
+*.js                        @hannesmitterer
+package.json                @hannesmitterer
+tsconfig.json               @hannesmitterer
+
+# Python code
+*.py                        @hannesmitterer
+requirements.txt            @hannesmitterer
+
+# Documentation
+*.md                        @hannesmitterer
+/docs/                      @hannesmitterer
+
+# Configuration files
+_config.yml                 @hannesmitterer
+.env.example                @hannesmitterer

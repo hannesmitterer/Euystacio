@@ -20,16 +20,18 @@ jobs:
         uses: actions/checkout@v3
       
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: ./.github/actions/setup-node-env
         with:
           node-version: '18'
-          cache: 'npm'
-      
-      - name: Install dependencies
-        run: npm ci
+          install-deps: 'true'
       
       - name: Build TypeScript
-        run: npm run build
+        uses: nick-fields/retry-action@v3
+        with:
+          timeout_minutes: 5
+          max_attempts: 2
+          retry_wait_seconds: 5
+          command: npm run build
       
       - name: Verify .env.example exists
         run: |
@@ -57,3 +59,24 @@ jobs:
             exit 1
           fi
           echo "Build artifacts verified ✓"
+      
+      - name: Run security audit
+        run: |
+          npm audit --audit-level=moderate > audit-results.txt 2>&1 || true
+          cat audit-results.txt
+        continue-on-error: true
+      
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: alo-001-build-artifacts
+          path: dist/
+          retention-days: 7
+      
+      - name: Upload audit results
+        uses: actions/upload-artifact@v4
+        with:
+          name: alo-001-audit-results
+          path: audit-results.txt
+          retention-days: 30
+        continue-on-error: true

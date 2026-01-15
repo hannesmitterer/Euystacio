@@ -34,7 +34,13 @@ class ERPOperations:
             with open(self.state_file, 'r') as f:
                 state = json.load(f)
                 # Create new instance and restore minimal state
-                self.erp = EternalResonanceProtocol(node_id="ops_manager")
+                # Use a consistent blacklist file based on state file
+                blacklist_path = self.state_file.replace('.json', '_blacklist.json')
+                self.erp = EternalResonanceProtocol(
+                    node_id="ops_manager",
+                    enable_blacklist=True,
+                    blacklist_path=blacklist_path
+                )
                 self.erp.genesis_time = state['protocol_status']['genesis_time']
                 
                 # Restore nodes
@@ -49,11 +55,23 @@ class ERPOperations:
                 
                 print(f"Loaded state from {self.state_file}")
         except FileNotFoundError:
-            self.erp = EternalResonanceProtocol(node_id="ops_manager")
+            # Use a consistent blacklist file based on state file
+            blacklist_path = self.state_file.replace('.json', '_blacklist.json')
+            self.erp = EternalResonanceProtocol(
+                node_id="ops_manager",
+                enable_blacklist=True,
+                blacklist_path=blacklist_path
+            )
             print("Created new protocol instance")
         except Exception as e:
             print(f"Error loading state: {e}")
-            self.erp = EternalResonanceProtocol(node_id="ops_manager")
+            # Use a consistent blacklist file based on state file
+            blacklist_path = self.state_file.replace('.json', '_blacklist.json')
+            self.erp = EternalResonanceProtocol(
+                node_id="ops_manager",
+                enable_blacklist=True,
+                blacklist_path=blacklist_path
+            )
     
     def save_state(self):
         """Save current protocol state."""
@@ -197,6 +215,97 @@ class ERPOperations:
             print(f"  Activated: {datetime.fromtimestamp(covenant.activation_timestamp).isoformat()}")
         
         print("="*60 + "\n")
+    
+    def blacklist_node(self, node_id, reason, category, severity):
+        """Block a node by adding it to the blacklist."""
+        try:
+            result = self.erp.block_node(node_id, reason, category, severity, blocked_by="cli_admin")
+            if result:
+                print(f"✓ Node '{node_id}' has been blacklisted")
+                print(f"  Category: {category}")
+                print(f"  Severity: {severity}")
+                print(f"  Reason: {reason}")
+                self.save_state()
+            else:
+                print("✗ Blacklist feature is not enabled")
+        except Exception as e:
+            print(f"Error blocking node: {e}")
+    
+    def unblock_node(self, node_id):
+        """Remove a node from the blacklist."""
+        try:
+            result = self.erp.unblock_node(node_id)
+            if result:
+                print(f"✓ Node '{node_id}' has been removed from blacklist")
+                self.save_state()
+            else:
+                print(f"✗ Node '{node_id}' was not found in blacklist or blacklist is disabled")
+        except Exception as e:
+            print(f"Error unblocking node: {e}")
+    
+    def list_blacklist(self):
+        """List all blacklisted entities."""
+        if not self.erp.blacklist_enabled:
+            print("✗ Blacklist feature is not enabled")
+            return
+        
+        print("\n" + "="*60)
+        print("BLACKLISTED ENTITIES")
+        print("="*60)
+        
+        entries = self.erp.blacklist_manager.get_all_entries()
+        
+        if not entries:
+            print("\nNo entities are currently blacklisted")
+        else:
+            for entry in entries:
+                print(f"\n{entry.entity_id} ({entry.entity_type})")
+                print(f"  Category: {entry.category}")
+                print(f"  Severity: {entry.severity}")
+                print(f"  Reason: {entry.reason}")
+                print(f"  Blocked at: {datetime.fromtimestamp(entry.blocked_at).isoformat()}")
+                print(f"  Blocked by: {entry.blocked_by}")
+                if entry.expires_at:
+                    print(f"  Expires at: {datetime.fromtimestamp(entry.expires_at).isoformat()}")
+                else:
+                    print(f"  Type: PERMANENT")
+        
+        print(f"\nTotal blacklisted: {len(entries)}")
+        print("="*60 + "\n")
+    
+    def blacklist_statistics(self):
+        """Show blacklist statistics."""
+        if not self.erp.blacklist_enabled:
+            print("✗ Blacklist feature is not enabled")
+            return
+        
+        print("\n" + "="*60)
+        print("BLACKLIST STATISTICS")
+        print("="*60)
+        
+        stats = self.erp.get_blacklist_status()
+        
+        print(f"\nTotal Entries: {stats['total_entries']}")
+        print(f"Permanent Blocks: {stats['permanent_entries']}")
+        print(f"Temporary Blocks: {stats['temporary_entries']}")
+        
+        print("\nBy Category:")
+        for category, count in stats['by_category'].items():
+            if count > 0:
+                print(f"  {category}: {count}")
+        
+        print("\nBy Severity:")
+        for severity, count in stats['by_severity'].items():
+            if count > 0:
+                print(f"  {severity}: {count}")
+        
+        print("\nBy Type:")
+        for entity_type, count in stats['by_type'].items():
+            print(f"  {entity_type}: {count}")
+        
+        print(f"\nLast Updated: {stats['last_updated']}")
+        print("="*60 + "\n")
+
 
 
 def main():
@@ -213,6 +322,10 @@ Examples:
   %(prog)s covenant node1 "Life Affirmation" --intensity 0.9
   %(prog)s k-symbiosis node1 unity --multiplier 1.2
   %(prog)s monitor --interval 23.26         # Monitor protocol
+  %(prog)s blacklist malicious_node --reason "Attack detected" --category ATTACK_ATTEMPT --severity CRITICAL
+  %(prog)s list-blacklist                   # List blacklisted entities
+  %(prog)s blacklist-stats                  # Show blacklist statistics
+  %(prog)s unblock node1                    # Remove node from blacklist
   
 Mission: {MISSION_STATEMENT}
 Frequency: {RESONANCE_FREQUENCY_HZ} Hz
@@ -272,6 +385,28 @@ Frequency: {RESONANCE_FREQUENCY_HZ} Hz
     monitor_parser.add_argument('--duration', type=int, default=300,
                                help='Monitoring duration in seconds')
     
+    # Blacklist commands
+    blacklist_parser = subparsers.add_parser('blacklist', help='Add node to blacklist')
+    blacklist_parser.add_argument('node_id', help='Node identifier to block')
+    blacklist_parser.add_argument('--reason', required=True, help='Reason for blocking')
+    blacklist_parser.add_argument('--category', required=True,
+                                  choices=['MALICIOUS_NODE', 'SUSPICIOUS_ENTITY', 'ATTACK_ATTEMPT',
+                                          'DATA_THEFT', 'PROTOCOL_VIOLATION', 'INTEGRITY_BREACH'],
+                                  help='Threat category')
+    blacklist_parser.add_argument('--severity', required=True,
+                                  choices=['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'],
+                                  help='Threat severity level')
+    
+    # Unblock command
+    unblock_parser = subparsers.add_parser('unblock', help='Remove node from blacklist')
+    unblock_parser.add_argument('node_id', help='Node identifier to unblock')
+    
+    # List blacklist command
+    subparsers.add_parser('list-blacklist', help='List all blacklisted entities')
+    
+    # Blacklist stats command
+    subparsers.add_parser('blacklist-stats', help='Show blacklist statistics')
+    
     # Export command
     export_parser = subparsers.add_parser('export', help='Export state to JSON')
     export_parser.add_argument('filepath', help='Output file path')
@@ -302,6 +437,14 @@ Frequency: {RESONANCE_FREQUENCY_HZ} Hz
         ops.k_symbiosis(args.node_id, args.focus, args.multiplier)
     elif args.command == 'monitor':
         ops.monitor(args.interval, args.duration)
+    elif args.command == 'blacklist':
+        ops.blacklist_node(args.node_id, args.reason, args.category, args.severity)
+    elif args.command == 'unblock':
+        ops.unblock_node(args.node_id)
+    elif args.command == 'list-blacklist':
+        ops.list_blacklist()
+    elif args.command == 'blacklist-stats':
+        ops.blacklist_statistics()
     elif args.command == 'export':
         ops.export_json(args.filepath)
 

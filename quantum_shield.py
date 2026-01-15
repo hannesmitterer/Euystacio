@@ -58,7 +58,25 @@ class QuantumKey:
 
 
 class NTRUKeyPair:
-    """NTRU key pair generator and manager."""
+    """
+    NTRU key pair generator and manager.
+    
+    IMPORTANT SECURITY NOTE:
+    This is a SIMPLIFIED DEMONSTRATION implementation of NTRU concepts.
+    It is NOT cryptographically secure and should NOT be used in production.
+    
+    For production use, implement one of these alternatives:
+    1. Use ntru-python library (pip install ntru)
+    2. Use pqcrypto library for post-quantum cryptography
+    3. Use NIST-approved lattice-based schemes (CRYSTALS-Kyber, NTRU Prime, etc.)
+    
+    This demonstration shows the concept of:
+    - Lattice-based encryption
+    - Key rotation and management
+    - Integration with ERP resonance
+    
+    But uses simplified polynomial arithmetic that lacks proper security properties.
+    """
     
     def __init__(self, n: int = NTRU_N, p: int = NTRU_P, q: int = NTRU_Q):
         self.n = n
@@ -67,10 +85,11 @@ class NTRUKeyPair:
     
     def generate_keypair(self, resonance_phase: float = 0.0) -> Tuple[List[int], List[int]]:
         """
-        Generate NTRU key pair.
+        Generate NTRU-inspired key pair.
         
-        This is a simplified NTRU implementation for demonstration.
-        In production, use a cryptographic library like NTRU-HRSS or Falcon.
+        WARNING: This is a simplified demonstration, not cryptographically secure NTRU.
+        Real NTRU requires proper polynomial ring arithmetic, specific coefficient
+        distributions, and validated security parameters.
         
         Args:
             resonance_phase: Current ERP phase for key synchronization

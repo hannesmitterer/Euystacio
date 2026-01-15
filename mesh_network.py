@@ -20,9 +20,7 @@ import os
 import time
 import json
 import hashlib
-import socket
-import threading
-import random
+import secrets
 from datetime import datetime, timezone
 from typing import Dict, List, Optional, Set, Tuple, Any
 from dataclasses import dataclass, asdict
@@ -253,14 +251,30 @@ class BlockchainBasedMeshNetwork:
         print(f"[BBMN] Node {self.node_id} stopped")
     
     def _network_server(self):
-        """Network server for receiving mesh messages."""
-        # This is a simplified implementation
-        # In production, use proper async networking (asyncio, twisted, etc.)
+        """
+        Network server for receiving mesh messages.
+        
+        NOTE: This is a proof-of-concept placeholder implementation.
+        
+        For production deployment, implement actual networking using:
+        1. asyncio with aiohttp or websockets for async networking
+        2. ZeroMQ for distributed messaging
+        3. libp2p for proper P2P networking
+        4. Custom UDP/TCP socket implementation with proper message framing
+        
+        This placeholder allows the system to demonstrate the architecture
+        without requiring complex networking setup.
+        """
         print(f"[BBMN] Network server listening on port {self.port}")
         
         while self.running:
             time.sleep(1)
-            # Placeholder for actual network I/O
+            # Placeholder - in production, this would handle actual network I/O
+            # Example implementation would:
+            # - Bind to self.port
+            # - Accept incoming connections
+            # - Parse and route messages
+            # - Handle peer handshakes
             pass
     
     def _peer_discovery(self):

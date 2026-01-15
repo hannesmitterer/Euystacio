@@ -29,7 +29,7 @@ from stealth_mode import StealthMode, LexAmorisRhythm
 
 # Import ERP if available
 try:
-    from eternal_resonance_protocol import EternalResonanceProtocol, RESONANCE_FREQUENCY_HZ
+    from eternal_resonance_protocol import EternalResonanceProtocol
     ERP_AVAILABLE = True
 except ImportError:
     ERP_AVAILABLE = False

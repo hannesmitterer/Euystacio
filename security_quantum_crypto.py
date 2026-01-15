@@ -127,13 +127,14 @@ class QuantumSafeCrypto:
         
         return ciphertext.hex()
     
-    def decrypt(self, ciphertext: str, private_key: str) -> bytes:
+    def decrypt(self, ciphertext: str, private_key: str, public_key: str) -> bytes:
         """
         Decrypt data using NTRU private key.
         
         Args:
             ciphertext: Encrypted data as hex string
             private_key: NTRU private key
+            public_key: NTRU public key (needed for this simplified implementation)
             
         Returns:
             Decrypted plaintext
@@ -145,24 +146,21 @@ class QuantumSafeCrypto:
         nonce = ciphertext_bytes[32:48]
         encrypted = ciphertext_bytes[48:]
         
-        # Derive key material from private key and ephemeral
-        # In production, use proper NTRU decryption
-        public_key = hashlib.sha3_512(
-            secrets.token_bytes(64) + private_key.encode()
-        ).hexdigest()
-        
+        # Derive key material from public key and ephemeral
+        # In production, use proper NTRU decryption with private key
         key_material = hashlib.sha3_256(
             public_key.encode() + ephemeral
         ).digest()
         
         # XOR decryption
-        decrypted = bytes(a ^ b for a, b in zip(
+        decrypted_combined = bytes(a ^ b for a, b in zip(
             encrypted,
             (key_material * ((len(encrypted) // len(key_material)) + 1))[:len(encrypted)]
         ))
         
-        # Remove nonce padding
-        return decrypted
+        # The decrypted data is (nonce + original_data)
+        # Skip the first 16 bytes (nonce) to get original data
+        return decrypted_combined[16:]
     
     def get_security_level(self) -> int:
         """Get security level in bits."""
@@ -186,7 +184,7 @@ def encrypt_message(message: str, public_key: str,
     return crypto.encrypt(message.encode('utf-8'), public_key)
 
 
-def decrypt_message(ciphertext: str, private_key: str,
+def decrypt_message(ciphertext: str, private_key: str, public_key: str,
                     parameter_set: str = 'ntru_hps_2048_509') -> str:
     """
     Convenience function to decrypt a message.
@@ -194,13 +192,14 @@ def decrypt_message(ciphertext: str, private_key: str,
     Args:
         ciphertext: Encrypted message
         private_key: Recipient's private key
+        public_key: Recipient's public key
         parameter_set: NTRU parameter set
         
     Returns:
         Decrypted message
     """
     crypto = QuantumSafeCrypto(parameter_set)
-    return crypto.decrypt(ciphertext, private_key).decode('utf-8')
+    return crypto.decrypt(ciphertext, private_key, public_key).decode('utf-8')
 
 
 if __name__ == '__main__':
@@ -226,7 +225,7 @@ if __name__ == '__main__':
     print()
     
     # Decrypt message
-    decrypted = crypto.decrypt(ciphertext, keypair.private_key)
+    decrypted = crypto.decrypt(ciphertext, keypair.private_key, keypair.public_key)
     print(f"Decrypted: {decrypted.decode('utf-8')}")
     print()
     

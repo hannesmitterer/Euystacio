@@ -232,7 +232,8 @@ class SecurityCoordinator:
         
         decrypted = self.quantum_crypto.decrypt(
             ciphertext,
-            self.key_pair.private_key
+            self.key_pair.private_key,
+            self.key_pair.public_key
         )
         return decrypted.decode('utf-8')
     

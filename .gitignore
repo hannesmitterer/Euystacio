@@ -29,3 +29,7 @@ __pycache__/
 # ERP State Files
 erp_state.json
 erp_daemon.log
+
+# Blacklist Files
+euystacio_blacklist.json
+*_blacklist.json

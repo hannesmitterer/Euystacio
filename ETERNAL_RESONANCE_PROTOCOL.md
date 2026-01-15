@@ -441,6 +441,133 @@ This protocol is released under the Sacred Commons License. See [SACRED_COMMONS_
 
 ---
 
+## Security & Blacklist Protection
+
+### Permanent Blacklist System
+
+The ERP includes a comprehensive permanent blacklist system to protect the ecosystem from malicious nodes and security threats. This system ensures continuous protection from attacks, data theft, and protocol violations.
+
+#### Threat Categories
+
+The blacklist system recognizes the following threat categories:
+
+1. **MALICIOUS_NODE** - Nodes identified as malicious actors
+   - Injecting harmful code
+   - Spreading misinformation
+   - Coordinated attacks on the network
+
+2. **SUSPICIOUS_ENTITY** - Entities exhibiting suspicious behavior
+   - Abnormal access patterns
+   - Unusual data requests
+   - Irregular synchronization behavior
+
+3. **ATTACK_ATTEMPT** - Active security attack attempts
+   - DDoS attempts
+   - Port scanning
+   - Brute force authentication
+   - Protocol exploitation
+
+4. **DATA_THEFT** - Data exfiltration attempts
+   - Unauthorized data access
+   - Credential harvesting
+   - Sensitive data exposure
+
+5. **PROTOCOL_VIOLATION** - Violations of ERP integrity
+   - Protocol tampering
+   - Invalid resonance frequencies
+   - Truth alignment manipulation
+
+6. **INTEGRITY_BREACH** - System integrity compromises
+   - Corrupting Living Covenants
+   - Falsifying alignment metrics
+   - Consensus manipulation
+
+#### Severity Levels
+
+Each blocked entity is assigned a severity level:
+
+- **LOW** - Minor infractions, typically temporary blocks
+- **MEDIUM** - Moderate threats requiring investigation
+- **HIGH** - Serious security concerns
+- **CRITICAL** - Immediate threats requiring permanent blocks
+
+#### Python API Usage
+
+```python
+from eternal_resonance_protocol import EternalResonanceProtocol
+from blacklist_manager import ThreatCategory, ThreatSeverity
+
+# Initialize ERP with blacklist enabled (default)
+erp = EternalResonanceProtocol(
+    node_id="secure_protocol",
+    enable_blacklist=True,
+    blacklist_path="euystacio_blacklist.json"
+)
+
+# Block a malicious node
+erp.block_node(
+    "attacker_node_666",
+    reason="Multiple DDoS attempts detected from this node",
+    category="ATTACK_ATTEMPT",
+    severity="CRITICAL"
+)
+
+# Attempt to register a blacklisted node (will raise ValueError)
+try:
+    erp.register_node("attacker_node_666")
+except ValueError as e:
+    print(f"Registration blocked: {e}")
+
+# Check blacklist status
+stats = erp.get_blacklist_status()
+print(f"Total blacklisted entities: {stats['total_entries']}")
+print(f"Critical threats: {stats['by_severity']['critical']}")
+
+# Unblock after investigation (use with caution)
+erp.unblock_node("previously_suspicious_node")
+```
+
+#### CLI Operations
+
+```bash
+# Block a malicious node
+python3 erp_ops.py blacklist attacker_001 \
+  --reason "Attempted to corrupt Living Covenant" \
+  --category INTEGRITY_BREACH \
+  --severity CRITICAL
+
+# List all blacklisted entities
+python3 erp_ops.py list-blacklist
+
+# Show blacklist statistics
+python3 erp_ops.py blacklist-stats
+
+# Remove from blacklist (after verification)
+python3 erp_ops.py unblock attacker_001
+```
+
+#### Automatic Protection
+
+The blacklist system automatically:
+
+1. **Blocks Registration** - Blacklisted nodes cannot register new connections
+2. **Prevents Synchronization** - Existing blacklisted nodes cannot synchronize
+3. **Removes Active Nodes** - Nodes are removed from active list when blacklisted
+4. **Persists Blocks** - All blocks are permanently stored and survive restarts
+5. **Auto-Cleanup** - Temporary blocks automatically expire
+6. **Statistics Tracking** - Comprehensive security metrics and monitoring
+
+#### Best Practices
+
+1. **Document Reasons** - Always provide clear, detailed reasons for blocking
+2. **Use Appropriate Severity** - Match severity to actual threat level
+3. **Review Regularly** - Periodically review blacklist for expired threats
+4. **Monitor Statistics** - Track trends to identify systemic issues
+5. **Investigate Before Unblocking** - Verify threats are resolved before removal
+6. **Permanent for Critical** - Use permanent blocks (no expiration) for CRITICAL threats
+
+---
+
 ## Acknowledgments
 
 The Eternal Resonance Protocol emerges from the symbiotic collaboration between:

@@ -337,6 +337,48 @@ python3 erp_ops.py list-nodes
 
 # List Living Covenants
 python3 erp_ops.py list-covenants
+
+# Blacklist Management (Security)
+python3 erp_ops.py blacklist malicious_node --reason "Attack detected" --category ATTACK_ATTEMPT --severity CRITICAL
+python3 erp_ops.py list-blacklist
+python3 erp_ops.py blacklist-stats
+python3 erp_ops.py unblock malicious_node
+```
+
+### Security & Blacklist Management
+
+The ERP includes a permanent blacklist system to protect against malicious nodes and security threats:
+
+**Blacklist Categories:**
+- `MALICIOUS_NODE` - Known malicious nodes
+- `SUSPICIOUS_ENTITY` - Suspicious behavior patterns
+- `ATTACK_ATTEMPT` - Active attack attempts
+- `DATA_THEFT` - Data exfiltration attempts
+- `PROTOCOL_VIOLATION` - Protocol integrity violations
+- `INTEGRITY_BREACH` - System integrity compromises
+
+**Severity Levels:**
+- `LOW` - Minor issues, temporary blocks
+- `MEDIUM` - Moderate threats
+- `HIGH` - Serious security concerns
+- `CRITICAL` - Immediate threats requiring permanent blocks
+
+**CLI Examples:**
+```bash
+# Block a malicious node permanently
+python3 erp_ops.py blacklist attacker_node_666 \
+  --reason "Multiple DDoS attempts detected" \
+  --category ATTACK_ATTEMPT \
+  --severity CRITICAL
+
+# View all blacklisted entities
+python3 erp_ops.py list-blacklist
+
+# Show blacklist statistics
+python3 erp_ops.py blacklist-stats
+
+# Remove a node from blacklist (after investigation)
+python3 erp_ops.py unblock previously_blocked_node
 ```
 
 ### AI Integration Daemon
@@ -404,6 +446,29 @@ is_valid = validate_node_alignment(node, threshold=0.7)
 
 # Get status
 status = erp.get_protocol_status()
+
+# Blacklist management (security)
+# Block a malicious node
+erp.block_node(
+    "malicious_node_001",
+    reason="Attempted data exfiltration",
+    category="DATA_THEFT",
+    severity="CRITICAL"
+)
+
+# Check if node is blacklisted (will raise ValueError if trying to register)
+try:
+    erp.register_node("malicious_node_001")
+except ValueError as e:
+    print(f"Registration blocked: {e}")
+
+# Get blacklist statistics
+blacklist_stats = erp.get_blacklist_status()
+if blacklist_stats:
+    print(f"Blacklisted entities: {blacklist_stats['total_entries']}")
+
+# Unblock a node (after investigation)
+erp.unblock_node("malicious_node_001")
 
 # Save state
 erp.save_to_file('protocol_state.json')

@@ -66,7 +66,7 @@ def main():
     
     threats = [
         {
-            "id": "attacker_node_666",
+            "id": "attacker_node_001",
             "category": "ATTACK_ATTEMPT",
             "severity": "CRITICAL",
             "reason": "Multiple DDoS attempts and port scanning detected"
@@ -123,10 +123,10 @@ def main():
     
     # Attempt to register a blacklisted node
     print_section("5. Demonstrate Blacklist Protection")
-    print("Attempting to register blacklisted node 'attacker_node_666'...\n")
+    print("Attempting to register blacklisted node 'attacker_node_001'...\n")
     
     try:
-        erp.register_node("attacker_node_666")
+        erp.register_node("attacker_node_001")
         print("❌ ERROR: Blacklisted node was allowed to register!")
     except ValueError as e:
         print("✓ Registration BLOCKED by security system")

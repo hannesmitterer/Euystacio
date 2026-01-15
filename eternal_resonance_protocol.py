@@ -24,7 +24,12 @@ from dataclasses import dataclass, asdict
 
 # Import blacklist manager for security
 try:
-    from blacklist_manager import BlacklistManager, validate_entity_against_blacklist
+    from blacklist_manager import (
+        BlacklistManager, 
+        validate_entity_against_blacklist,
+        ThreatCategory,
+        ThreatSeverity
+    )
     BLACKLIST_AVAILABLE = True
 except ImportError:
     BLACKLIST_AVAILABLE = False
@@ -336,8 +341,6 @@ class EternalResonanceProtocol:
         """
         if not self.blacklist_enabled:
             return False
-        
-        from blacklist_manager import ThreatCategory, ThreatSeverity
         
         # Convert string to enum
         cat_enum = ThreatCategory[category.upper()]

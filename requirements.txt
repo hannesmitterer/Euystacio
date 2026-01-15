@@ -1,2 +1,4 @@
 fastapi
 uvicorn
+# Security enhancement dependencies
+# Note: For production, use full NTRU implementation like ntru-python or liboqs

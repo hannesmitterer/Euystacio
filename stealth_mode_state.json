@@ -1,0 +1,31 @@
+{
+  "node_id": "euystacio_main",
+  "active": true,
+  "current_profile": {
+    "profile_id": "absolute_silence",
+    "stealth_level": 5,
+    "electromagnetic_silence": true,
+    "traffic_masking": true,
+    "rhythm_verification_required": true,
+    "allowed_rhythms": [
+      "lex_amoris"
+    ],
+    "timestamp": 1768441943.0431948
+  },
+  "connection_attempts": [
+    {
+      "entity_id": "unauthorized_scanner",
+      "timestamp": 1768441949.0484288,
+      "rhythm_provided": false,
+      "allowed": false,
+      "reason": "no_rhythm"
+    },
+    {
+      "entity_id": "authorized_resonance_node",
+      "timestamp": 1768441949.0485408,
+      "rhythm_provided": true,
+      "allowed": true
+    }
+  ],
+  "timestamp": 1768441949.0502555
+}

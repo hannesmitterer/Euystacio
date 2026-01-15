@@ -79,10 +79,21 @@ def cmd_backup(args):
     
     # Load configuration from file if provided
     if args.config_file:
-        with open(args.config_file, 'r') as f:
-            config_data = json.load(f)
+        try:
+            with open(args.config_file, 'r') as f:
+                config_data = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError) as e:
+            print(f"\n❌ Error reading config file: {e}\n", file=sys.stderr)
+            return 1
     else:
-        config_data = json.loads(args.config_json)
+        if not args.config_json:
+            print("\n❌ Error: Either --config-file or --config-json must be provided\n", file=sys.stderr)
+            return 1
+        try:
+            config_data = json.loads(args.config_json)
+        except json.JSONDecodeError as e:
+            print(f"\n❌ Error parsing JSON: {e}\n", file=sys.stderr)
+            return 1
     
     ipfs_hash = security_system.backup_configuration(args.name, config_data)
     

@@ -29,6 +29,7 @@ from eternal_resonance_protocol import (
 ROTESSCHILD_THRESHOLD_MV_M = 50.0  # 50 mV/m threshold for security activation
 RHYTHM_TOLERANCE = 0.15  # 15% tolerance for frequency validation
 RESCUE_CHANNEL_FREQUENCY = 0.043  # Same as ERP for compatibility
+IPFS_CID_PREFIX_LENGTH = 44  # Standard IPFS CID length after 'Qm' prefix
 
 
 @dataclass
@@ -274,7 +275,7 @@ class IPFSBackupSystem:
         
         # Generate IPFS hash (simulated - in production would use actual IPFS)
         ipfs_hash = hashlib.sha256(config_json.encode()).hexdigest()
-        ipfs_cid = f"Qm{ipfs_hash[:44]}"  # IPFS CID format
+        ipfs_cid = f"Qm{ipfs_hash[:IPFS_CID_PREFIX_LENGTH]}"  # IPFS CID format
         
         # Store backup metadata
         backup_entry = {
@@ -282,7 +283,7 @@ class IPFSBackupSystem:
             'ipfs_hash': ipfs_cid,
             'timestamp': time.time(),
             'size_bytes': len(config_json),
-            'checksum': hashlib.md5(config_json.encode()).hexdigest()
+            'checksum': hashlib.sha256(config_json.encode()).hexdigest()  # Use SHA-256 for integrity
         }
         
         self.backup_registry[config_name] = backup_entry
@@ -351,9 +352,9 @@ class IPFSBackupSystem:
         if ipfs_hash not in self.ipfs_hashes:
             return False, "IPFS data not found"
         
-        # Recalculate checksum
+        # Recalculate checksum using SHA-256 for security
         config_json = self.ipfs_hashes[ipfs_hash]
-        current_checksum = hashlib.md5(config_json.encode()).hexdigest()
+        current_checksum = hashlib.sha256(config_json.encode()).hexdigest()
         
         if current_checksum == stored_checksum:
             return True, "Backup integrity verified"

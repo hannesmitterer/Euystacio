@@ -5,6 +5,17 @@ Scenario A: Spionage und Datenextraktion
 
 Provides quantum-resistant encryption using NTRU (Nth-degree Truncated 
 polynomial Ring Units) algorithm to protect against quantum computer attacks.
+
+**IMPORTANT SECURITY NOTE:**
+This is a DEMONSTRATION/EDUCATIONAL implementation to showcase the security
+architecture. For PRODUCTION use, you MUST use a fully vetted NTRU library:
+- liboqs-python (recommended): https://github.com/open-quantum-safe/liboqs-python
+- ntru-python: https://github.com/joostrijneveld/NTRU-Python
+- PQClean: https://github.com/PQClean/PQClean
+
+The simplified cryptographic operations in this module DO NOT provide the
+security guarantees of real NTRU encryption and should NEVER be used for
+protecting actual sensitive data.
 """
 
 import hashlib
@@ -34,8 +45,21 @@ class QuantumSafeCrypto:
     """
     Quantum-safe cryptography implementation using NTRU-like principles.
     
-    This is a simplified implementation for demonstration. In production,
-    use a fully tested NTRU library like ntru-python or liboqs.
+    **SECURITY WARNING:**
+    This is a SIMPLIFIED DEMONSTRATION implementation. It uses hash-based
+    symmetric encryption to illustrate the security architecture concepts.
+    
+    Real NTRU uses:
+    - Lattice-based polynomial operations
+    - Ring arithmetic over truncated polynomial rings
+    - Specific parameter sets for provable security
+    
+    For production systems, use:
+    - liboqs-python for NIST PQC standardized algorithms
+    - Hardware Security Modules (HSM) for key storage
+    - Regularly updated cryptographic libraries
+    
+    This implementation provides API compatibility demonstration only.
     """
     
     # NTRU parameter sets (simplified)

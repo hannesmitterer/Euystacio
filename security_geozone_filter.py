@@ -126,11 +126,13 @@ class GeoZoneFilter:
             allowed=True
         ))
         
-        # High-risk zones (example - adjust based on actual threat intelligence)
+        # High-risk zones (example - configure based on actual threat intelligence)
+        # NOTE: In production, replace 'XX' with actual high-risk country codes
+        # based on your threat intelligence and security policy
         self.add_zone(GeoZone(
             zone_id='zone_high_risk',
             name='High Risk Regions',
-            country_codes={'XX'},  # Placeholder
+            country_codes=set(),  # Empty by default - configure as needed
             threat_level=ThreatLevel.HIGH,
             allowed=False
         ))

@@ -216,7 +216,7 @@ class DataPoisoningDetector:
             for i, val in enumerate(sample.features):
                 stds[i] += (val - means[i]) ** 2
         
-        stds = [math.sqrt(s / n_samples) if s > 0 else 1.0 for s in stds]
+        stds = [math.sqrt(s / n_samples) if s > 0 else 0.01 for s in stds]  # Use small epsilon instead of 1.0
         
         # Calculate normalized distance
         distance = 0.0

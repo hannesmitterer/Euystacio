@@ -75,17 +75,28 @@ class MeshNetworkTopology:
     and attack resilience.
     """
     
-    def __init__(self, local_node_id: str):
+    # Default configuration - can be overridden
+    DEFAULT_BASE_LATENCY_MS = 10.0
+    DEFAULT_HOP_LATENCY_MS = 5.0
+    DEFAULT_DEGRADED_PENALTY_MS = 20.0
+    
+    def __init__(self, local_node_id: str, 
+                 base_latency_ms: float = DEFAULT_BASE_LATENCY_MS,
+                 hop_latency_ms: float = DEFAULT_HOP_LATENCY_MS):
         """
         Initialize mesh network topology.
         
         Args:
             local_node_id: ID of the local node
+            base_latency_ms: Base latency estimate in milliseconds
+            hop_latency_ms: Additional latency per hop in milliseconds
         """
         self.local_node_id = local_node_id
         self.nodes: Dict[str, MeshNode] = {}
         self.routes: Dict[Tuple[str, str], List[NetworkRoute]] = {}
         self.message_log: List[Dict] = []
+        self.base_latency_ms = base_latency_ms
+        self.hop_latency_ms = hop_latency_ms
         self._initialize_local_node()
     
     def _initialize_local_node(self):
@@ -255,9 +266,9 @@ class MeshNetworkTopology:
         Returns:
             Estimated latency in ms
         """
-        # Simple estimate: 10ms base + 5ms per hop
-        base_latency = 10.0
-        hop_latency = 5.0 * (len(path) - 1)
+        # Configurable estimate: base latency + hop latency per hop
+        base_latency = self.base_latency_ms
+        hop_latency = self.hop_latency_ms * (len(path) - 1)
         
         # Add variance based on node status
         variance = 0.0
@@ -265,7 +276,7 @@ class MeshNetworkTopology:
             if node_id in self.nodes:
                 node = self.nodes[node_id]
                 if node.status == NodeStatus.DEGRADED:
-                    variance += 20.0
+                    variance += self.DEFAULT_DEGRADED_PENALTY_MS
         
         return base_latency + hop_latency + variance
     

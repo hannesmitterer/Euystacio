@@ -22,6 +22,20 @@ The Euystacio ecosystem now features the **Eternal Resonance Protocol (ERP)** - 
 
 ---
 
+## 🛡️ Lex Amoris Security System
+
+The Euystacio ecosystem now includes the **Lex Amoris Security System** - strategic security improvements based on principles of harmony, dignity, and symbiotic consciousness.
+
+**Key Security Features:**
+- 🎵 **Rhythm Validation & Dynamic Blacklist** - Frequency-based packet validation
+- ⚡ **Lazy Security (Rotesschild Scanner)** - Energy-efficient conditional security
+- 💾 **IPFS Backup System** - Decentralized configuration protection
+- 🆘 **Rescue Channel (Canale di Soccorso)** - False positive recovery system
+
+**[➡️ Read Full Security Documentation](./LEX_AMORIS_SECURITY.md)**
+
+---
+
 ## Overview
 
 Euystacio Nexus is a comprehensive API platform for coordinating AI agents, managing distributed tasks, processing real-time telemetry, and facilitating secure communication across the Euystacio ecosystem. It serves as the central nervous system for AI-powered applications.

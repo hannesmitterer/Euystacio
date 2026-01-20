@@ -1,0 +1,17 @@
+{
+  "update_server": "https://updates.euystacio.io",
+  "gpg_key_id": "",
+  "trusted_keys": [],
+  "install_dir": "/opt/euystacio",
+  "backup_dir": "/var/backups/euystacio",
+  "verify_checksums": true,
+  "verify_signatures": true,
+  "auto_rollback": true,
+  "max_backup_versions": 5,
+  "update_check_interval": 86400,
+  "auto_update": false,
+  "notification": {
+    "enabled": true,
+    "email": "admin@euystacio.io"
+  }
+}

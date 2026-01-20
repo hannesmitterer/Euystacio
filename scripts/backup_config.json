@@ -1,0 +1,42 @@
+{
+  "backup_directories": [
+    "/home/runner/work/Euystacio/Euystacio",
+    "/etc/euystacio",
+    "/var/lib/euystacio"
+  ],
+  "exclude_patterns": [
+    "*.tmp",
+    "*.log",
+    "__pycache__",
+    ".git",
+    "node_modules",
+    "*.pyc",
+    ".cache",
+    "dist",
+    "build"
+  ],
+  "gpg_recipient": "",
+  "ipfs_enabled": true,
+  "ipfs_api": "/ip4/127.0.0.1/tcp/5001",
+  "local_backup_dir": "/var/backups/euystacio",
+  "max_local_backups": 10,
+  "backup_schedule": "daily",
+  "compression": "gzip",
+  "notification": {
+    "enabled": true,
+    "email": "backup@euystacio.io"
+  },
+  "ipfs_pinning_services": [
+    {
+      "name": "Pinata",
+      "enabled": false,
+      "api_key": "",
+      "secret_key": ""
+    },
+    {
+      "name": "Web3.Storage",
+      "enabled": false,
+      "api_token": ""
+    }
+  ]
+}

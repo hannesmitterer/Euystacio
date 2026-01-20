@@ -29,3 +29,24 @@ __pycache__/
 # ERP State Files
 erp_state.json
 erp_daemon.log
+
+# Monitoring data
+monitoring/grafana/dashboards/*.db
+monitoring/loki/data/
+monitoring/prometheus/data/
+
+# Backups
+/var/backups/
+*.tar.gz.gpg
+backup_metadata.json
+
+# Certificates
+certs/
+*.pem
+*.key
+*.crt
+
+# Security logs
+/var/log/euystacio/
+forensic_actions.log
+intrusion.log

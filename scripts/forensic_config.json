@@ -1,0 +1,67 @@
+{
+  "response_enabled": false,
+  "tor_enabled": false,
+  "vpn_enabled": false,
+  "alert_threshold": 5,
+  "time_window_seconds": 300,
+  "suspicious_patterns": [
+    {
+      "name": "Multiple Failed Auth",
+      "pattern": "authentication failed|auth failure|invalid password",
+      "severity": "high",
+      "action": "tor_routing"
+    },
+    {
+      "name": "Port Scan Detection",
+      "pattern": "port scan|syn flood|scanning attempt",
+      "severity": "critical",
+      "action": "vpn_routing"
+    },
+    {
+      "name": "SQL Injection Attempt",
+      "pattern": "sql injection|union select|drop table",
+      "severity": "critical",
+      "action": "block_and_alert"
+    },
+    {
+      "name": "Unauthorized Access Attempt",
+      "pattern": "unauthorized|access denied|403|401",
+      "severity": "medium",
+      "action": "monitor"
+    },
+    {
+      "name": "Brute Force Attack",
+      "pattern": "brute force|too many requests|rate limit exceeded",
+      "severity": "high",
+      "action": "tor_routing"
+    },
+    {
+      "name": "Command Injection",
+      "pattern": "command injection|shell escape|exec\\(|system\\(",
+      "severity": "critical",
+      "action": "block_and_alert"
+    },
+    {
+      "name": "Directory Traversal",
+      "pattern": "\\.\\./|path traversal|directory listing",
+      "severity": "high",
+      "action": "block_and_alert"
+    },
+    {
+      "name": "XSS Attempt",
+      "pattern": "<script|javascript:|onerror=|onload=",
+      "severity": "high",
+      "action": "monitor"
+    }
+  ],
+  "notification": {
+    "enabled": true,
+    "email": "security@euystacio.io",
+    "webhook_url": ""
+  },
+  "log_files": [
+    "/var/log/euystacio/app.log",
+    "/var/log/euystacio/security.log",
+    "/var/log/auth.log"
+  ]
+}

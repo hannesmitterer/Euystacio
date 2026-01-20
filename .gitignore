@@ -29,3 +29,8 @@ __pycache__/
 # ERP State Files
 erp_state.json
 erp_daemon.log
+
+# EU 2026 Response State Files
+eu2026_state.json
+eu2026_time_reference.json
+eu2026_triple_sign.json

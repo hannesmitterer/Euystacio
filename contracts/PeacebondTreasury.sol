@@ -317,7 +317,11 @@ contract PeacebondTreasury {
     // ============ Receive Function ============
     
     /**
-     * @dev Allow contract to receive Ether
+     * @dev Allow contract to receive Ether for potential future use
+     * 
+     * Note: This contract manages Resonance Credits (CR) internally.
+     * Ether received can be used for gas payments or future integrations.
+     * For CR management, use depositResonanceCredits() instead.
      */
     receive() external payable {
         lastActivityTimestamp = block.timestamp;

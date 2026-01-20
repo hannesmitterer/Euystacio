@@ -98,9 +98,15 @@ class IPFSShardManager:
             
         Returns:
             IPFSShard object
+            
+        Note:
+            In production, this would interface with actual IPFS nodes.
+            The simulated hash uses CIDv0 format (Qm prefix) for compatibility.
         """
-        # Generate simulated IPFS hash
-        ipfs_hash = "Qm" + hashlib.sha256(data + str(time.time()).encode()).hexdigest()[:44]
+        # Generate simulated IPFS hash (CIDv0 format with Qm prefix)
+        # Real IPFS hashes vary by version and hash function
+        hash_data = data + str(time.time()).encode() + region.encode()
+        ipfs_hash = "Qm" + hashlib.sha256(hash_data).hexdigest()[:44]
         shard_id = f"{region}_{int(time.time())}_{random.randint(1000, 9999)}"
         checksum = hashlib.sha256(data).hexdigest()
         

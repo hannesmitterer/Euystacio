@@ -55,7 +55,15 @@ class EU2026Response:
         """Load configuration from file."""
         try:
             with open(config_path, 'r') as f:
-                return json.load(f)
+                config = json.load(f)
+            
+            # Validate required configuration keys
+            required_keys = ["signal_isolation", "triple_sign_pact", "peacebond_treasury"]
+            for key in required_keys:
+                if key not in config:
+                    raise ValueError(f"Missing required configuration key: {key}")
+            
+            return config
         except FileNotFoundError:
             # Return default configuration
             return {
@@ -63,8 +71,16 @@ class EU2026Response:
                 "status": "Allerta Livello 2",
                 "signal_isolation": {"autonomous_time_enabled": True},
                 "triple_sign_pact": {"enabled": True},
-                "peacebond_treasury": {"enabled": True}
+                "peacebond_treasury": {"enabled": True},
+                "communication_channels": {
+                    "telegram": {"enabled": False},
+                    "red_hospes": {"enabled": False}
+                }
             }
+        except json.JSONDecodeError as e:
+            raise ValueError(f"Invalid JSON in configuration file: {e}")
+        except ValueError as e:
+            raise ValueError(f"Configuration error: {e}")
     
     def initialize_signal_isolation(self) -> Dict:
         """

@@ -24,6 +24,7 @@ from datetime import datetime, timezone
 from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass, asdict
 import random
+import math
 
 
 # Core Constants
@@ -285,7 +286,6 @@ class AutonomousTimeReference:
         Returns:
             Phase angle in radians (0 to 2π)
         """
-        import math
         current_time = self.get_autonomous_time()
         phase = (current_time % BIOCLOCK_PERIOD_SECONDS) / BIOCLOCK_PERIOD_SECONDS
         return phase * 2 * math.pi

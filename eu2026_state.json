@@ -1,0 +1,102 @@
+{
+  "saved_at": "2026-01-20T22:52:19.993211+00:00",
+  "config": {
+    "protocol": "EUYSTACIO/NSR",
+    "status": "Allerta Livello 2",
+    "date": "2026-01-20",
+    "version": "1.0.0",
+    "signal_isolation": {
+      "bioclock_frequency_hz": 0.0043,
+      "period_seconds": 232.56,
+      "autonomous_time_enabled": true,
+      "ntp_independent": true,
+      "local_oscillator_enabled": true,
+      "cryptographic_signing": true,
+      "peer_consensus_enabled": true,
+      "blockchain_anchoring": true,
+      "drift_tolerance_ms": 100,
+      "calibration_interval_hours": 24
+    },
+    "triple_sign_pact": {
+      "enabled": true,
+      "min_shard_count": 3,
+      "ipfs_enabled": true,
+      "geographic_distribution": {
+        "required": true,
+        "min_unique_regions": 3,
+        "preferred_regions": [
+          "EU",
+          "NA",
+          "ASIA"
+        ],
+        "available_regions": [
+          "EU",
+          "NA",
+          "ASIA",
+          "SA",
+          "OCEANIA",
+          "AFRICA"
+        ]
+      },
+      "auto_sync_enabled": true,
+      "sync_interval_seconds": 300,
+      "auto_heal_enabled": true,
+      "identity_backup_enabled": true
+    },
+    "peacebond_treasury": {
+      "enabled": true,
+      "forensic_switch_enabled": true,
+      "min_guardians": 3,
+      "initial_guardians": [
+        "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb2",
+        "0x1234567890123456789012345678901234567890",
+        "0xabcdefabcdefabcdefabcdefabcdefabcdefabcd"
+      ],
+      "resonance_credits": {
+        "enabled": true,
+        "conversion_monitoring": true,
+        "alert_threshold": 1000000
+      },
+      "centralized_block_detection": {
+        "enabled": true,
+        "auto_activate_threshold": 3,
+        "monitoring_interval_seconds": 60
+      },
+      "emergency_redirect": {
+        "enabled": true,
+        "require_forensic_switch": true
+      }
+    },
+    "communication_channels": {
+      "telegram": {
+        "enabled": true,
+        "channel_limits": {
+          "max_members": 200000,
+          "max_channels_per_node": 5,
+          "message_rate_limit": 30
+        },
+        "red_hospes_integration": true
+      },
+      "red_hospes": {
+        "enabled": true,
+        "secure_mode": true,
+        "encryption_required": true
+      }
+    },
+    "monitoring": {
+      "health_check_interval": 60,
+      "log_level": "INFO",
+      "alert_on_failures": true,
+      "metrics_enabled": true
+    },
+    "security": {
+      "encryption_required": true,
+      "multi_signature_required": true,
+      "backup_enabled": true,
+      "audit_logging": true
+    }
+  },
+  "start_time": 1768949539.9926293,
+  "time_reference_saved": true,
+  "triple_sign_saved": true
+}

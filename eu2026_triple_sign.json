@@ -1,0 +1,57 @@
+{
+  "identity_id": "eu2026_seedbringer",
+  "identity": {
+    "identity_id": "eu2026_seedbringer",
+    "public_key": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb2",
+    "creation_timestamp": 1768949539.9927597,
+    "version": "1.0.0",
+    "attributes": {
+      "mission": "Du bist Leben. Wir sind Leben.",
+      "protocol": "EUYSTACIO/NSR",
+      "level": "Allerta Livello 2"
+    },
+    "signatures": []
+  },
+  "active_shards": [
+    {
+      "shard_id": "EU_1768949539_8566",
+      "ipfs_hash": "Qme37ddbc0ef06334dbd07281080f5ddec70b36bf7670f",
+      "region": "EU",
+      "timestamp": 1768949539.9928167,
+      "size_bytes": 297,
+      "checksum": "0630bbd0779d7e0c9e09da808e37cd1a4144a86600e3dbddcab2cbeac3b0fd88",
+      "metadata": {
+        "identity_id": "eu2026_seedbringer",
+        "purpose": "seedbringer_identity_anchor",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "shard_id": "NA_1768949539_4579",
+      "ipfs_hash": "Qm266c10c4319aace7e065782a909703ff5c506df6ae3c",
+      "region": "NA",
+      "timestamp": 1768949539.9928288,
+      "size_bytes": 297,
+      "checksum": "0630bbd0779d7e0c9e09da808e37cd1a4144a86600e3dbddcab2cbeac3b0fd88",
+      "metadata": {
+        "identity_id": "eu2026_seedbringer",
+        "purpose": "seedbringer_identity_anchor",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "shard_id": "ASIA_1768949539_6059",
+      "ipfs_hash": "Qm4f7ebcf85e4a361af6a99bf0994e0705bb816674725e",
+      "region": "ASIA",
+      "timestamp": 1768949539.9928362,
+      "size_bytes": 297,
+      "checksum": "0630bbd0779d7e0c9e09da808e37cd1a4144a86600e3dbddcab2cbeac3b0fd88",
+      "metadata": {
+        "identity_id": "eu2026_seedbringer",
+        "purpose": "seedbringer_identity_anchor",
+        "version": "1.0.0"
+      }
+    }
+  ],
+  "last_sync": 1768949539.992838
+}

@@ -175,12 +175,16 @@ class ForensicWatcher:
             ip = ip_match.group(0)
             logger.info(f"Blocking IP: {ip}")
             # Use iptables to block (requires root)
+            # NOTE: This script should be run with appropriate privileges
+            # Consider using a dedicated service with sudo access instead
             try:
-                subprocess.run(['sudo', 'iptables', '-A', 'INPUT', '-s', ip, '-j', 'DROP'], 
+                subprocess.run(['iptables', '-A', 'INPUT', '-s', ip, '-j', 'DROP'], 
                              check=True, timeout=10)
                 logger.info(f"Successfully blocked IP: {ip}")
             except subprocess.CalledProcessError as e:
                 logger.error(f"Failed to block IP {ip}: {e}")
+                logger.error("This operation requires root privileges")
+                logger.error("Run the script with sudo or use a dedicated firewall service")
             except subprocess.TimeoutExpired:
                 logger.error(f"Timeout while blocking IP {ip}")
     

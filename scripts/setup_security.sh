@@ -18,11 +18,16 @@ echo -e "${BLUE}Euystacio Security & Resilience Setup${NC}"
 echo -e "${BLUE}========================================${NC}"
 echo ""
 
-# Check if running as root
-if [ "$EUID" -eq 0 ]; then 
-    echo -e "${YELLOW}Warning: Running as root. Some features may not work correctly.${NC}"
-    echo -e "${YELLOW}Consider running as a regular user with sudo access.${NC}"
+# Check if running as root (required for iptables)
+if [ "$EUID" -ne 0 ]; then 
+    echo -e "${RED}[ERROR] This script requires root privileges${NC}"
+    echo "Please run with: sudo $0"
     echo ""
+    echo "Note: Root access is required for:"
+    echo "  - Creating /var/log/euystacio directory"
+    echo "  - Managing system services (tor, openvpn)"
+    echo "  - Configuring iptables firewall rules"
+    exit 1
 fi
 
 # Function to check if command exists
@@ -138,15 +143,13 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
         echo
         if [[ $REPLY =~ ^[Yy]$ ]]; then
             echo "Generating GPG key (this may take a moment)..."
-            gpg --batch --gen-key <<EOF
-Key-Type: RSA
-Key-Length: 2048
-Name-Real: Euystacio Backup
-Name-Email: backup@euystacio.local
-Expire-Date: 0
-%no-protection
-%commit
-EOF
+            echo ""
+            echo -e "${YELLOW}SECURITY NOTICE:${NC}"
+            echo "You will be prompted to create a passphrase for your GPG key."
+            echo "Use a strong passphrase to protect your backup encryption keys."
+            echo ""
+            # Interactive GPG key generation with passphrase
+            gpg --full-generate-key
             echo -e "${GREEN}✓ GPG key generated${NC}"
         fi
     fi

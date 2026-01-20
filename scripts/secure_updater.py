@@ -89,6 +89,12 @@ class SecureUpdateManager:
         """Verify GPG signature of a file"""
         logger.info(f"Verifying GPG signature for {file_path}")
         
+        # Check if we have trusted keys configured
+        if self.trusted_keys and len(self.trusted_keys) > 0:
+            logger.info(f"Verifying against trusted keys: {', '.join(self.trusted_keys)}")
+        else:
+            logger.warning("No trusted keys configured - signature will be verified but not checked against whitelist")
+        
         try:
             # Run GPG verification
             result = subprocess.run(
@@ -99,6 +105,18 @@ class SecureUpdateManager:
             )
             
             if result.returncode == 0:
+                # Check if signature is from a trusted key
+                if self.trusted_keys and len(self.trusted_keys) > 0:
+                    # Extract key ID from verification output
+                    import re
+                    key_match = re.search(r'key ID ([A-F0-9]+)', result.stderr, re.IGNORECASE)
+                    if key_match:
+                        key_id = key_match.group(1)
+                        if key_id not in self.trusted_keys:
+                            logger.error(f"✗ Signature from untrusted key: {key_id}")
+                            logger.error(f"Trusted keys: {', '.join(self.trusted_keys)}")
+                            return False
+                
                 logger.info("✓ Signature verification PASSED")
                 logger.debug(result.stderr)
                 return True

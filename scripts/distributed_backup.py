@@ -124,6 +124,23 @@ class DistributedBackupManager:
             logger.error("GPG recipient not configured")
             return False
         
+        # Verify GPG recipient key exists
+        try:
+            result = subprocess.run(
+                ['gpg', '--list-keys', self.gpg_recipient],
+                capture_output=True,
+                text=True,
+                timeout=10
+            )
+            if result.returncode != 0:
+                logger.error(f"GPG recipient key not found: {self.gpg_recipient}")
+                logger.error("Import the recipient's public key first:")
+                logger.error(f"  gpg --import recipient_key.asc")
+                return False
+        except Exception as e:
+            logger.error(f"Error checking GPG key: {e}")
+            return False
+        
         try:
             # Build GPG command
             gpg_cmd = [

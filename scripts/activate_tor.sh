@@ -31,7 +31,7 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
-# Tor configuration
+# Get Tor configuration
 TOR_UID=$(id -u debian-tor 2>/dev/null || id -u tor 2>/dev/null || echo "")
 TOR_PORT="9050"
 TOR_TRANS_PORT="9040"
@@ -39,6 +39,9 @@ TOR_DNS_PORT="5353"
 
 if [ -z "$TOR_UID" ]; then
     echo -e "${RED}[ERROR] Cannot determine Tor user UID${NC}"
+    echo "The tor user does not exist. Please install and configure Tor first:"
+    echo "  sudo apt-get install tor"
+    echo "  sudo systemctl enable tor"
     exit 1
 fi
 

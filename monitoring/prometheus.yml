@@ -24,6 +24,8 @@ scrape_configs:
       - targets: ['localhost:9090']
 
   # Euystacio nodes
+  # NOTE: Configure this target to match your Euystacio service
+  # Update the port if your service runs on a different port
   - job_name: 'euystacio-nodes'
     static_configs:
       - targets: ['localhost:8080']

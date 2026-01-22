@@ -16,7 +16,7 @@ Features:
 import logging
 import time
 from datetime import datetime, timezone
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional, Any, Tuple
 from dataclasses import dataclass, asdict
 from enum import Enum
 
@@ -207,7 +207,7 @@ class StealthModeController:
         self.last_activation_time: Optional[float] = None
         self.activation_count: int = 0
     
-    def can_activate(self) -> tuple[bool, Optional[str]]:
+    def can_activate(self) -> Tuple[bool, Optional[str]]:
         """
         Verifica se stealth mode può essere attivato.
         

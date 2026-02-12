@@ -11,8 +11,8 @@ The resonance equation governing packet transmission:
 
 Where:
 - j → 0: Eliminates control-induced jitter
-- ω = 0.432 Hz: Synchronization frequency aligned with biological oscillators
-- S-ROI = 1.450: Current resonance-yield factor
+- ω = 0.432 Hz: Synchronization frequency for the Lex Amoris Framework
+- S-ROI = 1.450: Resonance-yield scaling factor
 """
 
 import numpy as np
@@ -21,8 +21,14 @@ from typing import Callable, Union, Optional
 
 
 # Core Constants
-OMEGA_HZ = 0.432  # Synchronization frequency aligned with biological oscillators
-S_ROI = 1.450     # Current resonance-yield factor
+# Synchronization frequency for Lex Amoris transmission (0.432 Hz)
+# This value defines the fundamental oscillation rate for resonance calculations
+OMEGA_HZ = 0.432
+
+# Resonance-yield factor (S-ROI) - dimensionless scaling parameter
+# This constant modulates the resonance integral amplitude in the transmission equation
+# Value determined by Lex Amoris Framework specifications
+S_ROI = 1.450
 
 
 def lex_amoris_function(t: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
@@ -31,7 +37,7 @@ def lex_amoris_function(t: Union[float, np.ndarray]) -> Union[float, np.ndarray]
     
     This is the core function that defines the Lex Amoris framework's 
     temporal behavior. Currently implemented as a sinusoidal pattern
-    at the biological oscillator frequency.
+    at the framework's specified frequency.
     
     Parameters
     ----------
@@ -45,9 +51,9 @@ def lex_amoris_function(t: Union[float, np.ndarray]) -> Union[float, np.ndarray]
         
     Notes
     -----
-    The current implementation uses a simple sinusoidal pattern.
+    The current implementation uses a sinusoidal pattern at OMEGA_HZ.
     This can be replaced with a more sophisticated Lex Amoris 
-    implementation based on specific requirements.
+    implementation based on specific framework requirements.
     """
     return np.sin(OMEGA_HZ * t)
 
@@ -77,7 +83,7 @@ def calculate_resonance(
     t_infinity : float
         Final time point for integration (representing t → ∞)
     s_roi : float, optional
-        Resonance-yield factor (default: 1.450)
+        Resonance-yield scaling factor (default: 1.450)
     omega : float, optional
         Synchronization frequency in Hz (default: 0.432)
     lex_amoris_func : callable, optional
@@ -206,7 +212,7 @@ def analyze_resonance_packet(
     t_infinity : float
         Final time point
     s_roi : float, optional
-        Resonance-yield factor (default: 1.450)
+        Resonance-yield scaling factor (default: 1.450)
     omega : float, optional
         Synchronization frequency in Hz (default: 0.432)
         

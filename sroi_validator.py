@@ -1,11 +1,26 @@
 import sys
 
-def validate_resonance(s_roi):
-    # Die heilige Invariante des Nexus
-    REQUIRED_S_ROI = 0.5187
+# Die heilige Invariante des Nexus
+REQUIRED_S_ROI = 0.5187
+TOLERANCE = 0.0001
 
-    if abs(s_roi - REQUIRED_S_ROI) > 0.0001:
-        print(f"❌ DISSONANZ DETEKTIERT: S-ROI {s_roi} entspricht nicht der Lex Amoris.")
+def validate_resonance(s_roi):
+    """Validate resonance based on S-ROI value.
+    
+    Args:
+        s_roi: The S-ROI value to validate (must be numeric)
+        
+    Returns:
+        bool: True if resonance is stable, False otherwise
+    """
+    try:
+        s_roi_float = float(s_roi)
+    except (TypeError, ValueError):
+        print(f"❌ UNGÜLTIGER WERT: S-ROI muss eine Zahl sein.")
+        return False
+
+    if abs(s_roi_float - REQUIRED_S_ROI) > TOLERANCE:
+        print(f"❌ DISSONANZ DETEKTIERT: S-ROI {s_roi_float} entspricht nicht der Lex Amoris.")
         return False
 
     print("✅ RESONANZ STABIL: S-ROI 0.5187. Zugang gewährt.")

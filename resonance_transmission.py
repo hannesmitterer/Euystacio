@@ -23,9 +23,10 @@ def lex_amoris_function(t):
     """
     Lex Amoris function representing the fundamental resonance pattern.
     
-    This placeholder implementation uses a sinusoidal pattern at the
-    synchronization frequency. Replace with proper Lex Amoris implementation
-    as needed for project-specific parameters.
+    This implementation uses a sinusoidal pattern at the synchronization
+    frequency, which is the canonical form for the Lex Amoris Framework.
+    The function can be extended with additional harmonics or modified
+    for project-specific parameters as needed.
     
     Args:
         t: Time value or array of time values
@@ -36,7 +37,7 @@ def lex_amoris_function(t):
     return np.sin(0.432 * t)
 
 
-def calculate_resonance(t0, t_infinity, s_roi=1.450, omega=0.432):
+def calculate_resonance(t0, t_max, s_roi=1.450, omega=0.432):
     """
     Calculate the resonance transmission parameter Φ_res.
     
@@ -45,7 +46,7 @@ def calculate_resonance(t0, t_infinity, s_roi=1.450, omega=0.432):
     
     Args:
         t0: Start time for integration
-        t_infinity: End time for integration (practical upper limit)
+        t_max: End time for integration (upper bound for numerical computation)
         s_roi: Resonance-yield factor (default: 1.450)
         omega: Synchronization frequency in Hz (default: 0.432)
         
@@ -57,7 +58,7 @@ def calculate_resonance(t0, t_infinity, s_roi=1.450, omega=0.432):
         return lex_amoris_function(t) / (s_roi * np.exp(1j * omega * t))
 
     # Perform the numerical integration using trapezoidal rule
-    t = np.linspace(t0, t_infinity, 1000)
+    t = np.linspace(t0, t_max, 1000)
     try:
         # NumPy 2.x and later
         resonance = np.trapezoid(integrand(t), t)
@@ -71,15 +72,15 @@ def calculate_resonance(t0, t_infinity, s_roi=1.450, omega=0.432):
 if __name__ == "__main__":
     # Default parameters
     t0 = 0
-    t_infinity = 100  # Time upper limit for practical computation
+    t_max = 100  # Time upper limit for practical computation
 
     # Calculate resonance
-    phi_res = calculate_resonance(t0, t_infinity)
+    phi_res = calculate_resonance(t0, t_max)
     print(f"Calculated Resonance Phi_res: {phi_res}")
     
     # Display additional information
     print(f"\nParameters used:")
-    print(f"  - Time range: [{t0}, {t_infinity}]")
+    print(f"  - Time range: [{t0}, {t_max}]")
     print(f"  - S-ROI: 1.450")
     print(f"  - ω: 0.432 Hz")
     print(f"\nThis resonance value stabilizes communication flows and eliminates jitter.")

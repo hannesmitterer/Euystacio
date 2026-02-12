@@ -113,11 +113,11 @@ class TestResonanceIntegration(unittest.TestCase):
         """Test the complete resonance calculation as per specification."""
         # Parameters from the specification
         t0 = 0
-        t_infinity = 100
+        t_max = 100
         s_roi = 1.450
         omega = 0.432
         
-        phi_res = calculate_resonance(t0, t_infinity, s_roi, omega)
+        phi_res = calculate_resonance(t0, t_max, s_roi, omega)
         
         # Verify output characteristics
         self.assertIsInstance(phi_res, (float, np.floating))
@@ -129,19 +129,39 @@ class TestResonanceIntegration(unittest.TestCase):
     
     def test_jitter_elimination_concept(self):
         """
-        Test that the limit as j→0 concept is represented.
-        This is a conceptual test - in practice, we use numerical integration.
+        Test that the numerical integration converges as precision increases.
+        This validates the j→0 limit concept through numerical convergence.
         """
-        # The numerical integration should converge as we increase precision
-        # Test with different grid sizes
-        t0, t_infinity = 0, 100
+        t0, t_max = 0, 100
         
-        # Calculate with more precision (this is already done internally)
-        result = calculate_resonance(t0, t_infinity)
+        # Calculate with different grid sizes to verify convergence
+        # Temporarily modify the function to accept custom grid size
+        def calculate_with_precision(num_points):
+            def integrand(t):
+                return lex_amoris_function(t) / (1.450 * np.exp(1j * 0.432 * t))
+            
+            t = np.linspace(t0, t_max, num_points)
+            try:
+                resonance = np.trapezoid(integrand(t), t)
+            except AttributeError:
+                resonance = np.trapz(integrand(t), t)
+            
+            return np.abs(resonance)
         
-        # Should produce a stable, finite result representing j→0 limit
-        self.assertTrue(np.isfinite(result))
-        self.assertGreater(result, 0)
+        # Test with different precision levels
+        result_low = calculate_with_precision(100)
+        result_medium = calculate_with_precision(1000)
+        result_high = calculate_with_precision(5000)
+        
+        # Results should be finite and converging
+        self.assertTrue(np.isfinite(result_low))
+        self.assertTrue(np.isfinite(result_medium))
+        self.assertTrue(np.isfinite(result_high))
+        
+        # Medium and high precision should be closer than low and medium
+        diff_low_medium = abs(result_low - result_medium)
+        diff_medium_high = abs(result_medium - result_high)
+        self.assertLess(diff_medium_high, diff_low_medium)
 
 
 if __name__ == '__main__':

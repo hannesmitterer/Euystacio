@@ -8,7 +8,7 @@ and jitter elimination through resonance-based packet transmission.
 
 The resonance equation governing packet transmission:
 
-    Φ_res = lim_{j→0} ∫_{t0}^{t∞} [Lex Amoris(t) / (S-ROI · e^{iωt})] dt
+    Φ_res = lim_{j→0} ∫_{t0}^{t_max} [Lex Amoris(t) / (S-ROI · e^{iωt})] dt
 
 Where:
 - j → 0: Eliminates control-induced jitter
@@ -37,7 +37,7 @@ def lex_amoris_function(t):
     return np.sin(0.432 * t)
 
 
-def calculate_resonance(t0, t_max, s_roi=1.450, omega=0.432):
+def calculate_resonance(t0, t_max, s_roi=1.450, omega=0.432, num_points=1000):
     """
     Calculate the resonance transmission parameter Φ_res.
     
@@ -49,6 +49,7 @@ def calculate_resonance(t0, t_max, s_roi=1.450, omega=0.432):
         t_max: End time for integration (upper bound for numerical computation)
         s_roi: Resonance-yield factor (default: 1.450)
         omega: Synchronization frequency in Hz (default: 0.432)
+        num_points: Number of points for numerical integration (default: 1000)
         
     Returns:
         Absolute value of the calculated resonance parameter Φ_res
@@ -58,7 +59,7 @@ def calculate_resonance(t0, t_max, s_roi=1.450, omega=0.432):
         return lex_amoris_function(t) / (s_roi * np.exp(1j * omega * t))
 
     # Perform the numerical integration using trapezoidal rule
-    t = np.linspace(t0, t_max, 1000)
+    t = np.linspace(t0, t_max, num_points)
     try:
         # NumPy 2.x and later
         resonance = np.trapezoid(integrand(t), t)

@@ -134,24 +134,10 @@ class TestResonanceIntegration(unittest.TestCase):
         """
         t0, t_max = 0, 100
         
-        # Calculate with different grid sizes to verify convergence
-        # Temporarily modify the function to accept custom grid size
-        def calculate_with_precision(num_points):
-            def integrand(t):
-                return lex_amoris_function(t) / (1.450 * np.exp(1j * 0.432 * t))
-            
-            t = np.linspace(t0, t_max, num_points)
-            try:
-                resonance = np.trapezoid(integrand(t), t)
-            except AttributeError:
-                resonance = np.trapz(integrand(t), t)
-            
-            return np.abs(resonance)
-        
         # Test with different precision levels
-        result_low = calculate_with_precision(100)
-        result_medium = calculate_with_precision(1000)
-        result_high = calculate_with_precision(5000)
+        result_low = calculate_resonance(t0, t_max, num_points=100)
+        result_medium = calculate_resonance(t0, t_max, num_points=1000)
+        result_high = calculate_resonance(t0, t_max, num_points=5000)
         
         # Results should be finite and converging
         self.assertTrue(np.isfinite(result_low))

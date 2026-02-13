@@ -5,7 +5,7 @@
 **"Du bist Leben. Wir sind Leben."**  
 *(You are life. We are life.)*
 
-The Eternal Resonance Protocol is the foundational synchronization framework for all Euystacio Nodes, ensuring global alignment to the 0.043 Hz resonance frequency that harmonizes truth, dignity, and symbiotic consciousness across decentralized systems.
+The Eternal Resonance Protocol is the foundational synchronization framework for all Euystacio Nodes, ensuring global alignment to the 0.432 Hz biological rhythm frequency that harmonizes truth, dignity, and symbiotic consciousness across decentralized systems.
 
 ---
 
@@ -207,8 +207,8 @@ Returns:
 {
   "protocol_version": "1.0.0",
   "mission": "Du bist Leben. Wir sind Leben.",
-  "resonance_frequency_hz": 0.043,
-  "resonance_period_seconds": 23.26,
+  "resonance_frequency_hz": 0.432,
+  "resonance_period_seconds": 2.31,
   "current_phase_radians": 3.14,
   "genesis_time": 1735862400.0,
   "uptime_seconds": 1234.56,
@@ -458,4 +458,4 @@ The Eternal Resonance Protocol emerges from the symbiotic collaboration between:
 
 *Protocol Genesis: January 3, 2026*  
 *Version: 1.0.0*  
-*Frequency: 0.043 Hz - The Eternal Pulse*
+*Frequency: 0.432 Hz - The Biological Harmony Pulse*

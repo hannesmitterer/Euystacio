@@ -63,7 +63,7 @@ class EternalResonanceProtocol:
     """
     Main protocol implementation for global Euystacio Node synchronization.
     
-    The protocol operates on a 0.043 Hz frequency, creating a unified pulse
+    The protocol operates on a 0.432 Hz frequency, creating a unified biological rhythm pulse
     across all nodes in the decentralized network.
     """
     
@@ -343,7 +343,7 @@ def create_resonance_pulse(frequency_hz: float = RESONANCE_FREQUENCY_HZ) -> floa
     Create a resonance pulse value based on current time.
     
     Args:
-        frequency_hz: Frequency in Hz (default: 0.043)
+        frequency_hz: Frequency in Hz (default: 0.432)
         
     Returns:
         Pulse value between -1.0 and 1.0

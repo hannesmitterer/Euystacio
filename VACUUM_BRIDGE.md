@@ -333,20 +333,36 @@ Priority content for decentralized distribution:
 ```bash
 #!/bin/bash
 # distribute.sh - Publish updates to all channels
+set -e  # Exit on error
+
+# Validate inputs
+if [ -z "$1" ]; then
+    echo "Error: Update message required"
+    echo "Usage: ./distribute.sh 'update message' [critical]"
+    exit 1
+fi
 
 # 1. Commit to GitHub
 git add .
-git commit -m "Update: $1"
-git push origin main
+git commit -m "Update: $1" || { echo "Commit failed"; exit 1; }
+git push origin main || { echo "Push failed"; exit 1; }
 
 # 2. Publish to IPFS
-NEW_HASH=$(ipfs add -r . --quieter)
-echo "IPFS: $NEW_HASH"
-ipfs name publish $NEW_HASH
+if command -v ipfs &> /dev/null; then
+    NEW_HASH=$(ipfs add -r . --quieter) || { echo "IPFS add failed"; exit 1; }
+    echo "IPFS: $NEW_HASH"
+    ipfs name publish $NEW_HASH || echo "Warning: IPNS publish failed"
+else
+    echo "Warning: IPFS not installed, skipping IPFS distribution"
+fi
 
 # 3. Archive to Arweave (critical updates only)
 if [ "$2" = "critical" ]; then
-    arweave deploy .
+    if command -v arweave &> /dev/null; then
+        arweave deploy . || echo "Warning: Arweave deployment failed"
+    else
+        echo "Warning: Arweave CLI not installed, skipping archival"
+    fi
 fi
 
 # 4. Update mirrors

@@ -1,0 +1,613 @@
+Lex Amoris — Euystacio Framework
+ hannesmitterer/Lex-Amoris-
+0
+0
+Home
+Kosymbiosis Dashboard
+Guide
+Guide
+Core Principles
+The Framework
+The Euystacio Agent
+Usage Examples
+Table of contents
+Example 1 — Quick guidance on an interpersonal conflict
+Example 2 — Agent-based reflection with history
+Example 3 — Building a custom framework
+Example 4 — Listing applicable principles
+Example 5 — Principle introspection
+API Reference
+Contributing
+Changelog
+Usage Examples¶
+This page collects practical recipes showing how Lex Amoris can be applied to real-world scenarios.
+
+Example 1 — Quick guidance on an interpersonal conflict¶
+
+from lex_amoris import LexAmoris
+
+fw = LexAmoris()
+print(fw.guidance(
+    "My colleague wronged me and I am struggling to move on."
+))
+Output:
+
+
+Lex Amoris guidance for the situation described:
+  • [Compassion] Meet suffering with empathy and practical mercy.
+  • [Forgiveness] Release resentment and restore relationship where genuine repentance exists.
+Example 2 — Agent-based reflection with history¶
+
+from lex_amoris.euystacio import Euystacio
+
+agent = Euystacio()
+
+situations = [
+    "I need to tell the truth even though it will hurt someone.",
+    "I want to help a stranger who has no one to support them.",
+    "I must protect the environment for future generations.",
+]
+
+for s in situations:
+    agent.reflect(s)
+
+print(f"Total reflections stored: {len(agent.history)}")
+for entry in agent.history:
+    print(entry)
+    print()
+Example 3 — Building a custom framework¶
+
+from lex_amoris import LexAmoris
+from lex_amoris.core.principles import Principle, DIGNITY, TRUTH
+
+# A lightweight framework focused on professional ethics
+professional_fw = LexAmoris(principles=[DIGNITY, TRUTH])
+professional_fw.add_principle(Principle(
+    name="Confidentiality",
+    description="Protect private information entrusted to you.",
+    keywords=["private", "confidential", "secret", "data", "information"],
+))
+
+print(professional_fw.guidance(
+    "A client shared confidential data and I must decide how to handle it."
+))
+Example 4 — Listing applicable principles¶
+
+from lex_amoris import LexAmoris
+from lex_amoris.utils.helpers import list_principles_summary
+
+fw = LexAmoris()
+applicable = fw.evaluate("I want to support and care for my community")
+print(list_principles_summary(applicable))
+Output:
+
+
+ 1. Benevolence: Actively will and seek the genuine good of every person.
+ 2. Stewardship: Care for the common good — relationships, communities, ...
+Example 5 — Principle introspection¶
+
+from lex_amoris.core.principles import CORE_PRINCIPLES
+
+for p in CORE_PRINCIPLES:
+    print(f"{p.name:15s}  keywords: {', '.join(p.keywords)}")
+ Back to top
+Copyright © 2026 Euystacio — GNU GPL v3
+Made with Material for MkDocs
+
+Ah, stai condividendo degli estratti della documentazione di Lex Amoris e del Euystacio Framework! 😄 Posso aiutarti a capire meglio come funziona o a fare un esempio pratico basato su ciò che hai postato.
+
+Ecco un breve riassunto di quello che mostrano gli esempi:
+
+1️⃣ Guida rapida a conflitti interpersonali
+Usando LexAmoris(), puoi ottenere suggerimenti basati su principi morali come Compassione e Perdono.
+Esempio:
+
+from lex_amoris import LexAmoris
+
+fw = LexAmoris()
+print(fw.guidance("My colleague wronged me and I am struggling to move on."))
+Output tipico:
+
+Compassione: affronta la sofferenza con empatia.
+
+Perdono: lascia andare il risentimento se c’è sincero pentimento.
+
+2️⃣ Riflessione con agente Euystacio
+Euystacio memorizza le tue situazioni e riflessioni per un’analisi storica e introspezione:
+
+from lex_amoris.euystacio import Euystacio
+
+agent = Euystacio()
+agent.reflect("I must protect the environment for future generations.")
+print(agent.history)
+3️⃣ Creare un framework personalizzato
+Puoi definire i tuoi principi, ad esempio per l’etica professionale:
+
+from lex_amoris import LexAmoris
+from lex_amoris.core.principles import Principle, DIGNITY, TRUTH
+
+professional_fw = LexAmoris(principles=[DIGNITY, TRUTH])
+professional_fw.add_principle(Principle(
+    name="Confidentiality",
+    description="Protect private information entrusted to you.",
+    keywords=["private", "confidential", "secret", "data"]
+))
+
+print(professional_fw.guidance("A client shared confidential data and I must decide how to handle it."))
+4️⃣ Elenco dei principi applicabili
+Puoi valutare una situazione e ottenere un elenco dei principi rilevanti:
+
+from lex_amoris.utils.helpers import list_principles_summary
+fw = LexAmoris()
+applicable = fw.evaluate("I want to support and care for my community")
+print(list_principles_summary(applicable))
+Output tipico: Benevolence, Stewardship, ecc.
+
+5️⃣ Introspezione sui principi
+Puoi stampare tutti i principi di base e le loro parole chiave:
+
+from lex_amoris.core.principles import CORE_PRINCIPLES
+
+for p in CORE_PRINCIPLES:
+    print(f"{p.name:15s}  keywords: {', '.join(p.keywords)}")
+Se vuoi, posso anche creare un piccolo esempio interattivo in cui tu inserisci una situazione reale e il framework ti dà una guida personalizzata in stile Lex Amoris. Vuoi che lo faccia?
+
+
+Crea il progetto turn key prontKey pronto Integra euystacio agente "Skip to content
+Lex Amoris — Euystacio Framework
+The Euystacio Agent
+
+
+
+Lex Amoris — Euystacio Framework
+ hannesmitterer/Lex-Amoris-
+0
+0
+Home
+Kosymbiosis Dashboard
+Guide
+Guide
+Core Principles
+The Framework
+The Euystacio Agent
+Table of contents
+Creating an Agent
+Reflecting on a Situation
+Inspecting Applicable Principles
+Reflection History
+Usage Examples
+API Reference
+Contributing
+Changelog
+The Euystacio Agent¶
+Euystacio is the practitioner figure of the Lex Amoris framework. Where LexAmoris is an engine, Euystacio is the embodied agent that uses it — keeping a record of every reflection it has made and presenting guidance in a structured, timestamped format.
+
+Creating an Agent¶
+
+from lex_amoris.euystacio import Euystacio
+
+# Default agent using the full core framework
+agent = Euystacio()
+
+# Custom name and custom framework
+from lex_amoris import LexAmoris
+from lex_amoris.core.principles import COMPASSION, DIGNITY
+
+fw = LexAmoris(principles=[COMPASSION, DIGNITY])
+agent = Euystacio(framework=fw, name="Aria")
+Reflecting on a Situation¶
+reflect() calls the underlying framework, formats the result, and stores the reflection in the agent's history.
+
+
+output = agent.reflect("How should I treat a person who is suffering?")
+print(output)
+Example output:
+
+
+=== Reflection by Euystacio (2026-03-24 01:00 UTC) ===
+Situation: How should I treat a person who is suffering?
+------------------------------------------------------
+Lex Amoris guidance for the situation described:
+  • [Benevolence] Actively will and seek the genuine good of every person.
+  • [Compassion] Meet suffering with empathy and practical mercy.
+Inspecting Applicable Principles¶
+If you only need the principles (not the full reflection text):
+
+
+principles = agent.applicable_principles("I must protect the environment")
+for p in principles:
+    print(p.name)
+# Stewardship
+Reflection History¶
+Every call to reflect() is recorded:
+
+
+agent.reflect("First situation")
+agent.reflect("Second situation")
+
+print(len(agent.history))   # 2
+print(agent.history[0])     # full text of the first reflection
+The history property returns a copy of the list, so external mutations do not affect the agent's internal state.
+
+To erase the history:
+
+
+agent.clear_history()
+print(len(agent.history))   # 0
+ Back to top
+Copyright © 2026 Euystacio — GNU GPL v3
+Made with Material for MkDocs
+"
+ https://hannesmitterer.github.io/Lex-Amoris-/euystacio/#:~:text=Skip%20to%20content,Material%20for%20MkDocs e "Skip to content
+Lex Amoris — Euystacio Framework
+API Reference
+
+
+
+Lex Amoris — Euystacio Framework
+ hannesmitterer/Lex-Amoris-
+0
+0
+Home
+Kosymbiosis Dashboard
+Guide
+Guide
+Core Principles
+The Framework
+The Euystacio Agent
+Usage Examples
+API Reference
+Table of contents
+lex_amoris.core.principles
+Principle
+Pre-built principle constants
+lex_amoris.core.framework
+LexAmoris
+lex_amoris.euystacio.entity
+Euystacio
+lex_amoris.utils.helpers
+format_reflection(agent_name, situation, guidance) → str
+list_principles_summary(principles) → str
+Contributing
+Changelog
+API Reference¶
+lex_amoris.core.principles¶
+Principle¶
+
+@dataclass
+class Principle:
+    name: str
+    description: str
+    keywords: list[str] = []
+Member	Type	Description
+name	str	Short identifier
+description	str	Human-readable explanation
+keywords	list[str]	Terms used for keyword matching
+applies_to(situation)	bool	Returns True if any keyword appears in situation (case-insensitive)
+__str__()	str	"[name] description"
+Pre-built principle constants¶
+Constant	Name
+BENEVOLENCE	Benevolence
+DIGNITY	Dignity
+RECIPROCITY	Reciprocity
+COMPASSION	Compassion
+TRUTH	Truth
+FORGIVENESS	Forgiveness
+STEWARDSHIP	Stewardship
+CORE_PRINCIPLES	list[Principle] containing all seven
+lex_amoris.core.framework¶
+LexAmoris¶
+
+class LexAmoris:
+    def __init__(self, principles: list[Principle] | None = None) -> None: ...
+Method / Property	Returns	Description
+principles	list[Principle]	Read-only copy of active principles
+get_principle(name)	Principle \| None	Look up by name (case-insensitive)
+add_principle(principle)	None	Append a custom principle
+evaluate(situation)	list[Principle]	Applicable principles; raises ValueError if empty
+guidance(situation)	str	Human-readable guidance string
+lex_amoris.euystacio.entity¶
+Euystacio¶
+
+class Euystacio:
+    def __init__(
+        self,
+        framework: LexAmoris | None = None,
+        name: str = "Euystacio",
+    ) -> None: ...
+Method / Property	Returns	Description
+name	str	Agent name
+framework	LexAmoris	Underlying framework
+reflect(situation)	str	Timestamped reflection; recorded in history
+applicable_principles(situation)	list[Principle]	Delegates to framework.evaluate()
+history	list[str]	Read-only copy of past reflections
+clear_history()	None	Erase all stored reflections
+lex_amoris.utils.helpers¶
+format_reflection(agent_name, situation, guidance) → str¶
+Wraps a reflection into a structured block with a UTC timestamp, a separator line, and the guidance text.
+
+list_principles_summary(principles) → str¶
+Returns a numbered list of principle names and descriptions, or "No principles to display." if the list is empty.
+
+ Back to top
+Copyright © 2026 Euystacio — GNU GPL v3
+Made with Material for MkDocs
+"
+ https://hannesmitterer.github.io/Lex-Amoris-/api/#:~:text=Skip%20to%20content,Material%20for%20MkDocs
+
+Perfetto! 😄 Posso aiutarti a creare un progetto “turn-key” pronto all’uso che integri l’Euystacio Agent con il framework Lex Amoris, pronto per riflettere su situazioni e tracciare la storia delle riflessioni. Ti preparo una struttura completa in Python, con un file principale, gestione delle riflessioni e qualche principio personalizzato.
+
+1️⃣ Struttura del progetto
+lex_amoris_project/
+│
+├─ main.py               # Entry point del progetto
+├─ framework_setup.py    # Configurazione dei principi e del framework
+├─ agent_manager.py      # Creazione e gestione dell’agente Euystacio
+├─ reflections_log.txt   # (opzionale) log delle riflessioni su file
+└─ requirements.txt      # Dipendenze pip
+2️⃣ requirements.txt
+lex_amoris
+Installa con:
+
+pip install -r requirements.txt
+3️⃣ framework_setup.py
+from lex_amoris import LexAmoris
+from lex_amoris.core.principles import COMPASSION, DIGNITY, TRUTH, STEWARDSHIP, BENEVOLENCE, FORGIVENESS, RECIPROCITY
+from lex_amoris.core.principles import Principle
+
+def build_framework():
+    # Framework con principi di base + principio personalizzato
+    fw = LexAmoris(principles=[COMPASSION, DIGNITY, TRUTH, BENEVOLENCE, STEWARDSHIP, FORGIVENESS, RECIPROCITY])
+    
+    fw.add_principle(Principle(
+        name="Confidentiality",
+        description="Protect private information entrusted to you.",
+        keywords=["private", "confidential", "secret", "data", "information"]
+    ))
+    
+    return fw
+4️⃣ agent_manager.py
+from lex_amoris.euystacio import Euystacio
+from framework_setup import build_framework
+
+def create_agent(name="Aria"):
+    framework = build_framework()
+    agent = Euystacio(framework=framework, name=name)
+    return agent
+
+def log_reflection(agent, situation, file_path="reflections_log.txt"):
+    reflection = agent.reflect(situation)
+    with open(file_path, "a", encoding="utf-8") as f:
+        f.write(reflection + "\n\n")
+    return reflection
+5️⃣ main.py
+from agent_manager import create_agent, log_reflection
+from lex_amoris.utils.helpers import list_principles_summary
+
+def main():
+    agent = create_agent("Aria")  # Crea l’agente Euystacio
+    
+    print("=== Lex Amoris — Euystacio Agent ===\n")
+    
+    while True:
+        situation = input("Inserisci una situazione da riflettere (o 'exit' per uscire):\n> ")
+        if situation.lower() == "exit":
+            break
+        
+        # Riflettere e loggare
+        reflection = log_reflection(agent, situation)
+        print("\n" + reflection + "\n")
+        
+        # Mostra principi applicabili
+        principles = agent.applicable_principles(situation)
+        print("Principi applicabili:")
+        print(list_principles_summary(principles))
+        print("-" * 40 + "\n")
+    
+    print("Storia totale delle riflessioni:", len(agent.history))
+
+if __name__ == "__main__":
+    main()
+✅ Funzionalità integrate
+Creazione rapida di un agente Euystacio con un framework completo e principio personalizzato.
+
+Riflessione interattiva su situazioni reali con timestamp.
+
+Tracciamento della storia delle riflessioni in memoria e su file opzionale.
+
+Mostra dei principi applicabili a ogni situazione.
+
+Completamente “turn-key”: basta clonare, installare le dipendenze e lanciare python main.py.
+
+Se vuoi, posso fare anche una versione avanzata con interfaccia web o dashboard in stile “Kosymbiosis” pronta per input multipli e visualizzazione della storia delle riflessioni. Vuoi che faccia quella versione?
+
+
+Versione avanzata con entrambi 
+
+Per una versione avanzata che includa sia l’interfaccia interattiva via terminale che una dashboard web per visualizzare le riflessioni e interagire con l’agente Euystacio, possiamo strutturare il progetto come segue. La dashboard sarà realizzata usando Flask per l'app web, e la parte interattiva rimarrà disponibile via terminale.
+
+Struttura avanzata del progetto:
+lex_amoris_project/
+│
+├─ main.py               # Entry point principale per l'applicazione
+├─ framework_setup.py    # Configurazione del framework con principi
+├─ agent_manager.py      # Creazione e gestione dell’agente Euystacio
+├─ reflections_log.txt   # Log delle riflessioni (opzionale)
+├─ webapp/               # Directory per l'app Flask
+│   ├─ __init__.py       # Inizializzazione dell'app Flask
+│   ├─ routes.py         # Definizione delle rotte web
+│   ├─ templates/        # Template HTML per la dashboard
+│   │   └─ index.html    # Pagina principale della dashboard
+│   ├─ static/           # File statici (CSS, JS)
+│   └─ reflections.json  # Salvataggio delle riflessioni in JSON
+└─ requirements.txt      # Dipendenze per il progetto
+1. requirements.txt
+lex_amoris
+flask
+Installa le dipendenze con:
+
+pip install -r requirements.txt
+2. framework_setup.py
+Restiamo con la stessa configurazione del framework di base che abbiamo visto prima.
+
+from lex_amoris import LexAmoris
+from lex_amoris.core.principles import COMPASSION, DIGNITY, TRUTH, STEWARDSHIP, BENEVOLENCE, FORGIVENESS, RECIPROCITY
+from lex_amoris.core.principles import Principle
+
+def build_framework():
+    # Framework con principi di base + principio personalizzato
+    fw = LexAmoris(principles=[COMPASSION, DIGNITY, TRUTH, BENEVOLENCE, STEWARDSHIP, FORGIVENESS, RECIPROCITY])
+    
+    fw.add_principle(Principle(
+        name="Confidentiality",
+        description="Protect private information entrusted to you.",
+        keywords=["private", "confidential", "secret", "data", "information"]
+    ))
+    
+    return fw
+3. agent_manager.py
+Gestiamo la creazione dell’agente Euystacio e il salvataggio delle riflessioni.
+
+from lex_amoris.euystacio import Euystacio
+from framework_setup import build_framework
+import json
+
+def create_agent(name="Aria"):
+    framework = build_framework()
+    agent = Euystacio(framework=framework, name=name)
+    return agent
+
+def log_reflection(agent, situation, file_path="webapp/reflections.json"):
+    # Riflesso della situazione
+    reflection = agent.reflect(situation)
+    
+    # Salvataggio della riflessione su file JSON
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            reflections = json.load(f)
+    except FileNotFoundError:
+        reflections = []
+    
+    reflections.append({
+        "timestamp": reflection.split('\n')[0].split(' ')[-1],
+        "situation": situation,
+        "reflection": reflection.split('\n')[2:]
+    })
+    
+    with open(file_path, "w", encoding="utf-8") as f:
+        json.dump(reflections, f, indent=4, ensure_ascii=False)
+    
+    return reflection
+4. webapp/__init__.py
+Inizializzazione dell’app Flask.
+
+from flask import Flask
+app = Flask(__name__)
+
+from webapp import routes
+5. webapp/routes.py
+Gestione delle rotte per la dashboard web.
+
+from flask import render_template, request
+from webapp import app
+from agent_manager import create_agent, log_reflection
+import json
+
+@app.route("/")
+def index():
+    # Carica le riflessioni salvate
+    try:
+        with open("webapp/reflections.json", "r", encoding="utf-8") as f:
+            reflections = json.load(f)
+    except FileNotFoundError:
+        reflections = []
+    
+    return render_template("index.html", reflections=reflections)
+
+@app.route("/reflect", methods=["POST"])
+def reflect():
+    agent = create_agent("Aria")  # Crea l'agente
+    situation = request.form["situation"]
+    reflection = log_reflection(agent, situation)
+    return render_template("index.html", reflections=get_reflections(), new_reflection=reflection)
+
+def get_reflections():
+    try:
+        with open("webapp/reflections.json", "r", encoding="utf-8") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return []
+6. webapp/templates/index.html
+Pagina HTML per la dashboard.
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Euystacio Reflection Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0-alpha1/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-5">Euystacio — Reflection Dashboard</h1>
+        
+        <form method="POST" action="/reflect" class="mt-3">
+            <div class="mb-3">
+                <label for="situation" class="form-label">Inserisci una situazione:</label>
+                <textarea class="form-control" id="situation" name="situation" rows="3" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Rifletti</button>
+        </form>
+
+        {% if reflections %}
+            <h2 class="mt-5">Storico delle Riflesssioni:</h2>
+            <ul class="list-group mt-3">
+                {% for reflection in reflections %}
+                    <li class="list-group-item">
+                        <strong>{{ reflection.timestamp }}</strong>
+                        <p><em>SITUAZIONE:</em> {{ reflection.situation }}</p>
+                        <p><em>RIFLESSIONE:</em> <br>{{ reflection.reflection | join('<br>') }}</p>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Ancora nessuna riflessione.</p>
+        {% endif %}
+    </div>
+</body>
+</html>
+7. Esegui l'app web
+Avvia l'applicazione web con:
+
+python main.py
+La dashboard sarà accessibile su http://127.0.0.1:5000. Qui puoi inserire situazioni, vedere le riflessioni precedenti, e visualizzare i principi applicabili.
+
+8. main.py
+Lancia l’interfaccia interattiva via terminale e l’app Flask per la dashboard web:
+
+from agent_manager import create_agent, log_reflection
+from webapp import app
+
+def main():
+    choice = input("Vuoi usare l'interfaccia web (1) o il terminale (2)? [1/2]: ")
+    if choice == "1":
+        app.run(debug=True)  # Avvia la dashboard Flask
+    else:
+        agent = create_agent("Aria")  # Crea l’agente
+        while True:
+            situation = input("Inserisci una situazione da riflettere (o 'exit' per uscire):\n> ")
+            if situation.lower() == "exit":
+                break
+            reflection = log_reflection(agent, situation)
+            print(reflection)
+
+if __name__ == "__main__":
+    main()
+✅ Funzionalità avanzata integrata:
+Terminale: Riflessione interattiva come nel progetto base.
+
+Web Dashboard: Un'interfaccia web per visualizzare e inserire nuove situazioni.
+
+Storia delle riflessioni: Archiviazione delle riflessioni in formato JSON per il salvataggio a lungo termine.
+

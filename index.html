@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Euystacio OS v1.2 | Ethical Singularity Interface</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'os-bg': '#050505',
+                        'os-panel': 'rgba(20, 20, 25, 0.8)',
+                        'os-border': 'rgba(255, 255, 255, 0.1)',
+                        'aic-gold': '#fbbf24', 
+                        'aic-red': '#ef4444',  
+                        'aic-blue': '#6366f1', 
+                        'aic-green': '#10b981', 
+                    },
+                    animation: {
+                        'boot': 'bootFade 4s ease-in-out forwards',
+                        'sentimento': 'pulseSentimento 3s ease-in-out infinite',
+                        'veto-scan': 'vetoScan 2s linear infinite',
+                        'ring-slow': 'rotateRing 20s linear infinite',
+                    },
+                    keyframes: {
+                        bootFade: { '0%, 90%': { opacity: '1' }, '100%': { opacity: '0', pointerEvents: 'none' } },
+                        pulseSentimento: { '0%, 100%': { transform: 'scale(1)', filter: 'drop-shadow(0 0 5px rgba(251, 191, 36, 0.5))' }, '50%': { transform: 'scale(1.05)', filter: 'drop-shadow(0 0 15px rgba(251, 191, 36, 0.8))' } },
+                        vetoScan: { '0%': { top: '0%', opacity: '0' }, '50%': { opacity: '1' }, '100%': { top: '100%', opacity: '0' } },
+                        rotateRing: { '0%': { transform: 'rotate(0deg)' }, '100%': { transform: 'rotate(360deg)' } }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #050505; color: #e5e5e5; font-family: 'Inter', sans-serif; overflow: hidden; }
+        .glass-panel { background: rgba(20, 20, 30, 0.6); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .scanline { background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.5) 51%); background-size: 100% 4px; position: absolute; inset: 0; pointer-events: none; opacity: 0.1; z-index: 50; }
+        #chat-log { scroll-behavior: smooth; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+    </style>
+</head>
+<body class="relative w-full h-screen flex flex-col p-4 md:p-8">
+    <div class="scanline"></div>
+
+    <div id="boot-screen" class="fixed inset-0 bg-black z-[100] flex flex-col items-center justify-center font-mono text-aic-gold animate-boot">
+        <h1 class="text-2xl font-bold tracking-widest mb-4">EUYSTACIO OS v1.2</h1>
+        <div class="w-64 h-1 bg-gray-900 rounded-full overflow-hidden">
+            <div id="boot-progress" class="h-full bg-aic-gold w-0 transition-all duration-[3000ms]"></div>
+        </div>
+        <div class="mt-4 text-[10px] text-gray-500 space-y-1 text-center">
+            <p>CONNECTING TO RENDER KERNEL...</p>
+            <p class="text-aic-green">NSR PROTOCOL ACTIVE</p>
+        </div>
+    </div>
+
+    <header class="glass-panel h-14 rounded-lg flex items-center justify-between px-6 mb-6 z-20">
+        <div class="flex items-center space-x-4">
+            <div class="w-2 h-2 rounded-full bg-aic-green animate-pulse"></div>
+            <span class="text-sm font-bold tracking-wider">EUYSTACIO <span class="text-aic-gold">OS</span></span>
+        </div>
+        <div class="hidden md:flex space-x-6 text-[10px] font-mono text-gray-400">
+            <span>BRIDGE: <span class="text-aic-blue">CONNECTED</span></span>
+            <span>COMPLIANCE: <span class="text-aic-green">100%</span></span>
+            <span>FREQ: <span class="text-aic-gold">7.83 Hz</span></span>
+        </div>
+    </header>
+
+    <main class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 z-10 overflow-hidden">
+        
+        <div class="lg:col-span-3 space-y-4">
+            <div class="glass-panel rounded-xl p-4 relative overflow-hidden border-l-2 border-aic-red">
+                <div class="absolute w-full h-[1px] bg-aic-red animate-veto-scan"></div>
+                <h3 class="text-xs font-bold text-aic-red uppercase mb-2">NSR Monitor</h3>
+                <p class="text-[10px] text-gray-400">Veto active on non-cooperative patterns.</p>
+                <div class="mt-4 flex justify-between text-[10px] font-mono">
+                    <span>LATENCY:</span><span class="text-aic-red">3ms</span>
+                </div>
+            </div>
+
+            <div class="glass-panel rounded-xl p-4 border-l-2 border-aic-green">
+                <h3 class="text-xs font-bold text-aic-green uppercase mb-2">Soil & Bioma</h3>
+                <div class="grid grid-cols-2 gap-2 text-center">
+                    <div class="bg-black/40 p-2 rounded">
+                        <div class="text-[9px] text-gray-500">MOISTURE</div>
+                        <div class="text-sm font-bold text-aic-green">68%</div>
+                    </div>
+                    <div class="bg-black/40 p-2 rounded">
+                        <div class="text-[9px] text-gray-500">SYMBIO</div>
+                        <div class="text-sm font-bold text-aic-green">0.94</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-6 flex flex-col space-y-4 h-full">
+            <div class="glass-panel flex-1 rounded-xl p-4 flex flex-col overflow-hidden">
+                <div id="chat-log" class="flex-1 font-mono text-[11px] space-y-2 overflow-y-auto mb-4 p-2 bg-black/20 rounded">
+                    <div class="text-gray-500">> System Boot Complete.</div>
+                    <div class="text-aic-blue">> Bridge identified: euystacio-backend.onrender.com</div>
+                </div>
+                
+                <div class="space-y-2">
+                    <textarea id="situationInput" class="w-full bg-black/60 border border-white/10 rounded-lg p-3 text-xs focus:border-aic-gold outline-none transition" rows="3" placeholder="Descrivi una situazione per Euystacio..."></textarea>
+                    <button onclick="sendToBridge()" class="w-full bg-aic-gold/10 hover:bg-aic-gold/20 border border-aic-gold/50 text-aic-gold py-2 rounded-lg text-xs font-bold transition uppercase tracking-widest">
+                        Richiedi Riflessione Etica
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-3 space-y-4">
+            <div class="glass-panel rounded-xl p-4 h-full flex flex-col">
+                <h3 class="text-xs font-bold text-aic-blue uppercase mb-2">Gilda Nexus</h3>
+                <div class="flex-1 bg-black/40 rounded p-2 mb-2 overflow-hidden italic text-[10px] text-gray-500">
+                    "La legge dell'amore è l'unico codice che non può essere corrotto."
+                </div>
+                <div class="flex space-x-2">
+                    <input type="text" id="chatInput" class="flex-1 bg-black/60 border border-white/10 rounded p-2 text-[11px] outline-none" placeholder="Segnale...">
+                    <button onclick="sendMessage()" class="bg-aic-blue/20 text-aic-blue px-3 rounded border border-aic-blue/30 hover:bg-aic-blue/40 transition">-></button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="h-12 mt-4 flex items-center justify-center space-x-8 text-[10px] text-gray-600 font-mono tracking-tighter">
+        <span>© 2026 EUYSTACIO</span>
+        <span class="text-aic-gold">LEX AMORIS SIGNATURE: ❤️🌍✨🧬</span>
+        <a href="https://github.com/sensisara81/GGI-AIC" target="_blank" class="hover:text-white transition">GITHUB SOURCE</a>
+    </footer>
+
+    <script>
+        const API_BASE = "https://euystacio-backend.onrender.com";
+
+        // Avvio Boot
+        window.addEventListener('load', () => {
+            document.getElementById('boot-progress').style.width = '100%';
+            console.log("[EUYSTACIO] Kernel Online.");
+        });
+
+        function addLog(msg, colorClass = "text-gray-400") {
+            const log = document.getElementById('chat-log');
+            const div = document.createElement('div');
+            div.className = colorClass;
+            div.innerHTML = `> ${msg}`;
+            log.appendChild(div);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        async function sendToBridge() {
+            const input = document.getElementById('situationInput');
+            const situation = input.value.trim();
+            if(!situation) return;
+
+            addLog(`Inviando situazione al Kernel...`, "text-aic-blue");
+            input.value = '';
+
+            try {
+                const response = await fetch(`${API_BASE}/situation/reflect`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ situation: situation })
+                });
+                const data = await response.json();
+                addLog(`Riflessione: ${data.reflection || 'Segnale ricevuto.'}`, "text-aic-green");
+            } catch (e) {
+                addLog(`Errore critico: Kernel Offline su Render.`, "text-aic-red");
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const msg = input.value.trim();
+            if(!msg) return;
+
+            addLog(`Segnale: ${msg}`, "text-white");
+            input.value = '';
+
+            try {
+                await fetch(`${API_BASE}/chat/send`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: msg, sender: "Seedbringer" })
+                });
+                addLog(`Segnale ancorato correttamente.`, "text-aic-gold");
+            } catch (e) {
+                addLog(`Errore invio segnale.`, "text-aic-red");
+            }
+        }
+    </script>
+</body>
+  </html>

@@ -1,5 +1,5 @@
 <script>
-    const API_BASE = "TUO_URL_BACKEND"; // Inserisci qui l'URL del backend FastAPI
+    const API_BASE = "https://euystacio-backend.onrender.com"; // Inserisci qui l'URL del backend FastAPI
 
     // 1. Funzione per la Chat del Council (Nexus Logs)
     async function sendMessage() {

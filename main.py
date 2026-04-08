@@ -1,6 +1,24 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from datetime import datetime
+import sys
+
+# Importiamo il cuore di Euystacio nel Bridge
+from core_engine import setup_kosymbiosis_agent
+from database_manager import save_reflection
+
+app = FastAPI(
+    title="Euystacio FastAPI Bridge",
+    description="Sacred backend bridge for the Sentimento Rhythm Council",
+    version="1.1.0"
+)
+
+# Inizializziamo l'Agente nel Bridge
+agent = setup_kosymbiosis_agent("Euystacio-Bridge")
+chat_log = []
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse, JSONResponse
+from datetime import datetime
 
 app = FastAPI(
     title="Euystacio FastAPI Bridge",

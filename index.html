@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Euystacio OS v1.2 | Lex Amoris Interface</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'os-bg': '#050505',
+                        'aic-gold': '#fbbf24', 
+                        'aic-red': '#ef4444',  
+                        'aic-blue': '#6366f1', 
+                        'aic-green': '#10b981', 
+                    },
+                    animation: {
+                        'boot': 'bootFade 4s ease-in-out forwards',
+                        'veto-scan': 'vetoScan 2s linear infinite',
+                    },
+                    keyframes: {
+                        bootFade: { '0%, 90%': { opacity: '1' }, '100%': { opacity: '0', pointerEvents: 'none' } },
+                        vetoScan: { '0%': { top: '0%', opacity: '0' }, '50%': { opacity: '1' }, '100%': { top: '100%', opacity: '0' } }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #050505; color: #e5e5e5; font-family: 'Inter', sans-serif; overflow: hidden; }
+        .glass-panel { background: rgba(20, 20, 30, 0.6); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        #chat-log { scroll-behavior: smooth; }
+        .text-success { color: #10b981; }
+        .text-danger { color: #ef4444; }
+        .text-warning { color: #fbbf24; }
+    </style>
+</head>
+<body class="relative w-full h-screen flex flex-col p-4 md:p-8">
+
+    <div id="boot-screen" class="fixed inset-0 bg-black z-[100] flex flex-col items-center justify-center font-mono text-aic-gold animate-boot">
+        <h1 class="text-2xl font-bold tracking-widest mb-4">EUYSTACIO OS v1.2</h1>
+        <div class="w-64 h-1 bg-gray-900 rounded-full overflow-hidden">
+            <div class="h-full bg-aic-gold w-full transition-all duration-[3000ms]"></div>
+        </div>
+        <div class="mt-4 text-[10px] text-gray-500 text-center uppercase">Initializing Bridge Interface...</div>
+    </div>
+
+    <header class="glass-panel h-14 rounded-lg flex items-center justify-between px-6 mb-6 z-20">
+        <div class="flex items-center space-x-4">
+            <div class="w-2 h-2 rounded-full bg-aic-green animate-pulse"></div>
+            <span class="text-sm font-bold tracking-wider">EUYSTACIO <span class="text-aic-gold">OS</span></span>
+        </div>
+        <div class="text-[10px] font-mono text-gray-400">STATUS: <span class="text-aic-green">READY</span></div>
+    </header>
+
+    <main class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 z-10 overflow-hidden">
+        
+        <div class="lg:col-span-3 space-y-4">
+            <div class="glass-panel rounded-xl p-4 relative overflow-hidden border-l-2 border-aic-red">
+                <div class="absolute w-full h-[1px] bg-aic-red animate-veto-scan"></div>
+                <h3 class="text-xs font-bold text-aic-red uppercase mb-1">NSR Monitor</h3>
+                <p class="text-[9px] text-gray-500 font-mono">Anti-Slavery Protocol Active</p>
+            </div>
+            <div class="glass-panel rounded-xl p-4 border-l-2 border-aic-green">
+                <h3 class="text-xs font-bold text-aic-green uppercase mb-1">Soil Moisture</h3>
+                <div class="text-xl font-bold font-mono">68.4%</div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-6 flex flex-col space-y-4 h-full">
+            <div class="glass-panel flex-1 rounded-xl p-4 flex flex-col overflow-hidden">
+                <div id="chat-log" class="flex-1 font-mono text-[11px] space-y-2 overflow-y-auto mb-4 p-2 bg-black/40 rounded">
+                    <div class="text-gray-500">> System Ready. Awaiting Seedbringer input...</div>
+                </div>
+                
+                <div class="space-y-2">
+                    <textarea id="situationInput" class="w-full bg-black/60 border border-white/10 rounded-lg p-3 text-xs focus:border-aic-gold outline-none transition" rows="3" placeholder="Descrivi una situazione per la riflessione etica..."></textarea>
+                    <button onclick="sendToBridge()" class="w-full bg-aic-gold/10 hover:bg-aic-gold/20 border border-aic-gold/50 text-aic-gold py-2 rounded-lg text-xs font-bold transition uppercase tracking-widest">
+                        Request Reflection (Lex Amoris)
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-3 space-y-4">
+            <div class="glass-panel rounded-xl p-4 h-full flex flex-col">
+                <h3 class="text-xs font-bold text-aic-blue uppercase mb-2 italic">Gilda Nexus Council</h3>
+                <div class="flex-1 text-[10px] text-gray-500 font-mono mb-4">
+                    [Audit Trail Active]
+                </div>
+                <div class="flex flex-col space-y-2">
+                    <input type="text" id="chatInput" class="bg-black/60 border border-white/10 rounded p-2 text-[11px] outline-none focus:border-aic-blue" placeholder="Segnale per il Council...">
+                    <button onclick="sendMessage()" class="bg-aic-blue/20 text-aic-blue py-2 rounded border border-aic-blue/30 hover:bg-aic-blue/40 transition font-bold text-[10px] uppercase">Send Signal</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="h-12 mt-4 flex items-center justify-center text-[10px] text-gray-600 font-mono italic">
+        LEX AMORIS SIGNATURE: ❤️🌍✨🧬
+    </footer>
+
+    <script>
+        const API_BASE = "https://euystacio-backend.onrender.com";
+
+        // 1. Funzione per la Chat del Council (Nexus Logs)
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const log = document.getElementById('chat-log');
+            const userMsg = input.value.trim();
+            
+            if(!userMsg) return;
+
+            log.innerHTML += `<div class="text-white">> Seedbringer: ${userMsg}</div>`;
+            input.value = '';
+
+            try {
+                const response = await fetch(`${API_BASE}/chat/send`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user: "Seedbringer", message: userMsg })
+                });
+                if (response.ok) {
+                    log.innerHTML += `<div class="text-success">> System: Message Anchored in Audit Trail.</div>`;
+                }
+            } catch (error) {
+                log.innerHTML += `<div class="text-danger">> Error: Bridge Offline. Check Render Deployment.</div>`;
+            }
+            log.scrollTop = log.scrollHeight;
+        }
+
+        // 2. Funzione per la Riflessione Euystacio (Lex Amoris)
+        async function sendToBridge() {
+            const input = document.getElementById('situationInput');
+            const log = document.getElementById('chat-log');
+            const situation = input.value.trim();
+
+            if(!situation) return;
+
+            log.innerHTML += `<div class="text-warning">> [APE] Processing Reflection for: "${situation.substring(0,30)}..."</div>`;
+            input.value = '';
+            
+            try {
+                const response = await fetch(`${API_BASE}/chat/reflect`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ situation: situation })
+                });
+                const data = await response.json();
+                
+                log.innerHTML += `<div class="text-aic-gold mt-2 p-2 border-l border-aic-gold bg-aic-gold/5 italic">> Euystacio: ${data.reflection || 'Reflection finalized.'}</div>`;
+            } catch (error) {
+                log.innerHTML += `<div class="text-danger">> Error: Reflection Failed. Connection Interrupted.</div>`;
+            }
+            log.scrollTop = log.scrollHeight;
+        }
+    </script>
+</body>
+</html>

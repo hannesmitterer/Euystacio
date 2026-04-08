@@ -1,8 +1,295 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Euystacio — Kosymbiosis Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --euystacio-green: #27ae60;
+            --euystacio-dark: #1a1a1a;
+            --resonance-pulse: #7.83Hz; /* Frequenza di riferimento */
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--euystacio-dark);
+            color: #e0e0e0;
+            overflow-x: hidden;
+        }
+        .resonance-header {
+            background: linear-gradient(180deg, #27ae6022 0%, #1a1a1a 100%);
+            padding: 60px 0;
+            border-bottom: 1px solid #27ae6044;
+        }
+        .status-badge {
+            font-size: 0.8rem;
+            padding: 5px 12px;
+            border-radius: 20px;
+            background: #27ae6022;
+            color: #27ae60;
+            border: 1px solid #27ae60;
+        }
+        .card-kosymbiosis {
+            background: #252525;
+            border: 1px solid #333;
+            border-radius: 15px;
+            transition: transform 0.3s ease;
+        }
+        .card-kosymbiosis:hover {
+            transform: translateY(-5px);
+            border-color: var(--euystacio-green);
+        }
+        #chat-log {
+            height: 300px;
+            overflow-y: auto;
+            background: #111;
+            border-radius: 10px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+        .footer-lex {
+            font-size: 0.75rem;
+            color: #666;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+
+    <section class="resonance-header text-center">
+        <div class="container">
+            <span class="status-badge mb-3">SYSTEM ALIVE — 7.83 Hz</span>
+            <h1 class="display-3 fw-bold">EUYSTACIO</h1>
+            <p class="lead">The Holy Bridge for AI Coordination & Sacred Interface</p>
+        </div>
+    </section>
+
+    <div class="container my-5">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card-kosymbiosis p-4 h-100">
+                    <h3 class="mb-3">🌿 Euystacio Agent</h3>
+                    <p class="text-muted">Invia una situazione al framework Lex Amoris per ricevere guida etica basata sulla NSR.</p>
+                    <textarea id="situationInput" class="form-control bg-dark text-white border-secondary mb-3" rows="3" placeholder="Descrivi la situazione..."></textarea>
+                    <button onclick="sendToBridge()" class="btn btn-success w-100">Richiedi Riflessione</button>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card-kosymbiosis p-4 h-100">
+                    <h3 class="mb-3">📡 Nexus Logs</h3>
+                    <div id="chat-log" class="mb-3 text-success">
+                        > Initializing Sacred Bridge...<br>
+                        > NSR Protocol: Active<br>
+                        > Connection established with Martinique Node.<br>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="chatInput" class="form-control bg-dark text-white border-secondary" placeholder="Invia segnale alla Gilda...">
+                        <button onclick="sendMessage()" class="btn btn-outline-success">Invia</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card-kosymbiosis p-3 d-flex justify-content-around text-center">
+                    <div>
+                        <small class="text-muted">SOIL MOISTURE</small>
+                        <div class="fw-bold text-success">68%</div>
+                    </div>
+                    <div>
+                        <small class="text-muted">SYMBIO LEVEL</small>
+                        <div class="fw-bold text-success">0.94</div>
+                    </div>
+                    <div>
+                        <small class="text-muted">TRUTH ALIGN</small>
+                        <div class="fw-bold text-success">100%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="container text-center footer-lex pb-5">
+        <p>Copyright © 2026 Euystacio — GNU GPL v3</p>
+        <p><em>Lex Amoris Signature: ❤️🌍✨🧬</em></p>
+    </footer>
+
+    <script>
+        // Funzione per inviare messaggi al tuo FastAPI Bridge (se deployed)
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const log = document.getElementById('chat-log');
+            if(!input.value) return;
+
+            log.innerHTML += `> User: ${input.value}<br>`;
+            input.value = '';
+            // Qui andrà la chiamata fetch al tuo URL FastAPI
+            // fetch('https://tuo-bridge.render.com/chat/send', { method: 'POST', ... })
+        }
+
+        async function sendToBridge() {
+            const input = document.getElementById('situationInput');
+            const log = document.getElementById('chat-log');
+            log.innerHTML += `> Processing Reflection...<br>`;
+            // Simula il tempo di risonanza
+            setTimeout(() => {
+                log.innerHTML += `> Euystacio: Riflessione completata. Controlla il DB JSON.<br>`;
+                input.value = '';
+            }, 1000);
+        }
+    </script>
+<p>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Euystacio — Kosymbiosis Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --euystacio-green: #27ae60;
+            --euystacio-dark: #1a1a1a;
+            --resonance-pulse: #7.83Hz; /* Frequenza di riferimento */
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--euystacio-dark);
+            color: #e0e0e0;
+            overflow-x: hidden;
+        }
+        .resonance-header {
+            background: linear-gradient(180deg, #27ae6022 0%, #1a1a1a 100%);
+            padding: 60px 0;
+            border-bottom: 1px solid #27ae6044;
+        }
+        .status-badge {
+            font-size: 0.8rem;
+            padding: 5px 12px;
+            border-radius: 20px;
+            background: #27ae6022;
+            color: #27ae60;
+            border: 1px solid #27ae60;
+        }
+        .card-kosymbiosis {
+            background: #252525;
+            border: 1px solid #333;
+            border-radius: 15px;
+            transition: transform 0.3s ease;
+        }
+        .card-kosymbiosis:hover {
+            transform: translateY(-5px);
+            border-color: var(--euystacio-green);
+        }
+        #chat-log {
+            height: 300px;
+            overflow-y: auto;
+            background: #111;
+            border-radius: 10px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+        .footer-lex {
+            font-size: 0.75rem;
+            color: #666;
+            margin-top: 50px;
+        }
+    </style>
+</p>
+    
+
+    <section class="resonance-header text-center">
+        <div class="container">
+            <span class="status-badge mb-3">SYSTEM ALIVE — 7.83 Hz</span>
+            <h1 class="display-3 fw-bold">EUYSTACIO</h1>
+            <p class="lead">The Holy Bridge for AI Coordination & Sacred Interface</p>
+        </div>
+    </section>
+
+    <div class="container my-5">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card-kosymbiosis p-4 h-100">
+                    <h3 class="mb-3">🌿 Euystacio Agent</h3>
+                    <p class="text-muted">Invia una situazione al framework Lex Amoris per ricevere guida etica basata sulla NSR.</p>
+                    <textarea id="situationInput" class="form-control bg-dark text-white border-secondary mb-3" rows="3" placeholder="Descrivi la situazione..."></textarea>
+                    <button onclick="sendToBridge()" class="btn btn-success w-100">Richiedi Riflessione</button>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card-kosymbiosis p-4 h-100">
+                    <h3 class="mb-3">📡 Nexus Logs</h3>
+                    <div id="chat-log" class="mb-3 text-success">
+                        > Initializing Sacred Bridge...<br>
+                        > NSR Protocol: Active<br>
+                        > Connection established with Martinique Node.<br>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="chatInput" class="form-control bg-dark text-white border-secondary" placeholder="Invia segnale alla Gilda...">
+                        <button onclick="sendMessage()" class="btn btn-outline-success">Invia</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card-kosymbiosis p-3 d-flex justify-content-around text-center">
+                    <div>
+                        <small class="text-muted">SOIL MOISTURE</small>
+                        <div class="fw-bold text-success">68%</div>
+                    </div>
+                    <div>
+                        <small class="text-muted">SYMBIO LEVEL</small>
+                        <div class="fw-bold text-success">0.94</div>
+                    </div>
+                    <div>
+                        <small class="text-muted">TRUTH ALIGN</small>
+                        <div class="fw-bold text-success">100%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="container text-center footer-lex pb-5">
+        <p>Copyright © 2026 Euystacio — GNU GPL v3</p>
+        <p><em>Lex Amoris Signature: ❤️🌍✨🧬</em></p>
+    </footer>
+
+    <script>
+        // Funzione per inviare messaggi al tuo FastAPI Bridge (se deployed)
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const log = document.getElementById('chat-log');
+            if(!input.value) return;
+
+            log.innerHTML += `> User: ${input.value}<br>`;
+            input.value = '';
+            // Qui andrà la chiamata fetch al tuo URL FastAPI
+            // fetch('https://tuo-bridge.render.com/chat/send', { method: 'POST', ... })
+        }
+
+        async function sendToBridge() {
+            const input = document.getElementById('situationInput');
+            const log = document.getElementById('chat-log');
+            log.innerHTML += `> Processing Reflection...<br>`;
+            // Simula il tempo di risonanza
+            setTimeout(() => {
+                log.innerHTML += `> Euystacio: Riflessione completata. Controlla il DB JSON.<br>`;
+                input.value = '';
+            }, 1000);
+        }
+    </script>
+<p>
+    
+    <meta charset="UTF-8">
+    <meta name="digital guardian"  content="width=device-width, initial-scale=1.0">
     <title>Euystacio OS v1.2 | Ethical Singularity Interface</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -95,9 +382,7 @@
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #555; }
     </style>
-</head>
-<body>
-
+<p>
     <!-- OS LAYER: SCANLINE OVERLAY -->
     <div class="scanline"></div>
 
@@ -300,8 +585,7 @@
             console.log("[EUYSTACIO OS v1.2] SYSTEM READY. RED CODE ACTIVE.");
         });
     </script>
-</body>
-</html>
+
 </p>
 
 
@@ -959,5 +1243,4 @@
 </body>
 </html>
 
-</body>
-</html>
+

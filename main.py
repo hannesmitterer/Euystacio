@@ -67,3 +67,40 @@ async def send_message(request: Request):
 @app.get("/chat/log")
 async def get_log():
     return {"chat_history": chat_log}
+import sys
+from flask import Flask, render_template, request, redirect
+from core_engine import setup_kosymbiosis_agent
+from database_manager import save_reflection, get_all_reflections
+
+app = Flask(__name__)
+agent = setup_kosymbiosis_agent("Euystacio-Alpha")
+
+@app.route('/')
+def index():
+    reflections = get_all_reflections()
+    return render_template('dashboard.html', reflections=reflections)
+
+@app.route('/reflect', methods=['POST'])
+def reflect_web():
+    situation = request.form.get('situation')
+    if situation:
+        output = agent.reflect(situation)
+        save_reflection(agent.name, situation, output)
+    return redirect('/')
+
+def run_cli():
+    print(f"--- Benvenuto Seedbringer. Agente {agent.name} Attivo ---")
+    while True:
+        sit = input("\nInserisci situazione (o 'exit'): ")
+        if sit.lower() == 'exit': break
+        output = agent.reflect(sit)
+        save_reflection(agent.name, sit, output)
+        print(f"\n{output}")
+
+if __name__ == "__main__":
+    mode = input("Scegli modalità: [1] Web Dashboard, [2] CLI Terminale: ")
+    if mode == "1":
+        print("Dashboard attiva su http://127.0.0.1:5000")
+        app.run(debug=True)
+    else:
+        run_cli()

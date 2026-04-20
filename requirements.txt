@@ -1,2 +1,4 @@
 fastapi
 uvicorn
+numpy
+tensorflow  # Optional: For advanced threat detection (quantum_safe modules will work without it)

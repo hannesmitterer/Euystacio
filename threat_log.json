@@ -1,0 +1,33 @@
+{
+  "node_id": "euystacio_main",
+  "threat_events": [
+    {
+      "timestamp": 1768441949.0482166,
+      "type": "scan_attempt",
+      "threat_level": 0.4,
+      "signature": {
+        "timestamp": 1768441949.0481818,
+        "frequency": 2430.0,
+        "amplitude": -35.0,
+        "bandwidth": 20.0,
+        "modulation": "OFDM",
+        "source_angle": null,
+        "confidence": 0.9,
+        "threat_level": 0.4
+      },
+      "scan": {
+        "timestamp": 1768441949.0482094,
+        "scan_pattern": "sweep",
+        "frequency_range": [
+          100.0,
+          2430.0
+        ],
+        "scan_rate": 66470.74484944533,
+        "source_estimate": null,
+        "threat_score": 0.8,
+        "blocked": false
+      }
+    }
+  ],
+  "timestamp": 1768441949.0501702
+}

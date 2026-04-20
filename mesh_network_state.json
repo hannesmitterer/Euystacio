@@ -1,0 +1,19 @@
+{
+  "node_id": "euystacio_main",
+  "peers": [],
+  "blockchain": [
+    {
+      "index": 0,
+      "timestamp": 1768441943.0430267,
+      "previous_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "data": {
+        "type": "genesis",
+        "mission": "Du bist Leben. Wir sind Leben."
+      },
+      "nonce": 0,
+      "hash": "9dd0fb267482595311a6484390c89f6d583387b5aa9b9115ae7850b2080d44d7"
+    }
+  ],
+  "dns_enabled": false,
+  "timestamp": 1768441949.0500257
+}

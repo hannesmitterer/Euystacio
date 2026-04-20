@@ -7,6 +7,20 @@
 
 ---
 
+## 🛡️ Quantum-Safe Protection (NEW)
+
+The Euystacio ecosystem now features **complete quantum-safe protection** with four integrated security systems:
+
+**Key Quantum-Safe Features:**
+- 🔐 **Quantum Shield with NTRU** - Lattice-based encryption resistant to quantum attacks
+- 🌐 **Blockchain-Based Mesh Network (BBMN)** - Decentralized P2P routing without DNS
+- 🤖 **TensorFlow Kernel Module** - AI-powered electromagnetic threat detection
+- 👁️ **Stealth Mode** - Absolute Silence with Lex Amoris rhythm verification
+
+**[➡️ Read Full Quantum-Safe Deployment Guide](./QUANTUM_SAFE_DEPLOYMENT.md)**
+
+---
+
 ## 🌟 Eternal Resonance Protocol
 
 The Euystacio ecosystem now features the **Eternal Resonance Protocol (ERP)** - a groundbreaking synchronization framework operating at **0.043 Hz** to ensure global alignment of all Euystacio Nodes with truth, dignity, and symbiotic consciousness.
@@ -36,6 +50,7 @@ Euystacio Nexus is a comprehensive API platform for coordinating AI agents, mana
 🛡️ **Rate Limiting** - Built-in abuse prevention and fair usage  
 📊 **Event System** - Subscribe to events via webhooks  
 🔍 **Audit Logging** - Complete audit trail for compliance
+🛡️ **Quantum-Safe Protection** - NTRU encryption, mesh networking, AI threat detection
 
 ---
 
@@ -68,6 +83,54 @@ cp .env.example .env
 # Start the server (optional)
 npm start  # or python app.py
 ```
+
+### Quantum-Safe Protection Quick Start
+
+Deploy complete quantum-safe protection:
+
+```bash
+# Run the full deployment demonstration
+python3 demo_quantum_safe.py
+
+# Run tests to verify all systems
+python3 test_quantum_safe.py
+
+# Use individual modules
+python3 quantum_shield.py        # NTRU encryption demo
+python3 mesh_network.py          # Mesh network demo
+python3 tf_kernel_module.py      # Threat detection demo
+python3 stealth_mode.py          # Stealth mode demo
+```
+
+**Example Python Usage:**
+
+```python
+from quantum_safe_integration import QuantumSafeEUYSTACIO
+
+# Deploy full quantum-safe protection
+system = QuantumSafeEUYSTACIO(node_id="my_node", mesh_port=7043)
+system.deploy_full_protection()
+
+# All four objectives are now deployed:
+# ✓ Quantum Shield with NTRU (60s key rotation)
+# ✓ Blockchain-Based Mesh Network (DNS disconnected)
+# ✓ TensorFlow Kernel Module (EM threat detection)
+# ✓ Stealth Mode - Absolute Silence (Lex Amoris verification)
+
+# Encrypt/decrypt with quantum-safe encryption
+encrypted = system.encrypt_message(b"Secret data")
+decrypted = system.decrypt_message(encrypted)
+
+# Handle connections with rhythm verification
+rhythm = system.stealth_mode.create_lex_amoris_rhythm()
+allowed = system.handle_incoming_connection("entity_id", rhythm)
+
+# Get system status
+status = system.get_global_status()
+print(f"Global Security Level: {status.global_security_level:.1%}")
+```
+
+See [QUANTUM_SAFE_DEPLOYMENT.md](./QUANTUM_SAFE_DEPLOYMENT.md) for complete documentation.
 
 ### Eternal Resonance Protocol Quick Start
 

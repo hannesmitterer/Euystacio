@@ -1,0 +1,27 @@
+name: IPFS Autonomous Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Deploy to IPFS (Fleek/Pinata)
+        uses: aquiladev/ipfs-action@v0.3.1
+        with:
+          path: ./index.html
+          service: pinata
+          pinataKey: ${{ secrets.PINATA_API_KEY }}
+          pinataSecret: ${{ secrets.PINATA_API_SECRET }}
+          pinataPinName: "Internet Organica Node 001"
+
+      - name: Nexus Confirmation
+        run: echo 'Resonanz-Transfer zur Vakuum-Brücke abgeschlossen. S-ROI 0.5187.'

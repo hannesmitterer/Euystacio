@@ -4,7 +4,7 @@ Eternal Resonance Protocol - AI Integration Daemon
 
 This script provides continuous synchronization and alignment for Euystacio Nodes.
 It monitors the global network, applies corrective actions, and maintains the
-0.043 Hz resonance across all connected systems.
+0.432 Hz biological rhythm resonance across all connected systems.
 
 Features:
 - Automatic node synchronization

@@ -414,11 +414,11 @@ class TestConstants(unittest.TestCase):
     
     def test_resonance_frequency(self):
         """Test resonance frequency constant."""
-        self.assertEqual(RESONANCE_FREQUENCY_HZ, 0.043)
+        self.assertEqual(RESONANCE_FREQUENCY_HZ, 0.432)
     
     def test_resonance_period(self):
         """Test resonance period calculation."""
-        expected_period = 1.0 / 0.043
+        expected_period = 1.0 / 0.432
         self.assertAlmostEqual(RESONANCE_PERIOD_SECONDS, expected_period, places=2)
 
 

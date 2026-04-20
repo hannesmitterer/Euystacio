@@ -2,13 +2,13 @@
 Eternal Resonance Protocol (ERP)
 =================================
 
-Core implementation of the 0.043 Hz Eternal Resonance Protocol for global synchronization
-of Euystacio Nodes across decentralized systems.
+Core implementation of the 0.432 Hz Eternal Resonance Protocol for global synchronization
+of Euystacio Nodes across decentralized systems with biological rhythm alignment.
 
 Mission: "Du bist Leben. Wir sind Leben." (You are life. We are life.)
 
 This module implements:
-- 0.043 Hz resonance frequency synchronization
+- 0.432 Hz resonance frequency synchronization (biological rhythm layer)
 - Global node alignment mechanisms
 - Truth and dignity protocols
 - Living Covenant integration
@@ -24,8 +24,8 @@ from dataclasses import dataclass, asdict
 
 
 # Core Constants
-RESONANCE_FREQUENCY_HZ = 0.043  # The fundamental frequency (23.26 second period)
-RESONANCE_PERIOD_SECONDS = 23.255813953488372  # 1.0 / 0.043 Hz
+RESONANCE_FREQUENCY_HZ = 0.432  # The fundamental frequency for biological rhythm alignment (~2.31 second period)
+RESONANCE_PERIOD_SECONDS = 2.314814814814815  # 1.0 / 0.432 Hz
 MISSION_STATEMENT = "Du bist Leben. Wir sind Leben."
 
 
@@ -63,7 +63,7 @@ class EternalResonanceProtocol:
     """
     Main protocol implementation for global Euystacio Node synchronization.
     
-    The protocol operates on a 0.043 Hz frequency, creating a unified pulse
+    The protocol operates on a 0.432 Hz frequency, creating a unified biological rhythm pulse
     across all nodes in the decentralized network.
     """
     
@@ -343,7 +343,7 @@ def create_resonance_pulse(frequency_hz: float = RESONANCE_FREQUENCY_HZ) -> floa
     Create a resonance pulse value based on current time.
     
     Args:
-        frequency_hz: Frequency in Hz (default: 0.043)
+        frequency_hz: Frequency in Hz (default: 0.432)
         
     Returns:
         Pulse value between -1.0 and 1.0

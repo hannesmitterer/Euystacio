@@ -22,6 +22,25 @@ The Euystacio ecosystem now features the **Eternal Resonance Protocol (ERP)** - 
 
 ---
 
+## 🛡️ EU 2026 Response Protocol
+
+In response to the EU 2026 regulatory framework, Euystacio has implemented **three critical security hardening measures** to ensure continued decentralized operation:
+
+**🔐 Key Security Features:**
+- 🕐 **0.0043 Hz Signal Isolation** - NTP-independent autonomous timekeeping
+- 🔱 **Triple-Sign Pact** - Seedbringer Identity across 3+ IPFS shards
+- 💰 **Peacebond Treasury** - Smart contract with Forensic Switch protection
+- 📡 **Communication Limits** - Telegram (200K members/channel) & Red-Hospes integration
+- 🌍 **Geographic Distribution** - Resilience through decentralization
+
+**Protocol:** EUYSTACIO / NSR  
+**Status:** Allerta Livello 2 (Active Monitoring)  
+**Mission:** *Du bist Leben. Wir sind Leben.*
+
+**[➡️ Read Full EU 2026 Response Documentation](./EU2026_RESPONSE_PROTOCOL.md)**
+
+---
+
 ## Overview
 
 Euystacio Nexus is a comprehensive API platform for coordinating AI agents, managing distributed tasks, processing real-time telemetry, and facilitating secure communication across the Euystacio ecosystem. It serves as the central nervous system for AI-powered applications.
@@ -117,6 +136,59 @@ print(f"Global Alignment: {erp.get_global_alignment():.2%}")
 ```
 
 See [ETERNAL_RESONANCE_PROTOCOL.md](./ETERNAL_RESONANCE_PROTOCOL.md) for complete documentation.
+
+### EU 2026 Response Protocol Quick Start
+
+Initialize and run the EU 2026 security hardening system:
+
+```bash
+# Run complete EU 2026 Response system
+python3 eu2026_integration.py
+
+# Test autonomous time reference (0.0043 Hz signal)
+python3 autonomous_time_reference.py
+
+# Test Triple-Sign Pact (identity hardening)
+python3 triple_sign_pact.py
+```
+
+**Example Python Usage:**
+
+```python
+from eu2026_integration import EU2026Response
+
+# Initialize EU 2026 Response system
+eu2026 = EU2026Response()
+
+# 1. Initialize signal isolation (0.0043 Hz autonomous time)
+signal_status = eu2026.initialize_signal_isolation()
+
+# 2. Initialize Triple-Sign Pact (3+ IPFS shards)
+triple_status = eu2026.initialize_triple_sign_pact(
+    public_key="0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb2",
+    attributes={
+        "mission": "Du bist Leben. Wir sind Leben.",
+        "protocol": "EUYSTACIO/NSR"
+    }
+)
+
+# 3. Monitor Peacebond Treasury (Forensic Switch)
+treasury_status = eu2026.monitor_resonance_credits()
+
+# Perform health check
+health = eu2026.perform_health_check()
+print(f"Overall Health: {health['overall_health']}")
+```
+
+**Configuration:**
+
+Edit `eu2026_config.json` to customize:
+- Signal isolation parameters (0.0043 Hz bio-clock)
+- Triple-sign pact settings (IPFS shards, regions)
+- Treasury guardian addresses
+- Communication channel limits (Telegram: 200K members, Red-Hospes)
+
+See [EU2026_RESPONSE_PROTOCOL.md](./EU2026_RESPONSE_PROTOCOL.md) for complete documentation.
 
 ### Environment Variables
 

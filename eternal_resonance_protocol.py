@@ -22,6 +22,18 @@ from datetime import datetime, timezone
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, asdict
 
+# Import blacklist manager for security
+try:
+    from blacklist_manager import (
+        BlacklistManager, 
+        validate_entity_against_blacklist,
+        ThreatCategory,
+        ThreatSeverity
+    )
+    BLACKLIST_AVAILABLE = True
+except ImportError:
+    BLACKLIST_AVAILABLE = False
+
 
 # Core Constants
 RESONANCE_FREQUENCY_HZ = 0.043  # The fundamental frequency (23.26 second period)
@@ -67,13 +79,22 @@ class EternalResonanceProtocol:
     across all nodes in the decentralized network.
     """
     
-    def __init__(self, node_id: str = "primary"):
+    def __init__(self, node_id: str = "primary", enable_blacklist: bool = True, 
+                 blacklist_path: str = "euystacio_blacklist.json"):
         """Initialize the Eternal Resonance Protocol."""
         self.node_id = node_id
         self.genesis_time = time.time()
         self.nodes: Dict[str, ResonanceNode] = {}
         self.covenants: List[LivingCovenant] = []
         self.k_symbiosis_modules: Dict[str, Any] = {}
+        
+        # Initialize blacklist manager for security
+        self.blacklist_enabled = enable_blacklist and BLACKLIST_AVAILABLE
+        if self.blacklist_enabled:
+            self.blacklist_manager = BlacklistManager(storage_path=blacklist_path)
+        else:
+            self.blacklist_manager = None
+        
         self._initialize_core_covenants()
         
     def _initialize_core_covenants(self):
@@ -168,7 +189,14 @@ class EternalResonanceProtocol:
             
         Returns:
             The created ResonanceNode
+            
+        Raises:
+            ValueError: If node_id is blacklisted
         """
+        # Security check: Validate node is not blacklisted
+        if self.blacklist_enabled:
+            validate_entity_against_blacklist(node_id, self.blacklist_manager)
+        
         current_phase = self.get_current_phase()
         
         node = ResonanceNode(
@@ -193,7 +221,14 @@ class EternalResonanceProtocol:
             
         Returns:
             Updated ResonanceNode
+            
+        Raises:
+            ValueError: If node_id is blacklisted or not registered
         """
+        # Security check: Validate node is not blacklisted
+        if self.blacklist_enabled:
+            validate_entity_against_blacklist(node_id, self.blacklist_manager)
+        
         if node_id not in self.nodes:
             raise ValueError(f"Node {node_id} not registered")
         
@@ -289,6 +324,71 @@ class EternalResonanceProtocol:
         
         return total_alignment / comparisons if comparisons > 0 else 0.0
     
+    def block_node(self, node_id: str, reason: str, category: str, 
+                   severity: str, blocked_by: str = "protocol") -> bool:
+        """
+        Block a node by adding it to the blacklist.
+        
+        Args:
+            node_id: Node to block
+            reason: Reason for blocking
+            category: Threat category (from ThreatCategory enum)
+            severity: Severity level (from ThreatSeverity enum)
+            blocked_by: Who/what is blocking the node
+            
+        Returns:
+            True if node was blocked, False if blacklist is not enabled
+        """
+        if not self.blacklist_enabled:
+            return False
+        
+        # Convert string to enum
+        cat_enum = ThreatCategory[category.upper()]
+        sev_enum = ThreatSeverity[severity.upper()]
+        
+        # Add to blacklist
+        self.blacklist_manager.add_entry(
+            entity_id=node_id,
+            entity_type="node",
+            category=cat_enum,
+            severity=sev_enum,
+            reason=reason,
+            blocked_by=blocked_by
+        )
+        
+        # Remove node from active nodes if present
+        if node_id in self.nodes:
+            del self.nodes[node_id]
+        
+        return True
+    
+    def unblock_node(self, node_id: str) -> bool:
+        """
+        Unblock a node by removing it from the blacklist.
+        
+        Args:
+            node_id: Node to unblock
+            
+        Returns:
+            True if node was unblocked, False if not found or blacklist disabled
+        """
+        if not self.blacklist_enabled:
+            return False
+        
+        return self.blacklist_manager.remove_entry(node_id)
+    
+    def get_blacklist_status(self) -> Optional[Dict]:
+        """
+        Get blacklist statistics and status.
+        
+        Returns:
+            Blacklist status dictionary or None if blacklist is disabled
+        """
+        if not self.blacklist_enabled:
+            return None
+        
+        return self.blacklist_manager.get_statistics()
+    
     def get_protocol_status(self) -> Dict:
         """
         Get comprehensive status of the protocol.
@@ -296,7 +396,7 @@ class EternalResonanceProtocol:
         Returns:
             Status dictionary with all protocol metrics
         """
-        return {
+        status = {
             'protocol_version': '1.0.0',
             'mission': MISSION_STATEMENT,
             'resonance_frequency_hz': RESONANCE_FREQUENCY_HZ,
@@ -310,6 +410,15 @@ class EternalResonanceProtocol:
             'k_symbiosis_operations': sum(len(ops) for ops in self.k_symbiosis_modules.values()),
             'timestamp': datetime.now(timezone.utc).isoformat()
         }
+        
+        # Add blacklist status if enabled
+        if self.blacklist_enabled:
+            status['blacklist_enabled'] = True
+            status['blacklist_statistics'] = self.get_blacklist_status()
+        else:
+            status['blacklist_enabled'] = False
+        
+        return status
     
     def export_state(self) -> Dict:
         """

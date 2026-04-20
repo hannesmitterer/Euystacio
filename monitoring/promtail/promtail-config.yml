@@ -1,0 +1,63 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  # Euystacio application logs
+  - job_name: euystacio-app
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: euystacio-app
+          __path__: /var/log/euystacio/*.log
+
+  # Intrusion detection logs
+  - job_name: intrusion-logs
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: intrusion
+          alert_level: critical
+          __path__: /var/log/euystacio/intrusion*.log
+    pipeline_stages:
+      - regex:
+          expression: '(?P<timestamp>\S+)\s+(?P<level>\S+)\s+(?P<message>.*)'
+      - labels:
+          level:
+          timestamp:
+
+  # Node status logs
+  - job_name: node-status
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: node-status
+          __path__: /var/log/euystacio/node*.log
+
+  # System logs
+  - job_name: system
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: system-logs
+          __path__: /var/log/host/{syslog,messages,auth.log}
+
+  # Security events
+  - job_name: security-events
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: security
+          alert_level: high
+          __path__: /var/log/euystacio/security*.log

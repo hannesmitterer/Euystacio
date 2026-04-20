@@ -477,6 +477,41 @@ docker run -p 8080:8080 \
 
 ---
 
+---
+
+## 🔐 Resilience and Security Operations
+
+Euystacio now includes comprehensive security and resilience features for decentralized operations:
+
+### Real-time Monitoring Dashboard
+- **Grafana + Loki + Prometheus** stack for real-time visibility
+- Node status, latency tracking, and intrusion detection
+- 30-day log retention with centralized management
+
+### Forensic Response Automation
+- Automated log monitoring with pattern detection
+- Intelligent Tor/VPN routing activation on suspicious activity
+- Configurable response actions and alert thresholds
+
+### Secure Firmware Updates
+- Cryptographic signature verification (GPG)
+- SHA-512 checksum validation
+- Automatic rollback on failure
+
+### Distributed Encrypted Backups
+- GnuPG encryption for all backups
+- IPFS distributed storage for redundancy
+- Automated backup scheduling and rotation
+
+### Hardened Communication Protocols
+- QUIC protocol with mandatory TLS 1.3
+- No fallback to unencrypted protocols
+- Low-latency, secure communication
+
+**[➡️ Read Full Security Guide](./RESILIENCE_SECURITY_GUIDE.md)**
+
+---
+
 ## Security
 
 ### Best Practices

@@ -22,6 +22,22 @@ The Euystacio ecosystem now features the **Eternal Resonance Protocol (ERP)** - 
 
 ---
 
+## 🌱 Seedbringer: All is Open Source
+
+**NEW**: Euystacio now includes comprehensive documentation for the **Seedbringer** open-source vision—a philosophy and technical framework for building decentralized, accessible, and permanent systems.
+
+**👉 [Start with the Seedbringer Index](./SEEDBRINGER_INDEX.md)** - Complete guide to the open-source vision
+
+### Core Seedbringer Resources
+
+- 📜 **[Seedbringer Manifesto](./SEEDBRINGER_MANIFESTO.md)** - Philosophy and foundational principles
+- 🚀 **[Getting Started Guide](./GETTING_STARTED.md)** - Accessible introduction for everyone
+- 🔧 **[Technical Blueprint](./TECHNICAL_BLUEPRINT.md)** - Implementation guide for builders
+- 🌍 **[Example Projects](./examples/)** - Working templates for renewable energy, knowledge bases, ecological monitoring
+- ⚖️ **[License](./LICENSE)** - MIT & Sacred Commons dual licensing
+
+---
+
 ## Overview
 
 Euystacio Nexus is a comprehensive API platform for coordinating AI agents, managing distributed tasks, processing real-time telemetry, and facilitating secure communication across the Euystacio ecosystem. It serves as the central nervous system for AI-powered applications.
@@ -586,9 +602,19 @@ We welcome contributions! Please follow these steps:
 
 ## Support & Resources
 
+### Seedbringer Documentation
+- 🌱 **[Seedbringer Index](./SEEDBRINGER_INDEX.md)** - Complete open-source vision guide
+- 📜 **[Manifesto](./SEEDBRINGER_MANIFESTO.md)** - Philosophy and principles
+- 🚀 **[Getting Started](./GETTING_STARTED.md)** - Accessible introduction
+- 🔧 **[Technical Blueprint](./TECHNICAL_BLUEPRINT.md)** - Implementation guide
+- 🌍 **[Example Projects](./examples/)** - Working templates
+
+### Technical Documentation
 - 📚 **Full API Spec:** [NEXUS_API_SPEC.md](./NEXUS_API_SPEC.md)
 - 🚀 **Deployment Guide:** [DEPLOY_INSTRUCTIONS.md](./DEPLOY_INSTRUCTIONS.md)
 - 🔐 **Security Runbook:** [SECURITY_RUNBOOK.md](./SECURITY_RUNBOOK.md)
+
+### Community
 - 📧 **Support:** support@euystacio.io
 - 🐛 **Issues:** https://github.com/hannesmitterer/Euystacio/issues
 - 💬 **Discussions:** https://github.com/hannesmitterer/Euystacio/discussions
@@ -633,7 +659,11 @@ All funding is tracked with complete transparency. See [SUPPORT.md](./SUPPORT.md
 
 ## License
 
-See [SACRED_COMMONS_LICENSE.md](./SACRED_COMMONS_LICENSE.md) for license information.
+This project is dual-licensed:
+- **[MIT License](./LICENSE)** - Permissive open-source license for code and documentation
+- **[Sacred Commons License](./SACRED_COMMONS_LICENSE.md)** - Ensures accessibility and prevents enclosure
+
+**"All is Open Source"** - See [Seedbringer Manifesto](./SEEDBRINGER_MANIFESTO.md) for our commitment to transparency, collaboration, equity, and permanence.
 
 ---
 

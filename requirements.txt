@@ -1,2 +1,8 @@
 fastapi
 uvicorn
+# Security enhancement dependencies
+# Note: For production, install these additional packages:
+# pip install cryptography  # For production cryptographic operations
+# pip install liboqs-python  # For NIST PQC standardized algorithms (NTRU, Kyber, Dilithium)
+# pip install tensorflow  # For real ML-based anomaly detection
+# The current implementation uses built-in libraries for demonstration purposes

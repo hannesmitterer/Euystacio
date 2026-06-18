@@ -1,0 +1,29 @@
+# Euystacio GitHub Pages Configuration
+theme: minima
+title: Euystacio Nexus API
+description: The Holy Bridge - Unified AI Coordination Platform
+url: https://hannesmitterer.github.io
+baseurl: /Euystacio
+
+# Build settings
+markdown: kramdown
+
+# Exclude from processing
+exclude:
+  - node_modules/
+  - vendor/
+  - .git/
+  - .github/
+  - package.json
+  - package-lock.json
+  - tsconfig.json
+  - requirements.txt
+  - "*.py"
+  - "*.pyc"
+  - contracts/
+  - scripts/
+  - src/
+  - dist/
+  - Procfile
+  - .env.example
+  - .gitignore
